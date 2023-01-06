@@ -9,11 +9,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
-public class Posts {
+@Setter
+@NoArgsConstructor
+public class Posts extends BaseEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -53,4 +58,25 @@ public class Posts {
     Double latitude = 0d;
 
     Double longitude = 0d;
+
+    @Builder
+    public Posts(Long id, String title, String content, String photos, Long viewCount, Users users, Long replyCount, Long likeCount, Long dislikeCount, String topic, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.photos = photos;
+        this.viewCount = viewCount;
+        this.users = users;
+        this.replyCount = replyCount;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
+        this.topic = topic;
+        this.addressName = addressName;
+        this.region1depthName = region1depthName;
+        this.region2depthName = region2depthName;
+        this.region3depthName = region3depthName;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
 }

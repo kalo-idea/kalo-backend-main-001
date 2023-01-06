@@ -12,7 +12,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class LikePetitions {
+public class LikePetitions extends BaseEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

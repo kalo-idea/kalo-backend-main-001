@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import kalo.main.domain.Ledgers;
 
 public interface LedgersRepository extends JpaRepository<Ledgers, Long> {
-    Optional<List<Ledgers>> findByUsersIdOrderByCreatedAtDesc(String userId);
+    Optional<List<Ledgers>> findByUsersIdOrderByCreatedDateDesc(String userId);
 }
