@@ -1,4 +1,4 @@
-package kalo.main.domain.dto;
+package kalo.main.domain.dto.users;
 
 import java.time.LocalDateTime;
 
