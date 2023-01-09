@@ -37,11 +37,11 @@ public class Auths extends BaseEntity {
 
     String address;
 
-    @Column(length = 16)
-    String sido;
+    @Column(length = 32)
+    String region1depthName;
 
-    @Column(length = 16)
-    String sigugun;
+    @Column(length = 32)
+    String region2depthName;
 
     @Column(columnDefinition = "TINYINT", length = 1)
     Boolean promotionCheck;

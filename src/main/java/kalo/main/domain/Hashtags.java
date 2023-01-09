@@ -7,14 +7,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-public class Hashtags {
+@NoArgsConstructor
+public class Hashtags extends BaseEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(length = 32)
     String word;
+
+
+    public Hashtags(String word) {
+        this.word = word;
+    }
 }

@@ -1,4 +1,4 @@
-package kalo.kaloAdmin_kaloAdmin.config;
+package kalo.main.config;
 
 import java.security.Key;
 import java.util.Date;
@@ -20,21 +20,19 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import kalo.kaloAdmin_kaloAdmin.domain.Role;
-import kalo.kaloAdmin_kaloAdmin.domain.dto.LoginDto.LoginInfoDto;
+import kalo.main.domain.dto.users.LoginInfoDto;
 
 @Service
 public class JwtService {
     private String secretKey = "56g4hftfghtrd46fhgd4tr56hgbdrov34y0f4d5t6fgdrt546";
 
-    public String createJwt(Long id, Role role, String username) {
+    public String createJwt(Long id, String username) {
         Map<String, Object> headerMap = new HashMap<String, Object>();
         headerMap.put("typ", "JWT");
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("id", id);
         map.put("username", username);
-        map.put("role", role);
 
         Date expireTime  = new Date();
         expireTime.setTime(expireTime.getTime() + 1000 * 60 * 1);
@@ -88,10 +86,9 @@ public class JwtService {
         }
 
         Long id = claims.getBody().get("id",Long.class);
-        Role role = claims.getBody().get("role",Role.class);
         String username = claims.getBody().get("username",String.class);
 
-        return new LoginInfoDto(id, role, username);
+        return new LoginInfoDto(id, username);
     }
 
     public String getJwt(){
