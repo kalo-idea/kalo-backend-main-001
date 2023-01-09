@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import kalo.main.domain.dto.posts.CreatePostsDto;
-import kalo.main.domain.dto.posts.ViewPostsDto;
+import kalo.main.domain.dto.post.CreatePostDto;
+import kalo.main.domain.dto.post.ViewPostDto;
 import kalo.main.domain.dto.users.OnlyUserIdDto;
 import kalo.main.service.PostsService;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ public class PostController {
 
     // 글 작성
     @PostMapping("/posts")
-    public void createPosts(@RequestBody CreatePostsDto createPostsDto) {
-        log.info("at controller userId:{}", createPostsDto.getUsersId());
+    public void createPosts(@RequestBody CreatePostDto createPostsDto) {
+        log.info("at controller userId:{}", createPostsDto.getUserId());
         postsService.createPosts(createPostsDto);
     }
 
     // 글 단건 조회
     @PostMapping("/posts/{postId}")
-    public ViewPostsDto viewPosts(@PathVariable Long postId, @RequestBody OnlyUserIdDto onlyUserIdDto) {
+    public ViewPostDto viewPosts(@PathVariable Long postId, @RequestBody OnlyUserIdDto onlyUserIdDto) {
         return postsService.viewPosts(postId, onlyUserIdDto.getUserId());
     }
 }

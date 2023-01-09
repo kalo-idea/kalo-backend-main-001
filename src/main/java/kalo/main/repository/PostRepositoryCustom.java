@@ -1,7 +1,7 @@
 package kalo.main.repository;
 
-import kalo.main.domain.dto.posts.GetPostsWriter;
+import kalo.main.domain.dto.post.GetPostWriter;
 
 public interface PostRepositoryCustom {
-    GetPostsWriter findWriter(Long postId);
+    GetPostWriter findWriter(Long postId);
 }
