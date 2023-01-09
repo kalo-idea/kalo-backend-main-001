@@ -7,17 +7,17 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kalo.main.domain.Hashtags;
-import kalo.main.domain.Posts;
-import kalo.main.domain.PostsHashtags;
-import kalo.main.domain.dto.posts.CreatePostsDto;
-import kalo.main.domain.dto.posts.GetPostsWriter;
-import kalo.main.domain.dto.posts.ViewPostsDto;
-import kalo.main.repository.DislikePostsRepository;
-import kalo.main.repository.HashtagsRepository;
-import kalo.main.repository.LikePostsRepository;
-import kalo.main.repository.PostsHashtagsRepository;
-import kalo.main.repository.PostsRepository;
+import kalo.main.domain.Hashtag;
+import kalo.main.domain.Post;
+import kalo.main.domain.PostHashtag;
+import kalo.main.domain.dto.post.CreatePostDto;
+import kalo.main.domain.dto.post.GetPostWriter;
+import kalo.main.domain.dto.post.ViewPostDto;
+import kalo.main.repository.DislikePostRepository;
+import kalo.main.repository.HashtagRepository;
+import kalo.main.repository.LikePostRepository;
+import kalo.main.repository.PostHashtagRepository;
+import kalo.main.repository.PostRepository;
 import kalo.main.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -27,21 +27,21 @@ import lombok.RequiredArgsConstructor;
 public class PostsService {
     
     private final UsersRepository usersRepository;
-    private final PostsRepository postsRepository;
-    private final HashtagsRepository hashtagsRepository;
-    private final PostsHashtagsRepository postsHashtagsRepository;
-    private final LikePostsRepository likePostsRepository;
-    private final DislikePostsRepository dislikePostsRepository;
+    private final PostRepository postsRepository;
+    private final HashtagRepository hashtagsRepository;
+    private final PostHashtagRepository postsHashtagsRepository;
+    private final LikePostRepository likePostsRepository;
+    private final DislikePostRepository dislikePostsRepository;
 
 
-    public Long createPosts(CreatePostsDto createPostsDto) {
+    public Long createPosts(CreatePostDto createPostsDto) {
 
-        Posts posts = Posts.builder()
+        Post posts = Post.builder()
         .title(createPostsDto.getTitle())
         .content(createPostsDto.getContent())
         .photos(createPostsDto.getPhotos())
         .viewCount(0L)
-        .users(usersRepository.findById(createPostsDto.getUsersId()).get())
+        .user(usersRepository.findById(createPostsDto.getUserId()).get())
         .replyCount(0L)
         .likeCount(0L)
         .dislikeCount(0L)
@@ -54,24 +54,24 @@ public class PostsService {
         .longitude(createPostsDto.getLongitude())
         .build();
 
-        Posts resultPost = postsRepository.save(posts);
+        Post resultPost = postsRepository.save(posts);
 
         List<String> hashtags = createPostsDto.getHashtags();
         for (String hashtag : hashtags) {
             try {
                 // hashtag find
-                PostsHashtags postsHashtags = PostsHashtags.builder()
-                    .posts(resultPost)
-                    .hashtags(hashtagsRepository.findByWord(hashtag).orElseThrow())
+                PostHashtag postsHashtags = PostHashtag.builder()
+                    .post(resultPost)
+                    .hashtag(hashtagsRepository.findByWord(hashtag).orElseThrow())
                     .build();
                 postsHashtagsRepository.save(postsHashtags);
             } catch(NoSuchElementException e) {
                 // hashtag make
-                Hashtags makeHashtag = new Hashtags(hashtag);
+                Hashtag makeHashtag = new Hashtag(hashtag);
                 hashtagsRepository.save(makeHashtag);
-                PostsHashtags postsHashtags = PostsHashtags.builder()
-                    .posts(resultPost)
-                    .hashtags(makeHashtag)
+                PostHashtag postsHashtags = PostHashtag.builder()
+                    .post(resultPost)
+                    .hashtag(makeHashtag)
                     .build();
                 postsHashtagsRepository.save(postsHashtags);
             }
@@ -80,24 +80,24 @@ public class PostsService {
         return resultPost.getId();
     }
 
-    public ViewPostsDto viewPosts(Long postId, Long viewerId) {
-        Boolean isLike = likePostsRepository.findByPostsIdAndUsersId(postId, viewerId).isPresent();
-        Boolean isDislike = dislikePostsRepository.findByPostsIdAndUsersId(postId, viewerId).isPresent();
-        GetPostsWriter findPost = postsRepository.findWriter(postId);
-        Posts post = postsRepository.findById(postId).get();
-        List<Hashtags> hashs = hashtagsRepository.findPostsHashtags(postId);
+    public ViewPostDto viewPosts(Long postId, Long viewerId) {
+        Boolean isLike = likePostsRepository.findByPostIdAndUserId(postId, viewerId).isPresent();
+        Boolean isDislike = dislikePostsRepository.findByPostIdAndUserId(postId, viewerId).isPresent();
+        GetPostWriter findWriter = postsRepository.findWriter(postId);
+        Post post = postsRepository.findById(postId).get();
+        List<Hashtag> hashs = hashtagsRepository.findPostHashtags(postId);
 
         List<String> hashtags = new ArrayList();
 
-        for (Hashtags hash : hashs) {
+        for (Hashtag hash : hashs) {
             hashtags.add(hash.getWord());
         }
         post.setViewCount(post.getViewCount() + 1);
 
-        return ViewPostsDto.builder()
-        .userId(findPost.getUserId())
-        .nickname(findPost.getNickname())
-        .profileSrc(findPost.getProfileSrc())
+        return ViewPostDto.builder()
+        .userId(findWriter.getUserId())
+        .nickname(findWriter.getNickname())
+        .profileSrc(findWriter.getProfileSrc())
         .title(post.getTitle())
         .createdDate(post.getCreatedDate())
         .content(post.getContent())
