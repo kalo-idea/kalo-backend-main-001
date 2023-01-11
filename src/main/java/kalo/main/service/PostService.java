@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import kalo.main.domain.Hashtag;
 import kalo.main.domain.Post;
 import kalo.main.domain.PostHashtag;
+import kalo.main.domain.User;
 import kalo.main.domain.dto.post.CreatePostDto;
-import kalo.main.domain.dto.post.GetPostWriter;
-import kalo.main.domain.dto.post.ViewPostDto;
+import kalo.main.domain.dto.post.ReadPostDto;
 import kalo.main.repository.DislikePostRepository;
 import kalo.main.repository.HashtagRepository;
 import kalo.main.repository.LikePostRepository;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PostsService {
+public class PostService {
     
     private final UsersRepository usersRepository;
     private final PostRepository postsRepository;
@@ -34,7 +34,7 @@ public class PostsService {
     private final DislikePostRepository dislikePostsRepository;
 
 
-    public Long createPosts(CreatePostDto createPostsDto) {
+    public Long createPost(CreatePostDto createPostsDto) {
 
         Post posts = Post.builder()
         .title(createPostsDto.getTitle())
@@ -62,7 +62,7 @@ public class PostsService {
                 // hashtag find
                 PostHashtag postsHashtags = PostHashtag.builder()
                     .post(resultPost)
-                    .hashtag(hashtagsRepository.findByWord(hashtag).orElseThrow())
+                    .hashtag(hashtagsRepository.findByWordAndDeleted(hashtag, false).orElseThrow())
                     .build();
                 postsHashtagsRepository.save(postsHashtags);
             } catch(NoSuchElementException e) {
@@ -80,24 +80,24 @@ public class PostsService {
         return resultPost.getId();
     }
 
-    public ViewPostDto viewPosts(Long postId, Long viewerId) {
-        Boolean isLike = likePostsRepository.findByPostIdAndUserId(postId, viewerId).isPresent();
-        Boolean isDislike = dislikePostsRepository.findByPostIdAndUserId(postId, viewerId).isPresent();
-        GetPostWriter findWriter = postsRepository.findWriter(postId);
+    public ReadPostDto viewPosts(Long postId, Long viewerId) {
+        Boolean isLike = likePostsRepository.findByPostIdAndUserIdAndDeleted(postId, viewerId, false).isPresent();
+        Boolean isDislike = dislikePostsRepository.findByPostIdAndUserIdAndDeleted(postId, viewerId, false).isPresent();
         Post post = postsRepository.findById(postId).get();
+        User writer = usersRepository.findById(post.getUser().getId()).get();
         List<Hashtag> hashs = hashtagsRepository.findPostHashtags(postId);
-
         List<String> hashtags = new ArrayList();
 
         for (Hashtag hash : hashs) {
             hashtags.add(hash.getWord());
         }
+        
         post.setViewCount(post.getViewCount() + 1);
 
-        return ViewPostDto.builder()
-        .userId(findWriter.getUserId())
-        .nickname(findWriter.getNickname())
-        .profileSrc(findWriter.getProfileSrc())
+        return ReadPostDto.builder()
+        .userId(writer.getId())
+        .nickname(writer.getNickname())
+        .profileSrc(writer.getProfileSrc())
         .title(post.getTitle())
         .createdDate(post.getCreatedDate())
         .content(post.getContent())

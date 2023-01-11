@@ -6,4 +6,5 @@ import kalo.main.domain.Hashtag;
 
 public interface HashtagRepositoryCustom {
     List<Hashtag> findPostHashtags(Long postId);
+    List<Hashtag> findPetitionHashtags(Long petitionId);
 }

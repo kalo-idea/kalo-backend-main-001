@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import kalo.main.domain.Petition;
 
-public interface PetitionRepository extends JpaRepository<Petition, Long> {
+public interface PetitionRepository extends JpaRepository<Petition, Long>, PetitionRepositoryCustom {
     
 }
