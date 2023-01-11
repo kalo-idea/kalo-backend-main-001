@@ -26,49 +26,49 @@ import kalo.main.domain.dto.users.LoginInfoDto;
 public class JwtService {
     private String secretKey = "56g4hftfghtrd46fhgd4tr56hgbdrov34y0f4d5t6fgdrt546";
 
-    public String createJwt(Long id, String username) {
-        Map<String, Object> headerMap = new HashMap<String, Object>();
-        headerMap.put("typ", "JWT");
+    // public String createJwt(Long id, String username) {
+    //     Map<String, Object> headerMap = new HashMap<String, Object>();
+    //     headerMap.put("typ", "JWT");
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", id);
-        map.put("username", username);
+    //     Map<String, Object> map = new HashMap<String, Object>();
+    //     map.put("id", id);
+    //     map.put("username", username);
 
-        Date expireTime  = new Date();
-        expireTime.setTime(expireTime.getTime() + 1000 * 60 * 1);
+    //     Date expireTime  = new Date();
+    //     expireTime.setTime(expireTime.getTime() + 1000 * 60 * 1);
 
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
-        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+    //     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    //     byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
+    //     Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
-        JwtBuilder builder = Jwts.builder()
-            .setHeader(headerMap)
-            .setClaims(map)
-            .setExpiration(expireTime)
-            .signWith(signatureAlgorithm, signingKey);
+    //     JwtBuilder builder = Jwts.builder()
+    //         .setHeader(headerMap)
+    //         .setClaims(map)
+    //         .setExpiration(expireTime)
+    //         .signWith(signatureAlgorithm, signingKey);
 
-        return builder.compact();
-    }
+    //     return builder.compact();
+    // }
 
-    public boolean checkJwt() throws Exception {
-        String jwt = getJwt();
-        try {
-            Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
-                    .parseClaimsJws(jwt).getBody();
+    // public boolean checkJwt() throws Exception {
+    //     String jwt = getJwt();
+    //     try {
+    //         Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
+    //                 .parseClaimsJws(jwt).getBody();
 
-            System.out.println("토큰 정상");
-            System.out.println("expireTime :" + claims.getExpiration());
-            System.out.println("name :" + claims.get("name"));
-            System.out.println("Id :" + claims.get("id"));
-            return true;
-        } catch (ExpiredJwtException exception) {
-            System.out.println("토큰 만료");
-            return false;
-        } catch (JwtException exception) {
-            System.out.println("토큰 변조");
-            return false;
-        }
-    }
+    //         System.out.println("토큰 정상");
+    //         System.out.println("expireTime :" + claims.getExpiration());
+    //         System.out.println("name :" + claims.get("name"));
+    //         System.out.println("Id :" + claims.get("id"));
+    //         return true;
+    //     } catch (ExpiredJwtException exception) {
+    //         System.out.println("토큰 만료");
+    //         return false;
+    //     } catch (JwtException exception) {
+    //         System.out.println("토큰 변조");
+    //         return false;
+    //     }
+    // }
 
     public LoginInfoDto getInfo() {
         String accessToken = getJwt();

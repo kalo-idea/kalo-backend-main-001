@@ -8,10 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class LikePetitionReply extends BaseEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +22,16 @@ public class LikePetitionReply extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "petition_reply_id")
-    PetitionReply petitionsReply;
+    PetitionReply petitionReply;
 
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
+
+    @Builder
+    public LikePetitionReply(PetitionReply petitionReply, User user) {
+        this.petitionReply = petitionReply;
+        this.user = user;
+    }
 }

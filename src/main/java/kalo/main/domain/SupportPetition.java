@@ -8,10 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class SupportPetition extends BaseEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +29,13 @@ public class SupportPetition extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "petition_id")
     Petition petition;
+
+    @Builder
+    public SupportPetition(Long id, String nickname, User user, Petition petition) {
+        this.id = id;
+        this.nickname = nickname;
+        this.user = user;
+        this.petition = petition;
+    }
+
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Builder
-public class ViewPostDto{
+public class ReadPostDto{
 
     Long userId;
     String nickname;
@@ -45,7 +45,7 @@ public class ViewPostDto{
     String region2depthName;
 
     @QueryProjection
-    public ViewPostDto(Long userId, String nickname, String profileSrc, String title, LocalDateTime createdDate, String content, List<String> hashtags, String photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName) {
+    public ReadPostDto(Long userId, String nickname, String profileSrc, String title, LocalDateTime createdDate, String content, List<String> hashtags, String photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName) {
         this.userId = userId;
         this.nickname = nickname;        
         this.profileSrc = profileSrc;

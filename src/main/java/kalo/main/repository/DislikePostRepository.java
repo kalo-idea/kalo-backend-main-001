@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import kalo.main.domain.DislikePost;
 
 public interface DislikePostRepository extends JpaRepository<DislikePost, Long> {
-    Optional<DislikePost> findByPostIdAndUserId(Long postsId, Long userId);
+    Optional<DislikePost> findByPostIdAndUserIdAndDeleted(Long postsId, Long userId, Boolean deleted);
 }

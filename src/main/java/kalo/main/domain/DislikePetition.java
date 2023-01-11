@@ -8,10 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class DislikePetition extends BaseEntity{
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +27,10 @@ public class DislikePetition extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
+
+    @Builder
+    public DislikePetition(Petition petition, User user) {
+        this.petition = petition;
+        this.user = user;
+    }
 }
