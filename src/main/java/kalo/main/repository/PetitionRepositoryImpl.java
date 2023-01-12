@@ -95,7 +95,8 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .join(likePetition.petition, petition)
         .where(
             petition.deleted.eq(false),
-            likePetition.user.id.eq(viewerId)
+            likePetition.user.id.eq(viewerId),
+            likePetition.deleted.eq(false)
         )
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize());
@@ -134,7 +135,8 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .join(supportPetition.petition, petition)
         .where(
             petition.deleted.eq(false),
-            supportPetition.user.id.eq(viewerId)
+            supportPetition.user.id.eq(viewerId),
+            supportPetition.deleted.eq(false)
         )
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize());
