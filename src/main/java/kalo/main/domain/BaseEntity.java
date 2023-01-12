@@ -27,4 +27,12 @@ public class BaseEntity {
 
     @Column(columnDefinition = "TINYINT", length = 1)
     Boolean deleted = false;
+
+    public void revive() {
+        deleted = false;
+    }
+
+    public void delete() {
+        deleted = true;
+    }
 }
