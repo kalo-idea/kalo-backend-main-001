@@ -1,6 +1,7 @@
 package kalo.main.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -67,5 +68,4 @@ public class UserService {
 
         return result;
     }
-
 }
