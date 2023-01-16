@@ -20,10 +20,11 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import kalo.main.domain.QUser;
 import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.QReadSimplePetitionsDto;
+import kalo.main.domain.dto.petition.QSupportPetitionUserListDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
+import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -150,6 +151,22 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         List<ReadSimplePetitionsDto> result = query.fetch();
 
         return result;
+    }
+
+    @Override
+    public List<SupportPetitionUserListDto> findSupportPetitionUserList(Pageable pageable, Long petitionId) {
+        return queryFactory.select(new QSupportPetitionUserListDto(
+            user.nickname,
+            user.deleted,
+            supportPetition.createdDate))
+        .from(supportPetition)
+        .join(supportPetition.user, user)
+        .join(supportPetition.petition, petition)
+        .where(petition.id.eq(petitionId))
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .orderBy(supportPetition.createdDate.desc())
+        .fetch();
     }
 
     private BooleanExpression region1Filter(String region1Name) {

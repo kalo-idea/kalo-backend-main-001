@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kalo.main.controller.BasicException;
 import kalo.main.domain.DislikePetition;
 import kalo.main.domain.DislikePetitionReply;
 import kalo.main.domain.Hashtag;
@@ -26,6 +27,7 @@ import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
+import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import kalo.main.repository.DislikePetitionReplyRepository;
 import kalo.main.repository.DislikePetitionRepository;
 import kalo.main.repository.HashtagRepository;
@@ -35,7 +37,7 @@ import kalo.main.repository.PetitionHashtagRepository;
 import kalo.main.repository.PetitionReplyRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.SupportPetitionRepository;
-import kalo.main.repository.UsersRepository;
+import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -44,7 +46,7 @@ import lombok.RequiredArgsConstructor;
 public class PetitionService {
 
     private final PetitionRepository petitionRepository;
-    private final UsersRepository usersRepository;
+    private final UserRepository usersRepository;
     private final PetitionHashtagRepository petitionHashtagRepository;
     private final HashtagRepository hashtagRepository;
     private final LikePetitionRepository likePetitionRepository;
@@ -63,7 +65,7 @@ public class PetitionService {
         .photos(createPetitionDto.getPhotos())
         .supportCount(0L)
         .viewCount(0L)
-        .user(usersRepository.findById(createPetitionDto.getUserId()).get())
+        .user(usersRepository.findById(createPetitionDto.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다.")))
         .progress("모집")
         .goal(createPetitionDto.getGoal())
         .replyCount(0L)
@@ -107,6 +109,8 @@ public class PetitionService {
     // 청원 단건 조회
     public ReadPetitionDto readPetition(Long petitionId, Long viewerId) {
 
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        
         Boolean isLike = false;
         Boolean isDislike = false;
         Boolean isSupport = false;
@@ -115,14 +119,13 @@ public class PetitionService {
             isDislike = dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, viewerId, false).isPresent();
             isSupport = supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, viewerId, false).isPresent();
         }
-        Petition petition = petitionRepository.findById(petitionId).get();
         
-        // 삭제된 게시글이면 널 반환
+        // 삭제된 청원이면 널 반환
         if (petition.getDeleted()) {
             return null;
         }
 
-        User writer = usersRepository.findById(petition.getUser().getId()).get();
+        User writer = usersRepository.findById(petition.getUser().getId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
         List<Hashtag> hashs = hashtagRepository.findPetitionHashtags(petitionId);
         List<String> hashtags = new ArrayList();
         System.out.println("writer : " + writer.getNickname());
@@ -184,9 +187,9 @@ public class PetitionService {
     // 청원 댓글 추가
     public Long createPetitionReply(CreatePetitionReplyDto createPetitionReplyDto) {
         PetitionReply petitionReply = PetitionReply.builder()
-        .user(usersRepository.findById(createPetitionReplyDto.getUserId()).get())
+        .user(usersRepository.findById(createPetitionReplyDto.getUserId()).orElseThrow(() -> new BasicException("없는 회원입니다.")))
         .content(createPetitionReplyDto.getContent())
-        .petition(petitionRepository.findById(createPetitionReplyDto.getPetitionId()).get())
+        .petition(petitionRepository.findById(createPetitionReplyDto.getPetitionId()).orElseThrow(() -> new BasicException("없는 청원입니다.")))
         .likeCount(0L)
         .dislikeCount(0L)
         .build();
@@ -208,8 +211,8 @@ public class PetitionService {
             Boolean isLike = false;
             Boolean isDislike = false;
             if (viewerId != null) {
-                likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
-                dislikePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
+                isLike = likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
+                isDislike = dislikePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
             }
             // 댓글 작성자 탈퇴의 경우
             if (reply.getUser().getDeleted()) {
@@ -250,7 +253,7 @@ public class PetitionService {
 
         List<ReadPetitionsDto> result = new ArrayList<>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
-            User writer = usersRepository.findById(simplePetition.getWriterId()).get();
+            User writer = usersRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));;
             List<String> words = new ArrayList();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
@@ -267,11 +270,11 @@ public class PetitionService {
         return result;
     }
 
-    // 게시글 좋아요, 좋아요 취소
+    // 청원 좋아요, 좋아요 취소
     // 좋아요 클릭
     public LikeDislikeResDto likePetition(Long petitionId, Long userId) {
-        Petition petition = petitionRepository.findById(petitionId).get();
-        User user = usersRepository.findById(userId).get();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        User user = usersRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
         // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
         if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
@@ -311,11 +314,11 @@ public class PetitionService {
         return result;
     }
 
-    // 게시글 싫어요, 싫어요 취소
+    // 청원 싫어요, 싫어요 취소
     // 싫어요 클릭
     public LikeDislikeResDto dislikePetition(Long petitionId, Long userId) {
-        Petition petition = petitionRepository.findById(petitionId).get();
-        User user = usersRepository.findById(userId).get();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        User user = usersRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
         // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
         if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
@@ -359,8 +362,8 @@ public class PetitionService {
     // 댓글 좋아요 좋아요 취소
     // 댓글 좋아요 클릭
     public LikeDislikeResDto likePetitionReply(Long replyId, Long userId) {
-        PetitionReply reply = petitionReplyRepository.findById(replyId).get();
-        User user = usersRepository.findById(userId).get();
+        PetitionReply reply = petitionReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
+        User user = usersRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
         // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
         if (likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
@@ -403,8 +406,8 @@ public class PetitionService {
     // 댓글 싫어요 싫어요 취소
     // 댓글 싫어요 클릭
     public LikeDislikeResDto dislikePetitionReply(Long replyId, Long userId) {
-        PetitionReply reply = petitionReplyRepository.findById(replyId).get();
-        User user = usersRepository.findById(userId).get();
+        PetitionReply reply = petitionReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
+        User user = usersRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
         // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
         if (likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
@@ -448,11 +451,11 @@ public class PetitionService {
     // 청원 참여
     public ReadPetitionDto supportingPetition(Long petitionId, Long userId) {
 
-        Petition petition = petitionRepository.findById(petitionId).get();
-        User user = usersRepository.findById(userId).get();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        User user = usersRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
 
         if (supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
-            throw new RuntimeException("이미 참여한 청원입니다.");
+            throw new BasicException("이미 참여한 청원입니다.");
         }
 
         SupportPetition supportPetition = SupportPetition.builder()
@@ -467,6 +470,19 @@ public class PetitionService {
     }
 
     // 청원 참여 회원 리스트 조회
-    // 리턴 값 몰라서 미룸
+    public List<SupportPetitionUserListDto> getSupportPetitionList(Pageable pageable, Long petitionId) {
+        List<SupportPetitionUserListDto> res = petitionRepository.findSupportPetitionUserList(pageable, petitionId);
 
+        for (SupportPetitionUserListDto supportPetitionUser : res) {
+            String nickname = supportPetitionUser.getNickname();
+            int len = nickname.length() - 1;
+            
+            String convertNickname = nickname.substring(0, 1);
+            while(len-- > 0) {
+                convertNickname += "*";
+            }
+            supportPetitionUser.setNickname(convertNickname);
+        }
+        return res;
+    } 
 }

@@ -8,10 +8,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
+@NoArgsConstructor
 public class Auth extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -49,4 +54,23 @@ public class Auth extends BaseEntity {
     String fcmToken;
 
     LocalDateTime recentLogin;
+
+    @Builder
+    public Auth(Long id, String type, String kakao, String email, String name, LocalDateTime birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin) {
+        this.id = id;
+        this.type = type;
+        this.kakao = kakao;
+        this.email = email;
+        this.name = name;
+        this.birth = birth;
+        this.gender = gender;
+        this.tel = tel;
+        this.address = address;
+        this.region1depthName = region1depthName;
+        this.region2depthName = region2depthName;
+        this.promotionCheck = promotionCheck;
+        this.fcmToken = fcmToken;
+        this.recentLogin = recentLogin;
+    }
+    
 }

@@ -2,6 +2,8 @@ package kalo.main.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,6 +20,7 @@ import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
 import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
+import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import kalo.main.service.PetitionService;
 import lombok.RequiredArgsConstructor;
 
@@ -28,33 +31,33 @@ public class PetitionController {
     private final PetitionService petitionService;
 
     // 청원 작성
-    @PostMapping("/create_petition")
-    public void createPetition(@RequestBody CreatePetitionDto createPetitionDto) {
+    @PostMapping("/create-petition")
+    public void createPetition(@Valid @RequestBody CreatePetitionDto createPetitionDto) {
         petitionService.createPetition(createPetitionDto);
     }
 
     // 청원 단건 조회
-    @GetMapping("/public/get_petition")
+    @GetMapping("/public/get-petition")
     public ReadPetitionDto readPetition(TargetIdUserIdDto req) {
         return petitionService.readPetition(req.getTargetId(), req.getUserId());
     }
 
     // 청원 댓글 추가
-    @PostMapping("/create_petition_reply")
-    public void createPetitionReply(@RequestBody CreatePetitionReplyDto createPetitionReplyDto) {
+    @PostMapping("/create-petition-reply")
+    public void createPetitionReply(@Valid @RequestBody CreatePetitionReplyDto createPetitionReplyDto) {
         petitionService.createPetitionReply(createPetitionReplyDto);
     }
 
     // 청원 댓글 조회
-    @GetMapping("/public/get_petition_replys")
+    @GetMapping("/public/get-petition-replys")
     public List<ReplyDto> readComments(
         @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-        @RequestBody TargetIdUserIdDto req) {
+        TargetIdUserIdDto req) {
         return petitionService.readPetitionsReply(req.getTargetId(), req.getUserId(), pageable);
     }
 
     // 청원 리스트 조회
-    @GetMapping ("/public/get_petitions")
+    @GetMapping ("/public/get-petitions")
     public List<ReadPetitionsDto> readPetitions(
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
          PetitionCondDto cond
@@ -63,33 +66,41 @@ public class PetitionController {
     }
 
     // 청원 게시글 좋아요
-    @PostMapping("/like_petition")
-    public LikeDislikeResDto likePetition(@RequestBody TargetIdUserIdDto req) {
+    @PostMapping("/like-petition")
+    public LikeDislikeResDto likePetition(@Valid @RequestBody TargetIdUserIdDto req) {
         return petitionService.likePetition(req.getTargetId(), req.getUserId());
     }
  
     // 청원 게시글 싫어요
-    @PostMapping("/dislike_petition")
-    public LikeDislikeResDto dislikePetition(@RequestBody TargetIdUserIdDto req) {
+    @PostMapping("/dislike-petition")
+    public LikeDislikeResDto dislikePetition(@Valid @RequestBody TargetIdUserIdDto req) {
         return petitionService.dislikePetition(req.getTargetId(), req.getUserId());
     }
 
     // 청원 댓글 좋아요
-    @PostMapping("/like_petition_reply")
-    public LikeDislikeResDto likePetitionReply(@RequestBody TargetIdUserIdDto req) {
+    @PostMapping("/like-petition-reply")
+    public LikeDislikeResDto likePetitionReply(@Valid @RequestBody TargetIdUserIdDto req) {
         return petitionService.likePetitionReply(req.getTargetId(), req.getUserId());
     }
  
     // 청원 댓글 싫어요
-    @PostMapping("/dislike_petition_reply")
-    public LikeDislikeResDto dislikePetitionReply(@RequestBody TargetIdUserIdDto req) {
+    @PostMapping("/dislike-petition-reply")
+    public LikeDislikeResDto dislikePetitionReply(@Valid @RequestBody TargetIdUserIdDto req) {
         return petitionService.dislikePetitionReply(req.getTargetId(), req.getUserId());
     }
 
     // 청원 참여하기
-    @PostMapping("/support_petition")
-    public ReadPetitionDto TargetId (TargetIdUserIdDto req) {
+    @PostMapping("/support-petition")
+    public ReadPetitionDto TargetId (@Valid @RequestBody TargetIdUserIdDto req) {
         return petitionService.supportingPetition(req.getTargetId(), req.getUserId());
+    }
+
+    // 청원 참여 리스트
+    @GetMapping("/public/get-support-users")
+    public List<SupportPetitionUserListDto> getSupportPetitionList(
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        Long petitionId) {
+        return petitionService.getSupportPetitionList(pageable, petitionId);
     }
 
 }
