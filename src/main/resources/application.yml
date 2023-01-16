@@ -6,9 +6,9 @@ spring:
     active: main
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/new_kalo
-    username: root
-    password: Abcd123@
+    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test
+    username: user
+    password: user1234U
   jpa:
     hibernate:
       ddl-auto: update
