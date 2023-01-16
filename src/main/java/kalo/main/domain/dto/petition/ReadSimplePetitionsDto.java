@@ -1,7 +1,6 @@
 package kalo.main.domain.dto.petition;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.querydsl.core.annotations.QueryProjection;
 

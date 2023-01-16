@@ -9,10 +9,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
+@NoArgsConstructor
 public class User extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +36,16 @@ public class User extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="auth_id")
     Auth auth;
+
+    @Builder
+    public User(Long id, String type, String nickname, String intro, String profileSrc, String publicInfos, Auth auth) {
+        this.id = id;
+        this.type = type;
+        this.nickname = nickname;
+        this.intro = intro;
+        this.profileSrc = profileSrc;
+        this.publicInfos = publicInfos;
+        this.auth = auth;
+    }
+
 }

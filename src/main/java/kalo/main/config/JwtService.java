@@ -20,7 +20,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import kalo.main.domain.dto.users.LoginInfoDto;
+import kalo.main.domain.dto.user.LoginInfoDto;
 
 @Service
 public class JwtService {

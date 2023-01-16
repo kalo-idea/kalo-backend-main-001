@@ -18,7 +18,7 @@ import kalo.main.repository.HashtagRepository;
 import kalo.main.repository.LikePostRepository;
 import kalo.main.repository.PostHashtagRepository;
 import kalo.main.repository.PostRepository;
-import kalo.main.repository.UsersRepository;
+import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class PostService {
     
-    private final UsersRepository usersRepository;
+    private final UserRepository usersRepository;
     private final PostRepository postsRepository;
     private final HashtagRepository hashtagsRepository;
     private final PostHashtagRepository postsHashtagsRepository;

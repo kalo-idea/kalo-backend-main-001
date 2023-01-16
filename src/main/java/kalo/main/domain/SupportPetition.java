@@ -20,8 +20,6 @@ public class SupportPetition extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    String nickname;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
@@ -31,9 +29,8 @@ public class SupportPetition extends BaseEntity {
     Petition petition;
 
     @Builder
-    public SupportPetition(Long id, String nickname, User user, Petition petition) {
+    public SupportPetition(Long id, User user, Petition petition) {
         this.id = id;
-        this.nickname = nickname;
         this.user = user;
         this.petition = petition;
     }
