@@ -23,5 +23,5 @@ public class DislikePostReply extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_reply_id")
-    PostReply postsReply;
+    PostReply postReply;
 }

@@ -122,7 +122,7 @@ public class PetitionService {
         
         // 삭제된 청원이면 널 반환
         if (petition.getDeleted()) {
-            return null;
+            throw new BasicException("삭제된 청원입니다.");
         }
 
         User writer = usersRepository.findById(petition.getUser().getId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
