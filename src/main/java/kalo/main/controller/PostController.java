@@ -56,7 +56,6 @@ public class PostController {
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
          PostCondDto cond
     ) {
-        return null;
-        // return postService.readPosts(pageable, cond);
+        return postService.readPosts(pageable, cond);
     }
 }

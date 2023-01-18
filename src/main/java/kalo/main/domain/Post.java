@@ -28,8 +28,6 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String content = "";
 
-    String photos = "";
-
     Long viewCount = 0L;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,11 +58,10 @@ public class Post extends BaseEntity {
     Double longitude = 0d;
 
     @Builder
-    public Post(Long id, String title, String content, String photos, Long viewCount, User user, Long replyCount, Long likeCount, Long dislikeCount, String topic, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude) {
+    public Post(Long id, String title, String content, Long viewCount, User user, Long replyCount, Long likeCount, Long dislikeCount, String topic, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.photos = photos;
         this.viewCount = viewCount;
         this.user = user;
         this.replyCount = replyCount;

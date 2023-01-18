@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.querydsl.core.annotations.QueryProjection;
 
+import kalo.main.domain.dto.SimpleWriterDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +16,7 @@ public class ReadPetitionsDto {
     
     Long petitionId;
 
-    Long userId;
-    String nickname;
-    String profileSrc;
+    SimpleWriterDto writer;
     
     String title;
 
@@ -27,7 +26,7 @@ public class ReadPetitionsDto {
 
     List<String> hashtags;
 
-    String photos;
+    List<String> photos;
 
     Long likeCount;
 
@@ -49,16 +48,14 @@ public class ReadPetitionsDto {
 
     @Builder
     @QueryProjection
-    public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, Long userId, String nickname, String profileSrc, List<String> hashtags) {
+    public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> hashtags, List<String> photos) {
         this.petitionId = readSimplePetitionsDto.getPetitionId();
-        this.userId = userId;
-        this.nickname = nickname;
-        this.profileSrc = profileSrc;
+        this.writer = writer;
         this.title = readSimplePetitionsDto.getTitle();
         this.createdDate = readSimplePetitionsDto.getCreatedDate();
         this.content = readSimplePetitionsDto.getContent();
         this.hashtags = hashtags;
-        this.photos = readSimplePetitionsDto.getPhotos();
+        this.photos = photos;
         this.likeCount = readSimplePetitionsDto.getLikeCount();
         this.dislikeCount = readSimplePetitionsDto.getDislikeCount();
         this.progress = readSimplePetitionsDto.getProgress();

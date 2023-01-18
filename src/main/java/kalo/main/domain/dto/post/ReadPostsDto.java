@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.querydsl.core.annotations.QueryProjection;
 
+import kalo.main.domain.dto.SimpleWriterDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +16,7 @@ public class ReadPostsDto {
     
     Long postId;
 
-    Long userId;
-    String nickname;
-    String profileSrc;
+    SimpleWriterDto writer;
     
     String title;
 
@@ -27,15 +26,11 @@ public class ReadPostsDto {
 
     List<String> hashtags;
 
-    String photos;
+    List<String> photos;
 
     Long likeCount;
 
     Long dislikeCount;
-
-    String progress;
-
-    Long goal;
 
     Long replyCount;
 
@@ -47,20 +42,16 @@ public class ReadPostsDto {
 
     @Builder
     @QueryProjection
-    public ReadPostsDto(ReadSimplePostDto readSimplePostDto, Long userId, String nickname, String profileSrc, List<String> hashtags) {
+    public ReadPostsDto(ReadSimplePostDto readSimplePostDto, SimpleWriterDto writer, List<String> hashtags, List<String> photos) {
         this.postId = readSimplePostDto.getPostId();
-        this.userId = userId;
-        this.nickname = nickname;
-        this.profileSrc = profileSrc;
+        this.writer = writer;
         this.title = readSimplePostDto.getTitle();
         this.createdDate = readSimplePostDto.getCreatedDate();
         this.content = readSimplePostDto.getContent();
         this.hashtags = hashtags;
-        this.photos = readSimplePostDto.getPhotos();
+        this.photos = photos;
         this.likeCount = readSimplePostDto.getLikeCount();
         this.dislikeCount = readSimplePostDto.getDislikeCount();
-        this.progress = readSimplePostDto.getProgress();
-        this.goal = readSimplePostDto.getGoal();
         this.replyCount = readSimplePostDto.getReplyCount();
         this.topic = readSimplePostDto.getTopic();
         this.region1depthName = readSimplePostDto.getRegion1depthName();

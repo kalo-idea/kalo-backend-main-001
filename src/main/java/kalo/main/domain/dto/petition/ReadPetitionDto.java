@@ -3,6 +3,7 @@ package kalo.main.domain.dto.petition;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import kalo.main.domain.dto.SimpleWriterDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReadPetitionDto {
     
-    Long userId;
-    String nickname;
-    String profileSrc;
+    SimpleWriterDto writer;
     
     String title;
 
@@ -24,7 +23,7 @@ public class ReadPetitionDto {
 
     List<String> hashtags;
 
-    String photos;
+    List<String> photos;
 
     Long likeCount;
 
@@ -50,10 +49,8 @@ public class ReadPetitionDto {
 
     Boolean isSupport;
 
-    public ReadPetitionDto(Long userId, String nickname, String profileSrc, String title, LocalDateTime createdDate, String content, List<String> hashtags, String photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount, Boolean isSupport) {
-        this.userId = userId;
-        this.nickname = nickname;
-        this.profileSrc = profileSrc;
+    public ReadPetitionDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount, Boolean isSupport) {
+        this.writer = writer;
         this.title = title;
         this.createdDate = createdDate;
         this.content = content;

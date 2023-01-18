@@ -12,9 +12,7 @@ public class ReplyDto {
     
     Long commentId;
 
-    Long userId;
-    String nickname;
-    String profileSrc;
+    SimpleWriterDto writer;
 
     Boolean isLike;
     Long likeCount;
@@ -25,11 +23,9 @@ public class ReplyDto {
 
     @QueryProjection
     @Builder
-    public ReplyDto(Long commentId, Long userId, String nickname, String profileSrc, Boolean isLike, Long likeCount, Boolean isDislike, Long dislikeCount, String content) {
+    public ReplyDto(Long commentId, SimpleWriterDto writer, Boolean isLike, Long likeCount, Boolean isDislike, Long dislikeCount, String content) {
         this.commentId = commentId;
-        this.userId = userId;
-        this.nickname = nickname;
-        this.profileSrc = profileSrc;
+        this.writer = writer;
         this.isLike = isLike;
         this.likeCount = likeCount;
         this.isDislike = isDislike;

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.querydsl.core.annotations.QueryProjection;
 
+import kalo.main.domain.dto.SimpleWriterDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,9 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReadPostDto{
 
-    Long userId;
-    String nickname;
-    String profileSrc;
+    SimpleWriterDto writer;
     
     String title;
 
@@ -26,7 +25,7 @@ public class ReadPostDto{
 
     List<String> hashtags;
 
-    String photos;
+    List<String> photos;
 
     Long likeCount;
 
@@ -45,10 +44,8 @@ public class ReadPostDto{
     String region2depthName;
 
     @QueryProjection
-    public ReadPostDto(Long userId, String nickname, String profileSrc, String title, LocalDateTime createdDate, String content, List<String> hashtags, String photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName) {
-        this.userId = userId;
-        this.nickname = nickname;        
-        this.profileSrc = profileSrc;
+    public ReadPostDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName) {
+        this.writer = writer;
         this.title = title;
         this.createdDate = createdDate;
         this.content = content;

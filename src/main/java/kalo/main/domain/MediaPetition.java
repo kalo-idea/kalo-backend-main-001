@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -14,16 +14,16 @@ import lombok.Getter;
 @Entity
 @Getter
 @Builder
-public class Ledger extends BaseEntity {
+public class MediaPetition extends BaseEntity{
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "media_id")
+    Media media;
 
-    String type;
-
-    Long amount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "petition_id")
+    Petition petition;
 }

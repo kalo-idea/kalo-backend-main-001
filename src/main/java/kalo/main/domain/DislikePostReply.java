@@ -8,10 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class DislikePostReply extends BaseEntity{
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +27,12 @@ public class DislikePostReply extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_reply_id")
     PostReply postReply;
+
+    @Builder
+    public DislikePostReply(Long id, User user, PostReply postReply) {
+        this.id = id;
+        this.user = user;
+        this.postReply = postReply;
+    }
+
 }

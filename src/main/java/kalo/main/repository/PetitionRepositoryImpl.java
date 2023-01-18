@@ -1,12 +1,13 @@
 package kalo.main.repository;
 
-import static kalo.main.domain.QHashtag.hashtag;
 import static kalo.main.domain.QLikePetition.likePetition;
 import static kalo.main.domain.QPetition.petition;
-import static kalo.main.domain.QPetitionHashtag.petitionHashtag;
 import static kalo.main.domain.QSupportPetition.supportPetition;
 import static kalo.main.domain.QUser.user;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -32,28 +33,29 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    // 청원 리스트 조회, 페이징, 조건 포함
     @Override
     public List<ReadSimplePetitionsDto> findListPetitions(Pageable pageable, PetitionCondDto cond) {
 
         JPAQuery<ReadSimplePetitionsDto> query = queryFactory.select(new QReadSimplePetitionsDto(
-        petition.id,
-        petition.user.id,
-        petition.title,
-        petition.createdDate,
-        petition.content.substring(0, 100),
-        petition.photos,
-        petition.likeCount,
-        petition.dislikeCount,
-        petition.progress,
-        petition.goal,
-        petition.replyCount,
-        petition.category,
-        petition.region1depthName,
-        petition.region2depthName,
-        petition.supportCount))
+            petition.id,
+            petition.user.id,
+            petition.title,
+            petition.createdDate,
+            petition.content.substring(0, 100),
+            petition.likeCount,
+            petition.dislikeCount,
+            petition.progress,
+            petition.goal,
+            petition.replyCount,
+            petition.category,
+            petition.region1depthName,
+            petition.region2depthName,
+            petition.supportCount))
         .from(petition)
         .where(
             petition.deleted.eq(false),
+            searchFilter(cond.getSearch()),
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
             progressFilter(cond.getProgress()),
@@ -73,6 +75,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         return result;
     }
 
+    // 유저 좋아한 청원
     @Override
     public List<ReadSimplePetitionsDto> findLikePetitions(Pageable pageable, Long viewerId) {
 
@@ -82,7 +85,6 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.title,
         petition.createdDate,
         petition.content,
-        petition.photos,
         petition.likeCount,
         petition.dislikeCount,
         petition.progress,
@@ -113,6 +115,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         return result;
     }
 
+    // 참여한 청원
     @Override
     public List<ReadSimplePetitionsDto> findSupportPetitions(Pageable pageable, Long viewerId) {
 
@@ -122,7 +125,6 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.title,
         petition.createdDate,
         petition.content,
-        petition.photos,
         petition.likeCount,
         petition.dislikeCount,
         petition.progress,
@@ -153,6 +155,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         return result;
     }
 
+    // 청원에 참여한 사람 리스트
     @Override
     public List<SupportPetitionUserListDto> findSupportPetitionUserList(Pageable pageable, Long petitionId) {
         return queryFactory.select(new QSupportPetitionUserListDto(
@@ -167,6 +170,75 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .limit(pageable.getPageSize())
         .orderBy(supportPetition.createdDate.desc())
         .fetch();
+    }
+
+    // 베스트 관심 청원
+    @Override
+    public List<ReadSimplePetitionsDto> findBestLikePetitions() {
+        return queryFactory.select(new QReadSimplePetitionsDto(
+            petition.id,
+            petition.user.id,
+            petition.title,
+            petition.createdDate,
+            petition.content.substring(0, 100),
+            petition.likeCount,
+            petition.dislikeCount,
+            petition.progress,
+            petition.goal,
+            petition.replyCount,
+            petition.category,
+            petition.region1depthName,
+            petition.region2depthName,
+            petition.supportCount))
+        .from(petition)
+        .where(
+            petition.deleted.eq(false),
+            petition.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay())
+            )
+        .offset(0)
+        .limit(3)
+        .orderBy(
+            petition.likeCount.desc()
+        )
+        .fetch();
+    }
+
+    // 베스트 참여 청원
+    @Override
+    public List<ReadSimplePetitionsDto> findBestSupportPetitions() {
+        return queryFactory.select(new QReadSimplePetitionsDto(
+            petition.id,
+            petition.user.id,
+            petition.title,
+            petition.createdDate,
+            petition.content.substring(0, 100),
+            petition.likeCount,
+            petition.dislikeCount,
+            petition.progress,
+            petition.goal,
+            petition.replyCount,
+            petition.category,
+            petition.region1depthName,
+            petition.region2depthName,
+            petition.supportCount))
+        .from(petition)
+        .where(
+            petition.deleted.eq(false),
+            petition.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay())
+            )
+        .offset(0)
+        .limit(3)
+        .orderBy(
+            petition.supportCount.desc()
+        )
+        .fetch();
+    }
+
+    private BooleanExpression searchFilter(String search) {
+        if (StringUtils.hasText(search)) {
+            return petition.title.like("%" + search + "%").or(petition.content.like("%" + search + "%"));
+        }
+        return null;
     }
 
     private BooleanExpression region1Filter(String region1Name) {
@@ -184,8 +256,31 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
     }
 
     private BooleanExpression progressFilter(String progress) {
-        if (StringUtils.hasText(progress)) {
-            return petition.progress.eq(progress) ;
+        if (StringUtils.hasText(progress)) {            
+            List<String> progressList = Arrays.asList(progress.split(","));
+            
+            if (progressList.contains("fail")) { // 실패
+                return petition.progress.eq("recruit")
+                    .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
+                      .and(petition.supportCount.lt(100)))
+                .or(petition.progress.eq("fail"));
+            }
+            else if (progressList.contains("recruit")) { // 모집 중
+                return petition.progress.eq("recruit")
+                .and(petition.createdDate.goe(LocalDate.now().minusDays(29).atStartOfDay()));
+            }
+            else if (progressList.contains("suggest") || progressList.contains("inform") || progressList.contains("legalReview")) { // 민원/건의, 언론 제보, 법률 검토
+                return petition.progress.eq("recruit")
+                    .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
+                        .and(petition.supportCount.goe(100)))
+                .or(petition.progress.eq("suggest"))
+                .or(petition.progress.like("inform"))
+                .or(petition.progress.like("legalReview"));
+            }
+            else if (progressList.contains("complete")) { // 사회 참여 완료
+                return petition.progress.like("complete");
+            }
+            return null;
         }
         return null;
     }
