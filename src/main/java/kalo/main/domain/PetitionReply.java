@@ -29,9 +29,9 @@ public class PetitionReply extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String content;
 
-    Long likeCount = 0L;
+    Long likeCount;
 
-    Long dislikeCount = 0L;
+    Long dislikeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

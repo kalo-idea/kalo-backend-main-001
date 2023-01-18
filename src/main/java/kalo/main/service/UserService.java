@@ -2,6 +2,7 @@ package kalo.main.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -12,17 +13,24 @@ import org.springframework.transaction.annotation.Transactional;
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Auth;
 import kalo.main.domain.Hashtag;
+import kalo.main.domain.Media;
 import kalo.main.domain.User;
+import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
 import kalo.main.domain.dto.user.JoinReqDto;
+import kalo.main.domain.dto.user.MyProfileHomeDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
 import kalo.main.domain.dto.user.UserProfileResDto;
 import kalo.main.repository.AuthRepository;
 import kalo.main.repository.HashtagRepository;
+import kalo.main.repository.LedgerRepository;
+import kalo.main.repository.LikePetitionRepository;
+import kalo.main.repository.MediaRepository;
 import kalo.main.repository.PetitionRepository;
+import kalo.main.repository.SupportPetitionRepository;
 import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -34,24 +42,33 @@ public class UserService {
     private final PetitionRepository petitionRepository;
     private final HashtagRepository hashtagRepository;
     private final AuthRepository authRepository;
+    private final MediaRepository mediaRepository;
+    private final LedgerRepository ledgerRepository;
+    private final SupportPetitionRepository supportPetitionRepository;
+    private final LikePetitionRepository likePetitionRepository;
 
     // 유저 청원 좋아요 리스트조회
     public List<ReadPetitionsDto> getLikePetitions(Pageable pageable, Long userId) {
         List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findLikePetitions(pageable, userId);
 
-        List<ReadPetitionsDto> result = new ArrayList();
+        List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             User writer = userRepository.findById(simplePetition.getWriterId()).get();
-            List<String> words = new ArrayList();
+            List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
                 words.add(hashtag.getWord());
             }
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> media = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
+            for (Media medium : media) {
+                fileNames.add(medium.getFileName());
+            }
             if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, null, null, words));
+                result.add(new ReadPetitionsDto(simplePetition, null, words, fileNames));
             }
             else {
-                result.add(new ReadPetitionsDto(simplePetition, writer.getId(), writer.getNickname(), writer.getProfileSrc(), words));
+                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), words, fileNames));
             }
         }
 
@@ -62,19 +79,24 @@ public class UserService {
     public List<ReadPetitionsDto> getSupportPetitions(Pageable pageable, Long userId) {
         List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findSupportPetitions(pageable, userId);
 
-        List<ReadPetitionsDto> result = new ArrayList();
+        List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             User writer = userRepository.findById(simplePetition.getWriterId()).get();
-            List<String> words = new ArrayList();
+            List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
                 words.add(hashtag.getWord());
             }
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> media = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
+            for (Media medium : media) {
+                fileNames.add(medium.getFileName());
+            }
             if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, null, null, words));
+                result.add(new ReadPetitionsDto(simplePetition, null, words, fileNames));
             }
             else {
-                result.add(new ReadPetitionsDto(simplePetition, writer.getId(), writer.getNickname(), writer.getProfileSrc(), words));
+                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), words, fileNames));
             }
         }
 
@@ -103,6 +125,7 @@ public class UserService {
             }
         }
         String publicInfos = "";
+        
         for (String str : list) {
             publicInfos = publicInfos + str + ',';
         }
@@ -121,7 +144,6 @@ public class UserService {
     }
 
     public Long join(JoinReqDto req) {
-        System.out.println(req);
         if (!isDuplicatedNickname(req.getNickname())) {
             throw new BasicException("불가능한 닉네임입니다.");
         }
@@ -183,8 +205,8 @@ public class UserService {
     // 회원 정보 조회
     public UserProfileResDto getUserProfile(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 회원입니다."));
-        Auth auth = user.getAuth();
-        String[] info = user.getPublicInfos().split(",");
+        Auth auth = user.getAuth();             
+        List<String> info = Arrays.asList(user.getPublicInfos().split(","));
 
         UserProfileResDto res = new UserProfileResDto();
 
@@ -193,30 +215,28 @@ public class UserService {
         res.setPromotionCheck(auth.getPromotionCheck());
         res.setIntro(user.getIntro());
 
-        for (String str : info) {
-            System.out.println(str);
-            if (str.equals("birth")) {
-                res.setBirth(auth.getBirth());
-            }
-            if (str.equals("email")) {
-                res.setEmail(auth.getEmail());
-            }
-            if (str.equals("gender")) {
-                res.setGender(auth.getGender());
-            }
-            if (str.equals("name")) {
-                res.setName(auth.getName());
-            }
-            if (str.equals("region1depthName")) {
-                res.setRegion1depthName(auth.getRegion1depthName());
-            }
-            if (str.equals("region2depthName")) {
-                res.setRegion2depthName(auth.getRegion2depthName());
-            }
-            if (str.equals("tel")) {
-                res.setTel(auth.getTel());
-            }
+        if (info.contains("birth")) {
+            res.setBirth(auth.getBirth());
         }
+        if (info.contains("email")) {
+            res.setEmail(auth.getEmail());
+        }
+        if (info.contains("gender")) {
+            res.setGender(auth.getGender());
+        }
+        if (info.contains("name")) {
+            res.setName(auth.getName());
+        }
+        if (info.contains("region1depthName")) {
+            res.setRegion1depthName(auth.getRegion1depthName());
+        }
+        if (info.contains("region2depthName")) {
+            res.setRegion2depthName(auth.getRegion2depthName());
+        }
+        if (info.contains("tel")) {
+            res.setTel(auth.getTel());
+        }
+
         return res;
     }
 
@@ -240,5 +260,19 @@ public class UserService {
         res.setTel(auth.getTel());
 
         return res;
+    }
+
+    // 프로필 홈 화면
+    // 남은 포인트, 관심 청원 수, 참여 청원 수 반환
+    public MyProfileHomeDto getProfileHome(Long userId) {
+        Long ledgers = ledgerRepository.getSumLedger(userId);
+        Long supportCount = supportPetitionRepository.countByUserId(userId);
+        Long likeCount = likePetitionRepository.countByUserIdAndDeleted(userId, false);
+        
+        if(ledgers == null) {
+            ledgers = 0L;
+        }
+
+        return new MyProfileHomeDto(ledgers, supportCount, likeCount);
     }
 }

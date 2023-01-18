@@ -9,12 +9,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Setter
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class PostReply extends BaseEntity {
     
@@ -24,9 +29,9 @@ public class PostReply extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String content;
 
-    Long likeCount = 0L;
+    Long likeCount;
 
-    Long dislikeCount = 0L;
+    Long dislikeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -35,14 +40,4 @@ public class PostReply extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
-
-    @Builder
-    public PostReply(Long id, String content, Long likeCount, Long dislikeCount, Post post, User user) {
-        this.id = id;
-        this.content = content;
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
-        this.post = post;
-        this.user = user;
-    }
 }

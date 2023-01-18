@@ -8,4 +8,5 @@ import kalo.main.domain.LikePetition;
 
 public interface LikePetitionRepository extends JpaRepository<LikePetition, Long> {
     Optional<LikePetition> findByPetitionIdAndUserIdAndDeleted(Long petitionId, Long userId, Boolean deleted);
+    Long countByUserIdAndDeleted(Long userId, Boolean deleted);
 }

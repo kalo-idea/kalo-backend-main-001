@@ -9,22 +9,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kalo.main.controller.BasicException;
+import kalo.main.domain.DislikePost;
+import kalo.main.domain.DislikePostReply;
 import kalo.main.domain.Hashtag;
+import kalo.main.domain.LikePost;
+import kalo.main.domain.LikePostReply;
+import kalo.main.domain.Media;
+import kalo.main.domain.MediaPost;
 import kalo.main.domain.Post;
 import kalo.main.domain.PostHashtag;
 import kalo.main.domain.PostReply;
 import kalo.main.domain.User;
+import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
+import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.post.CreatePostDto;
 import kalo.main.domain.dto.post.CreatePostReplyDto;
 import kalo.main.domain.dto.post.PostCondDto;
 import kalo.main.domain.dto.post.ReadPostDto;
 import kalo.main.domain.dto.post.ReadPostsDto;
+import kalo.main.domain.dto.post.ReadSimplePostDto;
 import kalo.main.repository.DislikePostReplyRepository;
 import kalo.main.repository.DislikePostRepository;
 import kalo.main.repository.HashtagRepository;
 import kalo.main.repository.LikePostReplyRepository;
 import kalo.main.repository.LikePostRepository;
+import kalo.main.repository.MediaPostRepository;
+import kalo.main.repository.MediaRepository;
 import kalo.main.repository.PostHashtagRepository;
 import kalo.main.repository.PostReplyRepository;
 import kalo.main.repository.PostRepository;
@@ -45,14 +56,15 @@ public class PostService {
     private final PostReplyRepository postReplyRepository;
     private final LikePostReplyRepository likePostReplyRepository;
     private final DislikePostReplyRepository dislikePostReplyRepository;
+    private final MediaRepository mediaRepository;
+    private final MediaPostRepository mediaPostRepository;
 
     // 게시글 생성
     public Long createPost(CreatePostDto createPostsDto) {
 
-        Post posts = Post.builder()
+        Post post = Post.builder()
         .title(createPostsDto.getTitle())
         .content(createPostsDto.getContent())
-        .photos(createPostsDto.getPhotos())
         .viewCount(0L)
         .user(userRepository.findById(createPostsDto.getUserId()).get())
         .replyCount(0L)
@@ -67,7 +79,7 @@ public class PostService {
         .longitude(createPostsDto.getLongitude())
         .build();
 
-        Post resultPost = postRepository.save(posts);
+        Post resultPost = postRepository.save(post);
 
         List<String> hashtags = createPostsDto.getHashtags();
         for (String hashtag : hashtags) {
@@ -90,9 +102,21 @@ public class PostService {
             }
         }
 
+        List<String> media = createPostsDto.getPhotos();
+        for (String fileName : media) {
+            Media medium = new Media(fileName);
+            mediaRepository.save(medium);
+            MediaPost mediaPost = MediaPost.builder()
+                .media(medium)
+                .post(post)
+                .build();
+            mediaPostRepository.save(mediaPost);
+        }
+
         return resultPost.getId();
     }
 
+    // 게시글 단건 조회
     public ReadPostDto readPost(Long postId, Long viewerId) {
         Post post = postRepository.findById(postId).get();
 
@@ -108,11 +132,18 @@ public class PostService {
         }
 
         User writer = userRepository.findById(post.getUser().getId()).get();
-        List<Hashtag> hashs = hashtagRepository.findPostHashtags(postId);
-        List<String> hashtags = new ArrayList();
+        List<Hashtag> hashtags = hashtagRepository.findPostHashtags(postId);
+        List<String> hashtags_res = new ArrayList<String>();
 
-        for (Hashtag hash : hashs) {
-            hashtags.add(hash.getWord());
+        for (Hashtag hashtag : hashtags) {
+            hashtags_res.add(hashtag.getWord());
+        }
+
+        List<Media> media = mediaRepository.findPostMedia(postId);
+        List<String> media_res = new ArrayList<String>();
+
+        for (Media medium : media) {
+            media_res.add(medium.getFileName());
         }
         
         post.setViewCount(post.getViewCount() + 1);
@@ -122,8 +153,8 @@ public class PostService {
             .title(post.getTitle())
             .createdDate(post.getCreatedDate())
             .content(post.getContent())
-            .hashtags(hashtags)
-            .photos(post.getPhotos())
+            .hashtags(hashtags_res)
+            .photos(media_res)
             .likeCount(post.getLikeCount())
             .isLike(isLike)
             .dislikeCount(post.getDislikeCount())
@@ -136,14 +167,12 @@ public class PostService {
         }
 
         return ReadPostDto.builder()
-        .userId(writer.getId())
-        .nickname(writer.getNickname())
-        .profileSrc(writer.getProfileSrc())
+        .writer(new SimpleWriterDto(writer.getId(),writer.getNickname(),writer.getProfileSrc()))
         .title(post.getTitle())
         .createdDate(post.getCreatedDate())
         .content(post.getContent())
-        .hashtags(hashtags)
-        .photos(post.getPhotos())
+        .hashtags(hashtags_res)
+        .photos(media_res)
         .likeCount(post.getLikeCount())
         .isLike(isLike)
         .dislikeCount(post.getDislikeCount())
@@ -155,7 +184,7 @@ public class PostService {
         .build();
     }
 
-    // 청원 댓글 추가
+    // 게시글 댓글 추가
     public Long createPostReply(CreatePostReplyDto createPostReplyDto) {
         PostReply postReply = PostReply.builder()
         .user(userRepository.findById(createPostReplyDto.getUserId()).orElseThrow(() -> new BasicException("없는 회원입니다.")))
@@ -170,12 +199,12 @@ public class PostService {
         return result.getId();
     }
 
-    // 청원 댓글 조회
-    public List<ReplyDto> readPostReply(Long petitionId, Long viewerId, Pageable pageable) {
+    // 게시글 댓글 조회
+    public List<ReplyDto> readPostReply(Long postId, Long viewerId, Pageable pageable) {
 
-        List<PostReply> replys = postReplyRepository.findByPostIdAndDeleted(petitionId, pageable, false);
+        List<PostReply> replys = postReplyRepository.findByPostIdAndDeleted(postId, pageable, false);
 
-        List<ReplyDto> result = new ArrayList();
+        List<ReplyDto> result = new ArrayList<ReplyDto>();
 
         for (PostReply reply : replys) {
             Boolean isLike = false;
@@ -186,7 +215,7 @@ public class PostService {
             }
             // 댓글 작성자 탈퇴의 경우
             if (reply.getUser().getDeleted()) {
-                ReplyDto commentDto = new ReplyDto().builder()
+                ReplyDto commentDto = ReplyDto.builder()
                 .commentId(reply.getId())
                 .isLike(isLike)
                 .likeCount(reply.getLikeCount())
@@ -198,11 +227,9 @@ public class PostService {
                 result.add(commentDto);
             }
             if (!reply.getUser().getDeleted()) {
-                ReplyDto commentDto = new ReplyDto().builder()
+                ReplyDto commentDto = ReplyDto.builder()
                 .commentId(reply.getId())
-                .userId(reply.getUser().getId())
-                .nickname(reply.getUser().getNickname())
-                .profileSrc(reply.getUser().getProfileSrc())
+                .writer(new SimpleWriterDto(reply.getUser().getId(), reply.getUser().getNickname(), reply.getUser().getProfileSrc()))
                 .isLike(isLike)
                 .likeCount(reply.getLikeCount())
                 .isDislike(isDislike)
@@ -217,8 +244,209 @@ public class PostService {
     }
 
     // 게시글 리스트 조회
-    // public List<ReadPostsDto> readPosts(Pageable pageable, PostCondDto cond) {
+    public List<ReadPostsDto> readPosts(Pageable pageable, PostCondDto cond) {
+        List<ReadSimplePostDto> posts = postRepository.findListPosts(pageable, cond);
+        List<ReadPostsDto> result = new ArrayList<>();
 
-    // }
+        for (ReadSimplePostDto simplePost : posts) {
+            User writer = userRepository.findById(simplePost.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            List<String> words = new ArrayList<String>();
+            List<Hashtag> hashtags = hashtagRepository.findPostHashtags(simplePost.getPostId());
+            for (Hashtag hashtag : hashtags) {
+                words.add(hashtag.getWord());
+            }
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> media = mediaRepository.findPostMedia(simplePost.getPostId());
+            for (Media medium : media) {
+                fileNames.add(medium.getFileName());
+            }
+            if (writer.getDeleted()) {
+                result.add(new ReadPostsDto(simplePost, null, words, fileNames));
+            }
+            else {
+                SimpleWriterDto writerDto = new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc());
+                result.add(new ReadPostsDto(simplePost, writerDto, words, fileNames));
+            }
+        }
 
+        return result;
+    }
+    
+    // 게시글 좋아요, 좋아요 취소
+    // 좋아요 클릭
+    public LikeDislikeResDto likePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
+        
+        // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
+        if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+            likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+            post.setLikeCount(post.getLikeCount() - 1);
+        }
+        // 싫어요가 눌려있던 상태 : 좋아요 추가, 싫어요 취소 -> 좋아요 +1, 싫어요 -1
+        else if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+            dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+            LikePost likePost = LikePost.builder().post(post).user(user).build();
+            likePostRepository.save(likePost);
+
+            post.setLikeCount(post.getLikeCount() + 1);
+            post.setDislikeCount(post.getDislikeCount() - 1);
+        }
+        // 아무것도 눌려있지 않지만, 좋아요를 누른 기록이 있는 상태
+        else if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).isPresent()) {
+            likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).get().revive();
+
+            post.setLikeCount(post.getLikeCount() + 1);
+        }
+        // 아무것도 없던 상태 : 좋아요 추가 -> 좋아요 +1
+        else {
+            LikePost likePost = LikePost.builder().post(post).user(user).build();
+            likePostRepository.save(likePost);
+
+            post.setLikeCount(post.getLikeCount() + 1);
+        }
+        LikeDislikeResDto result = LikeDislikeResDto.builder()
+            .id(postId)
+            .isLike(likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent())
+            .isDislike(dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent())
+            .likeCount(post.getLikeCount())
+            .dislikeCount(post.getDislikeCount())
+            .build();
+
+        return result;
+    }
+
+    // 청원 싫어요, 싫어요 취소
+    // 싫어요 클릭
+    public LikeDislikeResDto dislikePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
+        
+        // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
+        if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+            likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+            DislikePost dislikePost = DislikePost.builder().user(user).post(post).build();
+            dislikePostRepository.save(dislikePost);
+            
+            post.setLikeCount(post.getLikeCount() - 1);
+            post.setDislikeCount(post.getDislikeCount() + 1);
+        }
+        // 싫어요가 이미 눌려있던 상태 : 싫어요 취소 -> 싫어요 -1
+        else if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+            dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+
+            post.setDislikeCount(post.getDislikeCount() - 1);
+        }
+        // 아무것도 눌려있지 않지만, 싫어요를 누른 기록이 있는 상태
+        else if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).isPresent()) {
+            dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).get().revive();
+
+            post.setDislikeCount(post.getDislikeCount() + 1);
+        }
+        // 아무것도 없던 상태 : 싫어요 추가 -> 싫어요 +1
+        else  {
+            DislikePost dislikePost = DislikePost.builder().user(user).post(post).build();
+            dislikePostRepository.save(dislikePost);
+
+            post.setDislikeCount(post.getDislikeCount() + 1);
+        }
+        LikeDislikeResDto result = LikeDislikeResDto.builder()
+            .id(postId)
+            .isLike(likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent())
+            .isDislike(dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent())
+            .likeCount(post.getLikeCount())
+            .dislikeCount(post.getDislikeCount())
+            .build();
+
+        return result;
+    }
+
+    // 댓글 좋아요 좋아요 취소
+    // 댓글 좋아요 클릭
+    public LikeDislikeResDto likePostReply(Long replyId, Long userId) {
+        PostReply reply = postReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        
+        // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
+        if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+            likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+            reply.setLikeCount(reply.getLikeCount() - 1);
+        }
+        // 싫어요가 눌려있던 상태 : 좋아요 추가, 싫어요 취소 -> 좋아요 +1, 싫어요 -1
+        else if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+            dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+            LikePostReply likePostReply = LikePostReply.builder().postReply(reply).user(user).build();
+            likePostReplyRepository.save(likePostReply);
+
+            reply.setLikeCount(reply.getLikeCount() + 1);
+            reply.setDislikeCount(reply.getDislikeCount() - 1);
+        }
+        // 아무것도 눌려있지 않지만, 좋아요를 누른 기록이 있는 상태
+        else if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).isPresent()) {
+            likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).get().revive();
+
+            reply.setLikeCount(reply.getLikeCount() + 1);
+        }
+        // 아무것도 없던 상태 : 좋아요 추가 -> 좋아요 +1
+        else {
+            LikePostReply likePostReply = LikePostReply.builder().postReply(reply).user(user).build();
+            likePostReplyRepository.save(likePostReply);
+
+            reply.setLikeCount(reply.getLikeCount() + 1);
+        }
+        LikeDislikeResDto result = LikeDislikeResDto.builder()
+            .id(replyId)
+            .isLike(likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent())
+            .isDislike(dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent())
+            .likeCount(reply.getLikeCount())
+            .dislikeCount(reply.getDislikeCount())
+            .build();
+
+        return result;
+    }
+    
+    // 댓글 싫어요 싫어요 취소
+    // 댓글 싫어요 클릭
+    public LikeDislikeResDto dislikePostReply(Long replyId, Long userId) {
+        PostReply reply = postReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        
+        // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
+        if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+            likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+            DislikePostReply dislikePostReply = DislikePostReply.builder().user(user).postReply(reply).build();
+            dislikePostReplyRepository.save(dislikePostReply);
+            
+            reply.setLikeCount(reply.getLikeCount() - 1);
+            reply.setDislikeCount(reply.getDislikeCount() + 1);
+        }
+        // 싫어요가 이미 눌려있던 상태 : 싫어요 취소 -> 싫어요 -1
+        else if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+            dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+
+            reply.setDislikeCount(reply.getDislikeCount() - 1);
+        }
+        // 아무것도 눌려있지 않지만, 싫어요를 누른 기록이 있는 상태 : 상태값 true로 변경
+        else if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).isPresent()) {
+            dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).get().revive();
+
+            reply.setDislikeCount(reply.getDislikeCount() + 1);
+        }
+        // 아무것도 없던 상태 : 싫어요 추가 -> 싫어요 +1
+        else {
+            DislikePostReply dislikePostReply = DislikePostReply.builder().user(user).postReply(reply).build();
+            dislikePostReplyRepository.save(dislikePostReply);
+
+            reply.setDislikeCount(reply.getDislikeCount() + 1);
+        }
+        LikeDislikeResDto result = LikeDislikeResDto.builder()
+            .id(replyId)
+            .isLike(likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent())
+            .isDislike(dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent())
+            .likeCount(reply.getLikeCount())
+            .dislikeCount(reply.getDislikeCount())
+            .build();
+
+        return result;
+    }
 }

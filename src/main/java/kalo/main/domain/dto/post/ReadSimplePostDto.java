@@ -22,15 +22,9 @@ public class ReadSimplePostDto {
 
     String content;
 
-    String photos;
-
     Long likeCount;
 
     Long dislikeCount;
-
-    String progress;
-
-    Long goal;
 
     Long replyCount;
 
@@ -42,17 +36,14 @@ public class ReadSimplePostDto {
 
     @Builder
     @QueryProjection
-    public ReadSimplePostDto(Long postId, Long writerId, String title, LocalDateTime createdDate, String content, String photos, Long likeCount, Long dislikeCount, String progress, Long goal, Long replyCount, String topic, String region1depthName, String region2depthName) {
+    public ReadSimplePostDto(Long postId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, Long replyCount, String topic, String region1depthName, String region2depthName) {
         this.postId = postId;
         this.writerId = writerId;
         this.title = title;
         this.createdDate = createdDate;
         this.content = content;
-        this.photos = photos;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
-        this.progress = progress;
-        this.goal = goal;
         this.replyCount = replyCount;
         this.topic = topic;
         this.region1depthName = region1depthName;

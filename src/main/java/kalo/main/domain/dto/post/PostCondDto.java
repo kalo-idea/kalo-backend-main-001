@@ -1,5 +1,8 @@
 package kalo.main.domain.dto.post;
 
+import lombok.Data;
+
+@Data
 public class PostCondDto {
     String sort;
     String region1depthName;

@@ -8,4 +8,5 @@ import kalo.main.domain.SupportPetition;
 
 public interface SupportPetitionRepository extends JpaRepository<SupportPetition, Long> {
     Optional<SupportPetition> findByPetitionIdAndUserIdAndDeleted(Long petitionId, Long userId, Boolean deleted);
+    Long countByUserId(Long userId);
 }

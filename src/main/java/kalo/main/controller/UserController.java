@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.user.JoinReqDto;
+import kalo.main.domain.dto.user.MyProfileHomeDto;
 import kalo.main.domain.dto.user.OnlyUserIdDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
@@ -92,5 +93,11 @@ public class UserController {
     public String updateUserProfile(@Valid @RequestBody UpdateUserProfileReqDto req) {
         userService.updateUserPublicInfos(req);
         return "성공";
+    }
+
+    // 유저 프로필 홈
+    @GetMapping("/get-my-profile-home")
+    public MyProfileHomeDto getProfileHome(@RequestParam Long userId) {
+        return userService.getProfileHome(userId);
     }
 }
