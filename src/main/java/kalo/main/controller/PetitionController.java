@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.dto.LikeDislikeResDto;
@@ -60,9 +61,10 @@ public class PetitionController {
     @GetMapping ("/public/get-petitions")
     public List<ReadPetitionsDto> readPetitions(
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-         PetitionCondDto cond
+         PetitionCondDto cond,
+         @RequestParam(defaultValue = "false") Boolean recent
         ) {
-            return petitionService.readPetitions(pageable, cond);
+            return petitionService.readPetitions(pageable, cond, recent);
     }
 
     // 청원 게시글 좋아요

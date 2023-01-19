@@ -26,7 +26,7 @@ public class ReadPostsDto {
 
     List<String> hashtags;
 
-    List<String> photos;
+    List<String> media;
 
     Long likeCount;
 
@@ -42,14 +42,14 @@ public class ReadPostsDto {
 
     @Builder
     @QueryProjection
-    public ReadPostsDto(ReadSimplePostDto readSimplePostDto, SimpleWriterDto writer, List<String> hashtags, List<String> photos) {
+    public ReadPostsDto(ReadSimplePostDto readSimplePostDto, SimpleWriterDto writer, List<String> hashtags, List<String> media) {
         this.postId = readSimplePostDto.getPostId();
         this.writer = writer;
         this.title = readSimplePostDto.getTitle();
         this.createdDate = readSimplePostDto.getCreatedDate();
         this.content = readSimplePostDto.getContent();
         this.hashtags = hashtags;
-        this.photos = photos;
+        this.media = media;
         this.likeCount = readSimplePostDto.getLikeCount();
         this.dislikeCount = readSimplePostDto.getDislikeCount();
         this.replyCount = readSimplePostDto.getReplyCount();

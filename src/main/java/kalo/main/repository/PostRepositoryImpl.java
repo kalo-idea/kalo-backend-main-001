@@ -2,6 +2,7 @@ package kalo.main.repository;
 
 import static kalo.main.domain.QPost.post;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,7 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ReadSimplePostDto> findListPosts(Pageable pageable, PostCondDto cond) {
+    public List<ReadSimplePostDto> findListPosts(Pageable pageable, PostCondDto cond, Boolean recent) {
 
         JPAQuery<ReadSimplePostDto> query = queryFactory.select(new QReadSimplePostDto(
             post.id,
@@ -45,7 +46,8 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
             post.deleted.eq(false),
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
-            topicFilter(cond.getTopic())
+            topicFilter(cond.getTopic()),
+            recentFilter(recent)
          )
          .offset(pageable.getOffset())
          .limit(pageable.getPageSize());
@@ -77,7 +79,14 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
 
     private BooleanExpression topicFilter(String topic) {
         if (StringUtils.hasText(topic)) {
-            return post.topic.eq(topic) ;
+            return post.topic.eq(topic);
+        }
+        return null;
+    }
+
+    private BooleanExpression recentFilter(Boolean recent) {
+        if (recent) {
+            return post.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay());
         }
         return null;
     }

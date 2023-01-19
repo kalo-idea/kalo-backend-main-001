@@ -10,10 +10,11 @@ import javax.persistence.OneToOne;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
+@NoArgsConstructor
 public class Ledger extends BaseEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +27,12 @@ public class Ledger extends BaseEntity {
     String type;
 
     Long amount;
+
+
+    @Builder
+    public Ledger(User user, String type, Long amount) {
+        this.user = user;
+        this.type = type;
+        this.amount = amount;
+    }
 }

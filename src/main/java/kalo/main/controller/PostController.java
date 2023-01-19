@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.dto.LikeDislikeResDto;
@@ -58,9 +59,10 @@ public class PostController {
     @GetMapping("/public/get-posts")
     public List<ReadPostsDto> readPosts(
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-         PostCondDto cond
+         PostCondDto cond,
+         @RequestParam(defaultValue = "false") Boolean recent
     ) {
-        return postService.readPosts(pageable, cond);
+        return postService.readPosts(pageable, cond, recent);
     }
 
     // 게시글 좋아요

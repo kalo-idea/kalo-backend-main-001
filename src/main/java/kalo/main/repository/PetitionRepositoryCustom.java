@@ -9,10 +9,8 @@ import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
 import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 
 public interface PetitionRepositoryCustom {
-    List<ReadSimplePetitionsDto> findListPetitions(Pageable pageable, PetitionCondDto cond);
+    List<ReadSimplePetitionsDto> findListPetitions(Pageable pageable, PetitionCondDto cond, Boolean recent);
     List<ReadSimplePetitionsDto> findLikePetitions(Pageable pageable, Long viewerId);
     List<ReadSimplePetitionsDto> findSupportPetitions(Pageable pageable, Long viewerId);
     List<SupportPetitionUserListDto> findSupportPetitionUserList(Pageable pageable, Long petitionId);
-    List<ReadSimplePetitionsDto> findBestLikePetitions();
-    List<ReadSimplePetitionsDto> findBestSupportPetitions();
 }

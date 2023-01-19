@@ -23,6 +23,7 @@ import kalo.main.domain.dto.user.MyProfileHomeDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
+import kalo.main.domain.dto.user.UserInfoDto;
 import kalo.main.domain.dto.user.UserProfileResDto;
 import kalo.main.repository.AuthRepository;
 import kalo.main.repository.HashtagRepository;
@@ -103,14 +104,38 @@ public class UserService {
         return result;
     }
 
-    public List<UserAuthResDto> getAuthAndUserByKakao(String kakao) {
+    public UserAuthResDto getAuthAndUserByKakao(String kakao) {
         if (authRepository.findByKakao(kakao).isPresent()) {
             // 이미 가입된 회원
-            return userRepository.getAuthKakao(kakao);
+            Auth auth = authRepository.findByKakao(kakao).get();
+            List<User> users = userRepository.findByAuthId(auth.getId()).orElseThrow(() -> new BasicException("연결된 계정이 없습니다."));
+            List<UserInfoDto> users_res = new ArrayList<UserInfoDto>();
+            for (User user : users) {
+                users_res.add(new UserInfoDto(user));
+            }
 
+            UserAuthResDto userAuthResDto = UserAuthResDto.builder()
+            .authId(auth.getId())
+            .type(auth.getType())
+            .kakao(auth.getKakao())
+            .email(auth.getEmail())
+            .name(auth.getName())
+            .birth(auth.getBirth())
+            .gender(auth.getGender())
+            .tel(auth.getTel())
+            .address(auth.getAddress())
+            .region1depthName(auth.getRegion1depthName())
+            .region2depthName(auth.getRegion2depthName())
+            .promotionCheck(auth.getPromotionCheck())
+            .fcmToken(auth.getFcmToken())
+            .recentLogin(auth.getRecentLogin())
+            .userInfoDto(users_res)
+            .build();
+
+            return userAuthResDto;
         } else {
             // 회원가입 필요
-            throw new BasicException("회원가입이 필요합니다.");
+            return null;
         }
     }
 
@@ -152,7 +177,7 @@ public class UserService {
         .kakao(req.getKakao())
         .email(req.getEmail())
         .name(req.getName())
-        .birth(req.getBirth().atStartOfDay())
+        .birth(req.getBirth())
         .gender(req.getGender())
         .tel(req.getTel())
         .address("")
@@ -186,12 +211,10 @@ public class UserService {
 
     // 회원 정보 수정
     public Long updateInfo(UpdateUserInfoReqDto req) {
-        User user = userRepository.findById(req.getUserId()).get();
-        Auth auth = user.getAuth();
+        Auth auth = authRepository.findById(req.getAuthId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
 
         auth.setName(req.getName());
-        user.setNickname(req.getNickname());
-        auth.setBirth(req.getBirth().atStartOfDay());
+        auth.setBirth(req.getBirth());
         auth.setGender(req.getGender());
         auth.setEmail(req.getEmail());
         auth.setTel(req.getTel());
@@ -199,7 +222,7 @@ public class UserService {
         auth.setRegion2depthName(req.getRegion2depthName());
         auth.setPromotionCheck(req.getPromotionCheck());
 
-        return user.getId();
+        return auth.getId();
     }
 
     // 회원 정보 조회
@@ -265,7 +288,7 @@ public class UserService {
     // 프로필 홈 화면
     // 남은 포인트, 관심 청원 수, 참여 청원 수 반환
     public MyProfileHomeDto getProfileHome(Long userId) {
-        Long ledgers = ledgerRepository.getSumLedger(userId);
+        Long ledgers = ledgerRepository.getSumUserLedger(userId);
         Long supportCount = supportPetitionRepository.countByUserId(userId);
         Long likeCount = likePetitionRepository.countByUserIdAndDeleted(userId, false);
         
@@ -274,13 +297,5 @@ public class UserService {
         }
 
         return new MyProfileHomeDto(ledgers, supportCount, likeCount);
-    }
-
-    // 출석
-    public Long Attendence(Long userId) {
-        // ledgerRepository.find
-        // Ledger ledger = Ledger.builder().user(user).type("attendence").amount(500L).build();
-        // ledgerRepository.save(ledger);
-        return null;
     }
 }
