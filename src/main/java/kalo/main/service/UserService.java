@@ -275,4 +275,12 @@ public class UserService {
 
         return new MyProfileHomeDto(ledgers, supportCount, likeCount);
     }
+
+    // 출석
+    public Long Attendence(Long userId) {
+        // ledgerRepository.find
+        // Ledger ledger = Ledger.builder().user(user).type("attendence").amount(500L).build();
+        // ledgerRepository.save(ledger);
+        return null;
+    }
 }
