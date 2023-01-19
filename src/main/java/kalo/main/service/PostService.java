@@ -102,7 +102,7 @@ public class PostService {
             }
         }
 
-        List<String> media = createPostsDto.getPhotos();
+        List<String> media = createPostsDto.getMedia();
         for (String fileName : media) {
             Media medium = new Media(fileName);
             mediaRepository.save(medium);
@@ -154,7 +154,7 @@ public class PostService {
             .createdDate(post.getCreatedDate())
             .content(post.getContent())
             .hashtags(hashtags_res)
-            .photos(media_res)
+            .media(media_res)
             .likeCount(post.getLikeCount())
             .isLike(isLike)
             .dislikeCount(post.getDislikeCount())
@@ -172,7 +172,7 @@ public class PostService {
         .createdDate(post.getCreatedDate())
         .content(post.getContent())
         .hashtags(hashtags_res)
-        .photos(media_res)
+        .media(media_res)
         .likeCount(post.getLikeCount())
         .isLike(isLike)
         .dislikeCount(post.getDislikeCount())
@@ -244,8 +244,8 @@ public class PostService {
     }
 
     // 게시글 리스트 조회
-    public List<ReadPostsDto> readPosts(Pageable pageable, PostCondDto cond) {
-        List<ReadSimplePostDto> posts = postRepository.findListPosts(pageable, cond);
+    public List<ReadPostsDto> readPosts(Pageable pageable, PostCondDto cond, Boolean recent) {
+        List<ReadSimplePostDto> posts = postRepository.findListPosts(pageable, cond, recent);
         List<ReadPostsDto> result = new ArrayList<>();
 
         for (ReadSimplePostDto simplePost : posts) {

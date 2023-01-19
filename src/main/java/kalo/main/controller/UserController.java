@@ -46,7 +46,7 @@ public class UserController {
 
     // 카카오로 회원, 비회원 조회
     @GetMapping("/public/get-auth-by-kakao")
-    public List<UserAuthResDto> getAuthByKakao(@RequestParam(required = true) String kakaoId) {
+    public UserAuthResDto getAuthByKakao(@RequestParam(required = true) String kakaoId) {
         return userService.getAuthAndUserByKakao(kakaoId);
     }
 

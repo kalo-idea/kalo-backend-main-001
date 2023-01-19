@@ -1,6 +1,6 @@
 package kalo.main.domain.dto.user;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ public class UserProfileResDto {
 
     String intro;
 
-    LocalDateTime birth;
+    LocalDate birth;
     String email;
     String gender;
     String name;

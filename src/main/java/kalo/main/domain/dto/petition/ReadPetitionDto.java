@@ -23,7 +23,7 @@ public class ReadPetitionDto {
 
     List<String> hashtags;
 
-    List<String> photos;
+    List<String> media;
 
     Long likeCount;
 
@@ -49,13 +49,13 @@ public class ReadPetitionDto {
 
     Boolean isSupport;
 
-    public ReadPetitionDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> photos, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount, Boolean isSupport) {
+    public ReadPetitionDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount, Boolean isSupport) {
         this.writer = writer;
         this.title = title;
         this.createdDate = createdDate;
         this.content = content;
         this.hashtags = hashtags;
-        this.photos = photos;
+        this.media = media;
         this.likeCount = likeCount;
         this.isLike = isLike;
         this.dislikeCount = dislikeCount;

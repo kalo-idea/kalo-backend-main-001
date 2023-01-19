@@ -1,9 +1,12 @@
 package kalo.main.domain.dto.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.querydsl.core.annotations.QueryProjection;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,12 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserAuthResDto {
     Long authId;
-    Long userId;
 
-    String authType;
+    String type;
     String kakao;
     String email;
     String name;
+    LocalDate birth;
     String gender;
     String tel;
     String address;
@@ -25,21 +28,17 @@ public class UserAuthResDto {
     Boolean promotionCheck;
     String fcmToken;
     LocalDateTime recentLogin;
-
-    String userType;
-    String nickname;
-    String intro;
-    String profileSrc;
-    String publicInfos;
+    List<UserInfoDto> userInfoDto;
 
     @QueryProjection
-    public UserAuthResDto(Long authId, Long userId, String authType, String kakao, String email, String name, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin, String userType, String nickname, String intro, String profileSrc, String publicInfos) {
+    @Builder
+    public UserAuthResDto(Long authId, String type, String kakao, String email, String name, LocalDate birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin, List<UserInfoDto> userInfoDto) {
         this.authId = authId;
-        this.userId = userId;
-        this.authType = authType;
+        this.type = type;
         this.kakao = kakao;
         this.email = email;
         this.name = name;
+        this.birth = birth;
         this.gender = gender;
         this.tel = tel;
         this.address = address;
@@ -48,33 +47,6 @@ public class UserAuthResDto {
         this.promotionCheck = promotionCheck;
         this.fcmToken = fcmToken;
         this.recentLogin = recentLogin;
-        this.userType = userType;
-        this.nickname = nickname;
-        this.intro = intro;
-        this.profileSrc = profileSrc;
-        this.publicInfos = publicInfos;
+        this.userInfoDto = userInfoDto;
     }
-
-
-    // public UserAuthResDto(Auth auth, User user) {
-    //     this.authId = auth.getId();
-    //     this.userId = user.getId();
-    //     this.authType = auth.getType();
-    //     this.kakao = auth.getKakao();
-    //     this.email = auth.getEmail();
-    //     this.name = auth.getName();
-    //     this.gender = auth.getGender();
-    //     this.tel = auth.getTel();
-    //     this.address = auth.getAddress();
-    //     this.region1depthName = auth.getRegion1depthName();
-    //     this.region2depthName = auth.getRegion2depthName();
-    //     this.promotionCheck = auth.getPromotionCheck();
-    //     this.fcmToken = auth.getFcmToken();
-    //     this.recentLogin = auth.getRecentLogin();
-    //     this.userType = user.getType();
-    //     this.nickname = user.getNickname();
-    //     this.intro = user.getIntro();
-    //     this.profileSrc = user.getProfileSrc();
-    //     this.publicInfos = user.getPublicInfos();
-    // }
 }

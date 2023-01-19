@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UpdateUserInfoReqDto {
-    Long userId;
+    Long authId;
     String name;
-    String nickname;
     LocalDate birth;
     String gender;
     String email;

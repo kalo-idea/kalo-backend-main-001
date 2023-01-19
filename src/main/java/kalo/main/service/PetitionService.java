@@ -114,7 +114,7 @@ public class PetitionService {
             }
         }
 
-        List<String> media = createPetitionDto.getPhotos();
+        List<String> media = createPetitionDto.getMedia();
         for (String fileName : media) {
             Media medium = new Media(fileName);
             mediaRepository.save(medium);
@@ -171,7 +171,7 @@ public class PetitionService {
             .createdDate(petition.getCreatedDate())
             .content(petition.getContent())
             .hashtags(hashtags_res)
-            .photos(media_res)
+            .media(media_res)
             .likeCount(petition.getLikeCount())
             .isLike(isLike)
             .dislikeCount(petition.getDislikeCount())
@@ -193,7 +193,7 @@ public class PetitionService {
         .createdDate(petition.getCreatedDate())
         .content(petition.getContent())
         .hashtags(hashtags_res)
-        .photos(media_res)
+        .media(media_res)
         .likeCount(petition.getLikeCount())
         .isLike(isLike)
         .dislikeCount(petition.getDislikeCount())
@@ -270,9 +270,9 @@ public class PetitionService {
     }
 
     // 청원 리스트 조회
-    public List<ReadPetitionsDto> readPetitions(Pageable pageable, PetitionCondDto cond) {
+    public List<ReadPetitionsDto> readPetitions(Pageable pageable, PetitionCondDto cond, Boolean recent) {
 
-        List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findListPetitions(pageable, cond);
+        List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findListPetitions(pageable, cond, recent);
 
         List<ReadPetitionsDto> result = new ArrayList<>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
@@ -493,7 +493,7 @@ public class PetitionService {
             throw new BasicException("이미 참여한 청원입니다.");
         }
 
-        Long getSum = ledgerRepository.getSumLedger(userId);
+        Long getSum = ledgerRepository.getSumUserLedger(userId);
         if (getSum < 500) {
             throw new BasicException("포인트가 부족합니다.");
         }
@@ -526,35 +526,5 @@ public class PetitionService {
             supportPetitionUser.setNickname(convertNickname);
         }
         return res;
-    }
-
-    // 베스트 관심 청원
-    public List<ReadPetitionsDto> bestLikePetitions() {
-
-        List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findBestLikePetitions();
-
-        List<ReadPetitionsDto> result = new ArrayList<>();
-        for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
-            User writer = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));;
-            List<String> words = new ArrayList<String>();
-            List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
-            for (Hashtag hashtag : hashtags) {
-                words.add(hashtag.getWord());
-            }
-            List<String> fileNames = new ArrayList<String>();
-            List<Media> media = new ArrayList<Media>();
-            for (Media medium : media) {
-                fileNames.add(medium.getFileName());
-            }
-
-            if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, words, fileNames));
-            }
-            else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), words, fileNames));
-            }
-        }
-
-        return result;
     }
 }

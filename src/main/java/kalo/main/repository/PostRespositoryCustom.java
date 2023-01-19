@@ -8,5 +8,5 @@ import kalo.main.domain.dto.post.PostCondDto;
 import kalo.main.domain.dto.post.ReadSimplePostDto;
 
 public interface PostRespositoryCustom {
-    List<ReadSimplePostDto> findListPosts(Pageable pageable, PostCondDto cond);
+    List<ReadSimplePostDto> findListPosts(Pageable pageable, PostCondDto cond, Boolean recent);
 }

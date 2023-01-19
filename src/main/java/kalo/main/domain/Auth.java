@@ -1,5 +1,6 @@
 package kalo.main.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class Auth extends BaseEntity {
     @Column(length = 32)
     String name;
 
-    LocalDateTime birth;
+    LocalDate birth;
 
     @Column(length = 8)
     String gender;
@@ -56,7 +57,7 @@ public class Auth extends BaseEntity {
     LocalDateTime recentLogin;
 
     @Builder
-    public Auth(Long id, String type, String kakao, String email, String name, LocalDateTime birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin) {
+    public Auth(Long id, String type, String kakao, String email, String name, LocalDate birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin) {
         this.id = id;
         this.type = type;
         this.kakao = kakao;

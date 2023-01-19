@@ -35,7 +35,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
 
     // 청원 리스트 조회, 페이징, 조건 포함
     @Override
-    public List<ReadSimplePetitionsDto> findListPetitions(Pageable pageable, PetitionCondDto cond) {
+    public List<ReadSimplePetitionsDto> findListPetitions(Pageable pageable, PetitionCondDto cond, Boolean recent) {
 
         JPAQuery<ReadSimplePetitionsDto> query = queryFactory.select(new QReadSimplePetitionsDto(
             petition.id,
@@ -59,7 +59,8 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
             progressFilter(cond.getProgress()),
-            categoryFilter(cond.getCategory())
+            categoryFilter(cond.getCategory()),
+            recentFilter(recent)
             )
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize());
@@ -172,68 +173,6 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .fetch();
     }
 
-    // 베스트 관심 청원
-    @Override
-    public List<ReadSimplePetitionsDto> findBestLikePetitions() {
-        return queryFactory.select(new QReadSimplePetitionsDto(
-            petition.id,
-            petition.user.id,
-            petition.title,
-            petition.createdDate,
-            petition.content.substring(0, 100),
-            petition.likeCount,
-            petition.dislikeCount,
-            petition.progress,
-            petition.goal,
-            petition.replyCount,
-            petition.category,
-            petition.region1depthName,
-            petition.region2depthName,
-            petition.supportCount))
-        .from(petition)
-        .where(
-            petition.deleted.eq(false),
-            petition.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay())
-            )
-        .offset(0)
-        .limit(3)
-        .orderBy(
-            petition.likeCount.desc()
-        )
-        .fetch();
-    }
-
-    // 베스트 참여 청원
-    @Override
-    public List<ReadSimplePetitionsDto> findBestSupportPetitions() {
-        return queryFactory.select(new QReadSimplePetitionsDto(
-            petition.id,
-            petition.user.id,
-            petition.title,
-            petition.createdDate,
-            petition.content.substring(0, 100),
-            petition.likeCount,
-            petition.dislikeCount,
-            petition.progress,
-            petition.goal,
-            petition.replyCount,
-            petition.category,
-            petition.region1depthName,
-            petition.region2depthName,
-            petition.supportCount))
-        .from(petition)
-        .where(
-            petition.deleted.eq(false),
-            petition.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay())
-            )
-        .offset(0)
-        .limit(3)
-        .orderBy(
-            petition.supportCount.desc()
-        )
-        .fetch();
-    }
-
     private BooleanExpression searchFilter(String search) {
         if (StringUtils.hasText(search)) {
             return petition.title.like("%" + search + "%").or(petition.content.like("%" + search + "%"));
@@ -288,6 +227,13 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
     private BooleanExpression categoryFilter(String category) {
         if (StringUtils.hasText(category)) {
             return petition.category.eq(category) ;
+        }
+        return null;
+    }
+    
+    private BooleanExpression recentFilter(Boolean recent) {
+        if (recent) {
+            return petition.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay());
         }
         return null;
     }

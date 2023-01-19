@@ -26,7 +26,7 @@ public class ReadPetitionsDto {
 
     List<String> hashtags;
 
-    List<String> photos;
+    List<String> media;
 
     Long likeCount;
 
@@ -48,14 +48,14 @@ public class ReadPetitionsDto {
 
     @Builder
     @QueryProjection
-    public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> hashtags, List<String> photos) {
+    public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> hashtags, List<String> media) {
         this.petitionId = readSimplePetitionsDto.getPetitionId();
         this.writer = writer;
         this.title = readSimplePetitionsDto.getTitle();
         this.createdDate = readSimplePetitionsDto.getCreatedDate();
         this.content = readSimplePetitionsDto.getContent();
         this.hashtags = hashtags;
-        this.photos = photos;
+        this.media = media;
         this.likeCount = readSimplePetitionsDto.getLikeCount();
         this.dislikeCount = readSimplePetitionsDto.getDislikeCount();
         this.progress = readSimplePetitionsDto.getProgress();

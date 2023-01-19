@@ -13,7 +13,7 @@ public class CreatePetitionDto {
 
     String content = "";
 
-    List<String> photos = new ArrayList<String>();
+    List<String> media = new ArrayList<String>();
 
     Long userId;
 
