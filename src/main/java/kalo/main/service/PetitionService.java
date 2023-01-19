@@ -14,6 +14,7 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.DislikePetition;
 import kalo.main.domain.DislikePetitionReply;
 import kalo.main.domain.Hashtag;
+import kalo.main.domain.Ledger;
 import kalo.main.domain.LikePetition;
 import kalo.main.domain.LikePetitionReply;
 import kalo.main.domain.Media;
@@ -36,6 +37,7 @@ import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import kalo.main.repository.DislikePetitionReplyRepository;
 import kalo.main.repository.DislikePetitionRepository;
 import kalo.main.repository.HashtagRepository;
+import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.LikePetitionReplyRepository;
 import kalo.main.repository.LikePetitionRepository;
 import kalo.main.repository.MediaPetitionRepository;
@@ -64,6 +66,7 @@ public class PetitionService {
     private final SupportPetitionRepository supportPetitionRepository;
     private final MediaRepository mediaRepository;
     private final MediaPetitionRepository mediaPetitionRepository;
+    private final LedgerRepository ledgerRepository;
 
     // 청원 생성
     public Long createPetition(CreatePetitionDto createPetitionDto) {
@@ -489,6 +492,13 @@ public class PetitionService {
         if (supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             throw new BasicException("이미 참여한 청원입니다.");
         }
+
+        Long getSum = ledgerRepository.getSumLedger(userId);
+        if (getSum < 500) {
+            throw new BasicException("포인트가 부족합니다.");
+        }
+        Ledger ledger = Ledger.builder().user(user).type("support").amount(-500L).build();
+        ledgerRepository.save(ledger);
 
         SupportPetition supportPetition = SupportPetition.builder()
         .petition(petition)
