@@ -28,6 +28,8 @@ public class ReadSimplePetitionsDto {
 
     String progress;
 
+    String step;
+
     Long goal;
 
     Long replyCount;
@@ -42,7 +44,7 @@ public class ReadSimplePetitionsDto {
 
     @Builder
     @QueryProjection
-    public ReadSimplePetitionsDto(Long petitionId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, String progress, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount) {
+    public ReadSimplePetitionsDto(Long petitionId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, String progress, String step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount) {
         this.petitionId = petitionId;
         this.writerId = writerId;
         this.title = title;
@@ -51,6 +53,7 @@ public class ReadSimplePetitionsDto {
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.progress = progress;
+        this.step = step;
         this.goal = goal;
         this.replyCount = replyCount;
         this.category = category;

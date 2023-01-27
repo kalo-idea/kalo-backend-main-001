@@ -3,6 +3,7 @@ package kalo.main.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -163,6 +164,19 @@ public class PetitionService {
         for (Media medium : media) {
             media_res.add(medium.getFileName());
         }
+        String progress = petition.getProgress();
+        if (progress.equals("recruit")) {
+            if (!petition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
+                if (petition.getSupportCount() >= 100) {
+                    progress = "ing";
+                } else {
+                    progress = "fail";
+                }
+            }
+        }
+
+        List<String> steps = Arrays.asList(petition.getStep().split(","));
+        
 
         // 탈퇴회원 -> 유저정보 제외하고 반환
         if (writer.getDeleted()) {
@@ -176,7 +190,8 @@ public class PetitionService {
             .isLike(isLike)
             .dislikeCount(petition.getDislikeCount())
             .isDislike(isDislike)
-            .progress(petition.getProgress())
+            .progress(progress)
+            .step(steps)
             .goal(petition.getGoal())
             .replyCount(petition.getReplyCount())
             .category(petition.getCategory())
@@ -198,7 +213,8 @@ public class PetitionService {
         .isLike(isLike)
         .dislikeCount(petition.getDislikeCount())
         .isDislike(isDislike)
-        .progress(petition.getProgress())
+        .progress(progress)
+        .step(steps)
         .goal(petition.getGoal())
         .replyCount(petition.getReplyCount())
         .category(petition.getCategory())
@@ -277,6 +293,22 @@ public class PetitionService {
         List<ReadPetitionsDto> result = new ArrayList<>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             User writer = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));;
+            
+            String progress = simplePetition.getProgress();
+            if (progress.equals("recruit")) {
+                if (!simplePetition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
+                    if (simplePetition.getSupportCount() >= 100) {
+                        progress = "ing";
+                    } else {
+                        progress = "fail";
+                    }
+                }
+            }
+            simplePetition.setProgress(progress);
+
+            List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
+
+            
             List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
@@ -289,10 +321,10 @@ public class PetitionService {
             }
 
             if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, null, steps, words, fileNames));
             }
             else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
             }
         }
 

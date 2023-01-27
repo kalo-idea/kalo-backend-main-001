@@ -34,6 +34,8 @@ public class ReadPetitionsDto {
 
     String progress;
 
+    List<String> step;
+
     Long goal;
 
     Long replyCount;
@@ -48,7 +50,7 @@ public class ReadPetitionsDto {
 
     @Builder
     @QueryProjection
-    public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> hashtags, List<String> media) {
+    public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> step, List<String> hashtags, List<String> media) {
         this.petitionId = readSimplePetitionsDto.getPetitionId();
         this.writer = writer;
         this.title = readSimplePetitionsDto.getTitle();
@@ -59,6 +61,7 @@ public class ReadPetitionsDto {
         this.likeCount = readSimplePetitionsDto.getLikeCount();
         this.dislikeCount = readSimplePetitionsDto.getDislikeCount();
         this.progress = readSimplePetitionsDto.getProgress();
+        this.step = step;
         this.goal = readSimplePetitionsDto.getGoal();
         this.replyCount = readSimplePetitionsDto.getReplyCount();
         this.category = readSimplePetitionsDto.getCategory();

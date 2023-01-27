@@ -1,5 +1,6 @@
 package kalo.main.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +56,21 @@ public class UserService {
         List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             User writer = userRepository.findById(simplePetition.getWriterId()).get();
+
+            String progress = simplePetition.getProgress();
+            if (progress.equals("recruit")) {
+                if (!simplePetition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
+                    if (simplePetition.getSupportCount() >= 100) {
+                        progress = "ongoing";
+                    } else {
+                        progress = "fail";
+                    }
+                }
+            }
+            simplePetition.setProgress(progress);
+
+            List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
+
             List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
@@ -66,10 +82,10 @@ public class UserService {
                 fileNames.add(medium.getFileName());
             }
             if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, null, steps, words, fileNames));
             }
             else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
             }
         }
 
@@ -83,6 +99,21 @@ public class UserService {
         List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             User writer = userRepository.findById(simplePetition.getWriterId()).get();
+
+            String progress = simplePetition.getProgress();
+            if (progress.equals("recruit")) {
+                if (!simplePetition.getCreatedDate().isAfter(LocalDate.now().minusDays(29).atStartOfDay())) {
+                    if (simplePetition.getSupportCount() >= 100) {
+                        progress = "ongoing";
+                    } else {
+                        progress = "fail";
+                    }
+                }
+            }
+            simplePetition.setProgress(progress);
+
+            List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
+
             List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
@@ -94,10 +125,10 @@ public class UserService {
                 fileNames.add(medium.getFileName());
             }
             if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, null, steps, words, fileNames));
             }
             else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
             }
         }
 
@@ -205,6 +236,9 @@ public class UserService {
     // 탈퇴
     public Long out(Long userId) {
         User user = userRepository.findById(userId).get();
+        if (user.getDeleted()) {
+            throw new BasicException("이미 탈퇴한 회원입니다.");
+        }
         user.delete();
         return userId;
     }
