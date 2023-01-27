@@ -38,6 +38,8 @@ public class Petition extends BaseEntity {
 
     String progress = "";
 
+    String step = "";
+
     Long goal = 0L;
 
     Long replyCount = 0L;

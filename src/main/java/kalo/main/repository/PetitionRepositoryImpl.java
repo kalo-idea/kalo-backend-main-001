@@ -46,6 +46,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             petition.likeCount,
             petition.dislikeCount,
             petition.progress,
+            petition.step,
             petition.goal,
             petition.replyCount,
             petition.category,
@@ -59,6 +60,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
             progressFilter(cond.getProgress()),
+            stepFilter(cond.getStep()),
             categoryFilter(cond.getCategory()),
             recentFilter(recent)
             )
@@ -89,6 +91,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.likeCount,
         petition.dislikeCount,
         petition.progress,
+        petition.step,
         petition.goal,
         petition.replyCount,
         petition.category,
@@ -129,6 +132,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.likeCount,
         petition.dislikeCount,
         petition.progress,
+        petition.step,
         petition.goal,
         petition.replyCount,
         petition.category,
@@ -195,29 +199,42 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
     }
 
     private BooleanExpression progressFilter(String progress) {
-        if (StringUtils.hasText(progress)) {            
-            List<String> progressList = Arrays.asList(progress.split(","));
-            
-            if (progressList.contains("fail")) { // 실패
+        if (StringUtils.hasText(progress)) {
+            if (progress.equals("fail")) { // 실패
                 return petition.progress.eq("recruit")
                     .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
                       .and(petition.supportCount.lt(100)))
                 .or(petition.progress.eq("fail"));
             }
-            else if (progressList.contains("recruit")) { // 모집 중
+            else if (progress.equals("recruit")) { // 모집 중
                 return petition.progress.eq("recruit")
                 .and(petition.createdDate.goe(LocalDate.now().minusDays(29).atStartOfDay()));
             }
-            else if (progressList.contains("suggest") || progressList.contains("inform") || progressList.contains("legalReview")) { // 민원/건의, 언론 제보, 법률 검토
+            else if (progress.equals("ing")) { // 민원/건의, 언론 제보, 법률 검토
                 return petition.progress.eq("recruit")
                     .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
                         .and(petition.supportCount.goe(100)))
-                .or(petition.progress.eq("suggest"))
-                .or(petition.progress.like("inform"))
-                .or(petition.progress.like("legalReview"));
+                .or(petition.progress.eq("ing"));
             }
-            else if (progressList.contains("complete")) { // 사회 참여 완료
-                return petition.progress.like("complete");
+            else if (progress.equals("complete")) { // 사회 참여 완료
+                return petition.progress.eq("complete");
+            }
+            return null;
+        }
+        return null;
+    }
+
+    private BooleanExpression stepFilter(String step) {
+
+        if (StringUtils.hasText(step)) {
+            if (step.equals("suggest")) { // 실패
+                return petition.progress.like("suggest");
+            }
+            if (step.equals("inform")) { // 실패
+                return petition.progress.like("inform");
+            }
+            if (step.equals("legalReview")) { // 실패
+                return petition.progress.like("legalReview");
             }
             return null;
         }

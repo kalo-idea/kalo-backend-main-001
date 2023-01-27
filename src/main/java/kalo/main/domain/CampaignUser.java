@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +27,12 @@ public class CampaignUser extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campaign_id")
     Campaign campaign;
+
+    @Builder
+    public CampaignUser(Long id, User user, Campaign campaign) {
+        this.id = id;
+        this.user = user;
+        this.campaign = campaign;
+    }
+
 }
