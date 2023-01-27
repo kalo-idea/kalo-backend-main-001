@@ -494,6 +494,9 @@ public class PetitionService {
         }
 
         Long getSum = ledgerRepository.getSumUserLedger(userId);
+        if (getSum == null) {
+            getSum = 0L;
+        }
         if (getSum < 500) {
             throw new BasicException("포인트가 부족합니다.");
         }
