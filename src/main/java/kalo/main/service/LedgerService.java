@@ -6,16 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Ledger;
 import kalo.main.domain.User;
+import kalo.main.domain.dto.LedgerHistoryDto;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LedgerService {
     private final LedgerRepository ledgerRepository;
     private final UserRepository userRepository;
@@ -51,4 +54,15 @@ public class LedgerService {
         }
         return result;
     } 
+
+    // 회원 조회용 거래내역
+    public List<LedgerHistoryDto> getLedgersHistory(Long userId) {        
+        List<Ledger> ledger = ledgerRepository.findByUserIdAndDeletedOrderByCreatedDateDesc(userId, false).get();
+        List<LedgerHistoryDto> history = new ArrayList<LedgerHistoryDto>();
+        for (Ledger led : ledger) {
+            history.add(new LedgerHistoryDto(led));
+        }
+
+        return history;
+    }
 }
