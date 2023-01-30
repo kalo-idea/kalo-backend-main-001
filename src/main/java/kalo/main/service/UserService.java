@@ -140,9 +140,9 @@ public class UserService {
             // 이미 가입된 회원
             Auth auth = authRepository.findByKakao(kakao).get();
             List<User> users = userRepository.findByAuthId(auth.getId()).orElseThrow(() -> new BasicException("연결된 계정이 없습니다."));
-            List<UserInfoDto> users_res = new ArrayList<UserInfoDto>();
+            List<UserInfoDto> userInfos = new ArrayList<UserInfoDto>();
             for (User user : users) {
-                users_res.add(new UserInfoDto(user));
+                userInfos.add(new UserInfoDto(user));
             }
 
             UserAuthResDto userAuthResDto = UserAuthResDto.builder()
@@ -160,7 +160,7 @@ public class UserService {
                 .promotionCheck(auth.getPromotionCheck())
                 .fcmToken(auth.getFcmToken())
                 .recentLogin(auth.getRecentLogin())
-                .userInfoDto(users_res)
+                .userInfos(userInfos)
                 .build();
 
             return userAuthResDto;
