@@ -28,11 +28,11 @@ public class UserAuthResDto {
     Boolean promotionCheck;
     String fcmToken;
     LocalDateTime recentLogin;
-    List<UserInfoDto> userInfoDto;
+    List<UserInfoDto> userInfos;
 
     @QueryProjection
     @Builder
-    public UserAuthResDto(Long authId, String type, String kakao, String email, String name, LocalDate birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin, List<UserInfoDto> userInfoDto) {
+    public UserAuthResDto(Long authId, String type, String kakao, String email, String name, LocalDate birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin, List<UserInfoDto> userInfos) {
         this.authId = authId;
         this.type = type;
         this.kakao = kakao;
@@ -47,6 +47,6 @@ public class UserAuthResDto {
         this.promotionCheck = promotionCheck;
         this.fcmToken = fcmToken;
         this.recentLogin = recentLogin;
-        this.userInfoDto = userInfoDto;
+        this.userInfos = userInfos;
     }
 }

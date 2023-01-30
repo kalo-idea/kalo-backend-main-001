@@ -146,27 +146,27 @@ public class UserService {
             }
 
             UserAuthResDto userAuthResDto = UserAuthResDto.builder()
-            .authId(auth.getId())
-            .type(auth.getType())
-            .kakao(auth.getKakao())
-            .email(auth.getEmail())
-            .name(auth.getName())
-            .birth(auth.getBirth())
-            .gender(auth.getGender())
-            .tel(auth.getTel())
-            .address(auth.getAddress())
-            .region1depthName(auth.getRegion1depthName())
-            .region2depthName(auth.getRegion2depthName())
-            .promotionCheck(auth.getPromotionCheck())
-            .fcmToken(auth.getFcmToken())
-            .recentLogin(auth.getRecentLogin())
-            .userInfoDto(users_res)
-            .build();
+                .authId(auth.getId())
+                .type(auth.getType())
+                .kakao(auth.getKakao())
+                .email(auth.getEmail())
+                .name(auth.getName())
+                .birth(auth.getBirth())
+                .gender(auth.getGender())
+                .tel(auth.getTel())
+                .address(auth.getAddress())
+                .region1depthName(auth.getRegion1depthName())
+                .region2depthName(auth.getRegion2depthName())
+                .promotionCheck(auth.getPromotionCheck())
+                .fcmToken(auth.getFcmToken())
+                .recentLogin(auth.getRecentLogin())
+                .userInfoDto(users_res)
+                .build();
 
             return userAuthResDto;
         } else {
             // 회원가입 필요
-            return null;
+            return UserAuthResDto.builder().build();
         }
     }
 
@@ -193,14 +193,13 @@ public class UserService {
         user.setPublicInfos(publicInfos);
     }
 
-    // 가능한 닉네임이면 true
-    // 불가능한 닉네임이면 false
+    // 중복되면 true
     public Boolean isDuplicatedNickname(String nickname) {
-        return !userRepository.findByNicknameIgnoreCase(nickname).isPresent();
+        return userRepository.findByNicknameIgnoreCase(nickname).isPresent();
     }
 
     public Long join(JoinReqDto req) {
-        if (!isDuplicatedNickname(req.getNickname())) {
+        if (isDuplicatedNickname(req.getNickname())) {
             throw new BasicException("불가능한 닉네임입니다.");
         }
         Auth auth = Auth.builder()
