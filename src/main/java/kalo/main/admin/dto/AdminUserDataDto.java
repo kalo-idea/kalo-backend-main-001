@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AdminUserResDto {
+public class AdminUserDataDto {
     Long id;
     String type;
     String nickname;
