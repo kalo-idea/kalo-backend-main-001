@@ -210,11 +210,11 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
                 return petition.progress.eq("recruit")
                 .and(petition.createdDate.goe(LocalDate.now().minusDays(29).atStartOfDay()));
             }
-            else if (progress.equals("ing")) { // 민원/건의, 언론 제보, 법률 검토
+            else if (progress.equals("ongoing")) { // 민원/건의, 언론 제보, 법률 검토
                 return petition.progress.eq("recruit")
                     .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
                         .and(petition.supportCount.goe(100)))
-                .or(petition.progress.eq("ing"));
+                .or(petition.progress.eq("ongoing"));
             }
             else if (progress.equals("complete")) { // 사회 참여 완료
                 return petition.progress.eq("complete");

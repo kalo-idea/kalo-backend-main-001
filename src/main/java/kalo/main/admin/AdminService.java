@@ -12,7 +12,7 @@ import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
 import kalo.main.admin.dto.AdminUserReqDto;
-import kalo.main.admin.dto.AdminUserResDto;
+import kalo.main.admin.dto.AdminUserDataDto;
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Auth;
 import kalo.main.domain.Ledger;
@@ -151,9 +151,9 @@ public class AdminService {
     }
 
     // User 조회
-    public AdminUserResDto getUser(AdminUserReqDto req) {
+    public AdminUserDataDto getUser(AdminUserReqDto req) {
         User user = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-        AdminUserResDto res = new AdminUserResDto();
+        AdminUserDataDto res = new AdminUserDataDto();
         
         res.setId(user.getId());
         if (req.getType()) {
@@ -179,7 +179,26 @@ public class AdminService {
     }
 
     // User 수정
+    public String updateUser(AdminUserDataDto req) {
+        User res = userRepository.findById(req.getId()).orElseThrow(() -> new BasicException("없는 유저입니다."));
 
+        if (req.getType() != null) {
+            res.setType(req.getType());
+        }
+        if (req.getNickname() != null) {
+            res.setNickname(req.getNickname());
+        }
+        if (req.getIntro() != null) {
+            res.setIntro(req.getIntro());
+        }
+        if (req.getProfileSrc() != null) {
+            res.setProfileSrc(req.getProfileSrc());
+        }
+        if (req.getPublicInfos() != null) {
+            res.setPublicInfos(req.getPublicInfos());
+        }
 
+        return "성공";
+    }
 
 }
