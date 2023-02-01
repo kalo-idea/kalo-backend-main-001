@@ -31,6 +31,7 @@ import kalo.main.repository.HashtagRepository;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.LikePetitionRepository;
 import kalo.main.repository.MediaRepository;
+import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.SupportPetitionRepository;
 import kalo.main.repository.UserRepository;
@@ -48,6 +49,7 @@ public class UserService {
     private final LedgerRepository ledgerRepository;
     private final SupportPetitionRepository supportPetitionRepository;
     private final LikePetitionRepository likePetitionRepository;
+    private final NotisService notisService;
 
     // 유저 청원 좋아요 리스트조회
     public List<ReadPetitionsDto> getLikePetitions(Pageable pageable, Long userId) {
@@ -198,6 +200,7 @@ public class UserService {
         return userRepository.findByNicknameIgnoreCase(nickname).isPresent();
     }
 
+    // 회원가입
     public UserAuthResDto createAuth(JoinReqDto req) {
         if (isDuplicatedNickname(req.getNickname())) {
             throw new BasicException("불가능한 닉네임입니다.");
@@ -251,6 +254,8 @@ public class UserService {
             .userInfos(userInfos)
             .build();
 
+        notisService.joinNotis(user.getId());
+
         return userAuthResDto;
     }
 
@@ -268,10 +273,6 @@ public class UserService {
     public Long updateInfo(UpdateUserInfoReqDto req) {
         Auth auth = authRepository.findById(req.getAuthId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
 
-        auth.setName(req.getName());
-        auth.setBirth(req.getBirth());
-        auth.setGender(req.getGender());
-        auth.setEmail(req.getEmail());
         auth.setTel(req.getTel());
         auth.setRegion1depthName(req.getRegion1depthName());
         auth.setRegion2depthName(req.getRegion2depthName());

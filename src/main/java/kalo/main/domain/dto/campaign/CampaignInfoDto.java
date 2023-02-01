@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class CampaignInfoDto {
     Long id;
     String title;
+    String subTitle;
     String info;
     String thumbnail;
     String contentImage;
@@ -20,6 +21,7 @@ public class CampaignInfoDto {
     public CampaignInfoDto(Campaign campaign, Double percent) {
         this.id = campaign.getId();
         this.title = campaign.getTitle();
+        this.subTitle = campaign.getSubTitle();
         this.info = campaign.getInfo();
         this.thumbnail = campaign.getThumbnail();
         this.contentImage = campaign.getContentImage();

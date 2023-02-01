@@ -53,8 +53,13 @@ public class CampaignService {
         }
 
         for (Campaign campaign : campaigns) {
-            Double percent = 100 * campaign.getVote().doubleValue() / voteCount;
-            campaignInfos.add(new CampaignInfoDto(campaign, percent));
+            if (voteCount == 0) {
+                campaignInfos.add(new CampaignInfoDto(campaign, 0D));
+            }
+            else {
+                Double percent = 100 * campaign.getVote().doubleValue() / voteCount;
+                campaignInfos.add(new CampaignInfoDto(campaign, percent));
+            }
         }
         GroupCampaignInfoDto info = GroupCampaignInfoDto.builder()
         .donation(donation)

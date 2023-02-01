@@ -9,13 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateUserInfoReqDto {
     Long authId;
-    String name;
-    LocalDate birth;
-    String gender;
-    String email;
     String tel;
     String region1depthName;
     String region2depthName;
     Boolean promotionCheck;
-
 }

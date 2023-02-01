@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import kalo.main.domain.Notis;
 
 public interface NotisRepository extends JpaRepository<Notis, Long> {
-    List<Notis> findNotisByReceiverIdAndIsDisplayAndDeleted(Pageable pageable, Long receiverId, Boolean deleted, Boolean isDisplay);
+    List<Notis> findNotisByReceiverIdAndDeletedAndIsDisplay(Pageable pageable, Long receiverId, Boolean deleted, Boolean isDisplay);
     Long countNotisByReceiverIdAndDeletedAndIsDisplayAndIsCheck(Long receiverId, Boolean deleted, Boolean isDisplay, Boolean isCheck);
 }
