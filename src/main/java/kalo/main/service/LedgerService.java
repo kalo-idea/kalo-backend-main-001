@@ -65,4 +65,9 @@ public class LedgerService {
 
         return history;
     }
+
+    public Long getPoint(Long userId) {
+        Long ledgers = ledgerRepository.getSumUserLedger(userId);
+        return ledgers;
+    }
 }

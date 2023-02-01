@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MyProfileHomeDto {
     Long point;
-    Long supportPetition;
-    Long likePetition;
+    Long supportPetitionCount;
+    Long likePetitionCount;
 
     @QueryProjection
-    public MyProfileHomeDto(Long point, Long supportPetition, Long likePetition) {
+    public MyProfileHomeDto(Long point, Long supportPetitionCount, Long likePetitionCount) {
         this.point = point;
-        this.supportPetition = supportPetition;
-        this.likePetition = likePetition;
+        this.supportPetitionCount = supportPetitionCount;
+        this.likePetitionCount = likePetitionCount;
     }
 
 }

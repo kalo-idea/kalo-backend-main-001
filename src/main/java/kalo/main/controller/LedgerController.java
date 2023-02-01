@@ -33,4 +33,9 @@ public class LedgerController {
     public List<LocalDate> getAttend(Long userId, int year, int month) {
         return ledgerService.getAttend(userId, year, month);
     }
+
+    @PostMapping("/get-point")
+    public Long getPoint(Long userId) {
+        return ledgerService.getPoint(userId);
+    }
 }
