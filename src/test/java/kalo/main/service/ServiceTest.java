@@ -67,7 +67,7 @@ public class ServiceTest {
         joinReq.setRegion1depthName("경기");
         joinReq.setRegion2depthName("안양");
         joinReq.setTel("010-1234-9173");
-        Long userId = usersService.join(joinReq);
+        Long userId = usersService.createAuth(joinReq).getUserInfos().get(0).getUserId();
         Long afterCount = userRepository.count();
 
         assertThat(beforeCount).isEqualTo(afterCount - 1);

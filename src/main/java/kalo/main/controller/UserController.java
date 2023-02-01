@@ -59,14 +59,14 @@ public class UserController {
 
     // 회원 가입
     @PostMapping("/public/create-auth")
-    public Long join(@RequestBody JoinReqDto req) {
-        return userService.join(req);
+    public UserAuthResDto createAuth(@RequestBody JoinReqDto req) {
+        return userService.createAuth(req);
     }
 
     // 회원 탈퇴
     @PostMapping("/delete-auth")
-    public Long join(@RequestBody OnlyUserIdDto req) {
-        return userService.out(req.getUserId());
+    public Long deleteAuth(@RequestBody OnlyUserIdDto req) {
+        return userService.deleteAuth(req.getUserId());
     }
 
     // 회원 프로필 정보

@@ -198,7 +198,7 @@ public class UserService {
         return userRepository.findByNicknameIgnoreCase(nickname).isPresent();
     }
 
-    public Long join(JoinReqDto req) {
+    public UserAuthResDto createAuth(JoinReqDto req) {
         if (isDuplicatedNickname(req.getNickname())) {
             throw new BasicException("불가능한 닉네임입니다.");
         }
@@ -227,13 +227,35 @@ public class UserService {
         .publicInfos("region1depthName,region2depthName")
         .auth(auth)
         .build();
-        Long userId = userRepository.save(user).getId();
 
-        return userId;
+        userRepository.save(user);
+
+        List<UserInfoDto> userInfos = new ArrayList<UserInfoDto>();
+        userInfos.add(new UserInfoDto(user));
+        
+        UserAuthResDto userAuthResDto = UserAuthResDto.builder()
+            .authId(auth.getId())
+            .type(auth.getType())
+            .kakao(auth.getKakao())
+            .email(auth.getEmail())
+            .name(auth.getName())
+            .birth(auth.getBirth())
+            .gender(auth.getGender())
+            .tel(auth.getTel())
+            .address(auth.getAddress())
+            .region1depthName(auth.getRegion1depthName())
+            .region2depthName(auth.getRegion2depthName())
+            .promotionCheck(auth.getPromotionCheck())
+            .fcmToken(auth.getFcmToken())
+            .recentLogin(auth.getRecentLogin())
+            .userInfos(userInfos)
+            .build();
+
+        return userAuthResDto;
     }
 
     // 탈퇴
-    public Long out(Long userId) {
+    public Long deleteAuth(Long userId) {
         User user = userRepository.findById(userId).get();
         if (user.getDeleted()) {
             throw new BasicException("이미 탈퇴한 회원입니다.");
