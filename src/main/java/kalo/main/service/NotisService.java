@@ -1,5 +1,6 @@
 package kalo.main.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import kalo.main.domain.Notis;
 import kalo.main.domain.Petition;
 import kalo.main.domain.Post;
 import kalo.main.domain.User;
+import kalo.main.domain.dto.NotisResDto;
 import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.PostRepository;
@@ -27,8 +29,14 @@ public class NotisService {
     private final PetitionRepository petitionRepository;
     private final PostRepository postRepository;
 
-    public List<Notis> getMyNotis(Pageable pageable, Long userId) {
-        return notisRepository.findNotisByReceiverIdAndIsDisplayAndDeleted(pageable, userId, false, true);
+    public List<NotisResDto> getMyNotis(Pageable pageable, Long userId) {
+        List<Notis> notis = notisRepository.findNotisByReceiverIdAndDeletedAndIsDisplay(pageable, userId, false, true);
+        
+        List<NotisResDto> res = new ArrayList<NotisResDto>();
+        for (Notis noti : notis) {
+            res.add(new NotisResDto(noti));
+        }
+        return res;
     }
 
     public Long checkMyNotis(Long userId) {
@@ -37,6 +45,7 @@ public class NotisService {
 
     public void joinNotis(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        User kalo = userRepository.findById(112L).get();
 
         Notis notis = Notis.builder()
         .image("kalo")
@@ -45,7 +54,7 @@ public class NotisService {
         .content("회원가입을 축하합니다. 당신의 목소리를 들려주세요!")
         .isDisplay(true)
         .targetId(userId)
-        .sender(null)
+        .sender(kalo)
         .receiver(user)
         .targetUrl(null)
         .target("user")
@@ -56,6 +65,7 @@ public class NotisService {
 
     public void supportMyPetitionNotis(Long petitionWriterId, Long TargetId) {
         User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        User kalo = userRepository.findById(112L).get();
 
         Notis notis = Notis.builder()
         .image(null)
@@ -64,7 +74,7 @@ public class NotisService {
         .content(null)
         .isDisplay(true)
         .targetId(TargetId)
-        .sender(null)
+        .sender(kalo)
         .receiver(petitionWriter)
         .targetUrl("/community/petition/" + TargetId)
         .target("petition")
