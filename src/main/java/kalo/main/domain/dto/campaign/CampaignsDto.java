@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CampaignsDto {
-    MonthCampaignInfoDto info;
+    GroupCampaignInfoDto info;
     List<CampaignInfoDto> campaigns;
 
     @Builder
-    public CampaignsDto(MonthCampaignInfoDto info, List<CampaignInfoDto> campaigns) {
+    public CampaignsDto(GroupCampaignInfoDto info, List<CampaignInfoDto> campaigns) {
         this.info = info;
         this.campaigns = campaigns;
     }

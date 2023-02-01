@@ -9,16 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import kalo.main.domain.Campaign;
+import kalo.main.domain.CampaignGroup;
 import kalo.main.domain.Petition;
 import kalo.main.domain.SupportPetition;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.user.JoinReqDto;
+import kalo.main.repository.CampaignGroupRepository;
 import kalo.main.repository.CampaignRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.SupportPetitionRepository;
@@ -44,6 +47,9 @@ public class ServiceTest {
     SupportPetitionRepository supportPetitionRepository;
     @Autowired
     CampaignRepository campaignRepository;
+    @Autowired
+    CampaignGroupRepository campaignGroupRepository;
+
 
     @Test
     void totalTest() {
@@ -117,39 +123,51 @@ public class ServiceTest {
         assertThat(nowPoint).isEqualTo(0);
         assertThat(beforeCount).isEqualTo(afterCount - 1);
 
-        assertThat(campaignService.getVoteCampaignStatus(userId, LocalDate.now().getYear(), LocalDate.now().getMonthValue())).isEqualTo("impossible");
+        CampaignGroup campaignGroup = CampaignGroup.builder()
+        .year(LocalDateTime.now().minusMonths(1).getYear())
+        .month(LocalDateTime.now().minusMonths(1).getMonthValue())
+        .supportingDateStart(LocalDate.of(LocalDate.now().minusMonths(1).getYear(), LocalDate.now().minusMonths(1).getMonthValue(), 1).atStartOfDay())
+        .supportingDateEnd(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX))
+        .votingDateStart(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).atStartOfDay())
+        .votingDateEnd(LocalDate.of(LocalDate.now().plusMonths(1).getYear(), LocalDate.now().plusMonths(1).getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX))
+        .donation(150000L)
+        .build();
+        Long campaignGroupId = campaignGroupRepository.save(campaignGroup).getId();
+
+        Campaign campaign = Campaign.builder()
+        .title( "캠페인 제목")
+        .info("캠페인 정보")
+        .thumbnail("캠페인 썸네일")
+        .contentImage("캠페인 이미지")
+        .vote(0L)
+        .campaignGroup(campaignGroup)
+        .build();
+        Long campaignId = campaignRepository.save(campaign).getId();
+
+        assertThat(campaignService.getVoteCampaignStatus(userId, LocalDate.now().minusMonths(1).getYear(), LocalDate.now().minusMonths(1).getMonthValue())).isEqualTo("impossible");
         
         assertThat(supportPetitionRepository.findByUserIdAndDeletedAndCreatedDateBetween(userId, 
         false,
-        LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusMonths(1).atStartOfDay(), 
-        LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX)).size())
+        campaignGroup.getSupportingDateStart(), 
+        campaignGroup.getSupportingDateEnd())).size()
         .isEqualTo(0);
 
-        SupportPetition supportPetition = supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get();
+        Long supportPetitionId = supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().getId();
         
-        Campaign campaign = new Campaign(null, LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1), "캠페인 제목", "캠페인 정보", "캠페인 썸네일", "캠페인 이미지", 0L);
-        Long campaignId = campaignRepository.save(campaign).getId();
 
         Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("투표권이 없습니다.");
 
         findPetition.setCreatedDate(LocalDateTime.now().minusMonths(1));
-        supportPetition = supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get();
+        SupportPetition supportPetition = supportPetitionRepository.findById(supportPetitionId).get();
         supportPetition.setCreatedDate(LocalDateTime.now().minusMonths(1));
-
-        assertThat(supportPetitionRepository.findByUserIdAndDeletedAndCreatedDateBetween(
-            userId, 
-            false,
-            LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusMonths(1).atStartOfDay(), 
-            LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX)
-        ).size())
-        .isGreaterThan(0);
-
-        assertThat(campaignService.getVoteCampaignStatus(userId, LocalDate.now().getYear(), LocalDate.now().getMonthValue())).isEqualTo("possible");
+        
+        assertThat(campaignService.getVoteCampaignStatus(userId, LocalDate.now().minusMonths(1).getYear(), LocalDate.now().minusMonths(1).getMonthValue())).isEqualTo("possible");
 
         
         campaignService.voteCampaign(campaignId, userId);
+            
 
-        assertThat(campaignService.getVoteCampaignStatus(userId, LocalDate.now().getYear(), LocalDate.now().getMonthValue())).isEqualTo("complete");
+        assertThat(campaignService.getVoteCampaignStatus(userId, LocalDate.now().minusMonths(1).getYear(), LocalDate.now().minusMonths(1).getMonthValue())).isEqualTo("complete");
         Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("이미 투표를 하셨습니다.");
 
     }

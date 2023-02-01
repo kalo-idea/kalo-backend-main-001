@@ -559,6 +559,7 @@ public class PetitionService {
                 convertNickname += "*";
             }
             supportPetitionUser.setNickname(convertNickname);
+            supportPetitionUser.setCreatedDate(supportPetitionUser.getCreatedDate().toLocalDate().atStartOfDay());
         }
         return res;
     }
