@@ -14,11 +14,13 @@ import kalo.main.repository.SupportPetitionRepository;
 import kalo.main.repository.UserRepository;
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Campaign;
+import kalo.main.domain.CampaignGroup;
 import kalo.main.domain.CampaignUser;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.campaign.CampaignInfoDto;
 import kalo.main.domain.dto.campaign.CampaignsDto;
-import kalo.main.domain.dto.campaign.MonthCampaignInfoDto;
+import kalo.main.domain.dto.campaign.GroupCampaignInfoDto;
+import kalo.main.repository.CampaignGroupRepository;
 import kalo.main.repository.CampaignRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class CampaignService {
     private final CampaignRepository campaignRepository;
+    private final CampaignGroupRepository campaignGroupRepository;
     private final CampaignUserRepository campaignUserRepository;
     private final SupportPetitionRepository supportPetitionRepository;
     private final UserRepository userRepository;
@@ -34,16 +37,15 @@ public class CampaignService {
     // 캠페인 목록
     public CampaignsDto getCampaigns(int year, int month) {
 
-        // 적립 금액을 뽑아내는 방법 -> 해당 월 supportPetition에서 참여 갯수 * 150
-        LocalDateTime startTime = LocalDate.of(year, month, 1).atStartOfDay();
-        LocalDate nextMonth = LocalDate.of(year, month, 1).plusMonths(1);
-        LocalDateTime endTime = nextMonth.minusDays(1).atTime(LocalTime.MAX);
+        CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(year, month).orElseThrow(() -> new BasicException("캠페인 그룹을 찾을 수 없습니다."));
         
-        Long supportCount = supportPetitionRepository.countByDeletedAndCreatedDateBetween(false, startTime, endTime);
-        Long accruedAmount = supportCount * 150;
+        Long donation = campaignGroup.getDonation();
 
-        LocalDate votingDate = LocalDate.of(year, month, 1);
-        List<Campaign> campaigns = campaignRepository.findByVotingDate(votingDate);
+        List<Campaign> campaigns = campaignRepository.findByCampaignGroup(campaignGroup);
+        if (!(campaigns.size() > 0)) {
+            throw new BasicException("캠페인을 찾을 수 없습니다.");
+        }
+
         List<CampaignInfoDto> campaignInfos = new ArrayList<CampaignInfoDto>();
         Long voteCount = 0L;
         for (Campaign campaign : campaigns) {
@@ -54,9 +56,11 @@ public class CampaignService {
             Double percent = 100 * campaign.getVote().doubleValue() / voteCount;
             campaignInfos.add(new CampaignInfoDto(campaign, percent));
         }
-        MonthCampaignInfoDto info = MonthCampaignInfoDto.builder()
-        .price(accruedAmount)
+        GroupCampaignInfoDto info = GroupCampaignInfoDto.builder()
+        .donation(donation)
         .voteCount(voteCount)
+        .votingDateStart(campaignGroup.getVotingDateStart())
+        .votingDateEnd(campaignGroup.getVotingDateEnd())
         .build();
 
         CampaignsDto result = CampaignsDto.builder()
@@ -70,21 +74,14 @@ public class CampaignService {
     // 투표 상태 확인
     public String getVoteCampaignStatus(Long userId, int year, int month) {
         // impossible, possible, complete
+        CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(year, month).orElseThrow(() -> new BasicException("캠페인 그룹을 찾을 수 없습니다."));
         
-        LocalDateTime beforeStartTime = LocalDate.of(year, month, 1).minusMonths(1).atStartOfDay();
-        LocalDate beforeNextMonth = LocalDate.of(year, month, 1);
-        LocalDateTime beforeEndTime = beforeNextMonth.minusDays(1).atTime(LocalTime.MAX);
-
-        LocalDateTime startTime = LocalDate.of(year, month, 1).atStartOfDay();
-        LocalDate nextMonth = LocalDate.of(year, month, 1).plusMonths(1);
-        LocalDateTime endTime = nextMonth.minusDays(1).atTime(LocalTime.MAX);
-
         // 투표권 보유 여부 확인
-        // 투표권 보유
-        if (supportPetitionRepository.findByUserIdAndDeletedAndCreatedDateBetween(userId, false, beforeStartTime, beforeEndTime).size() > 0) {
+        // 투표권 보유 
+        if (supportPetitionRepository.findByUserIdAndDeletedAndCreatedDateBetween(userId, false, campaignGroup.getSupportingDateStart(), campaignGroup.getSupportingDateEnd()).size() > 0) {
             
             // 투표 여부 확인
-            if (campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, startTime, endTime, false).isPresent()) {
+            if (campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, campaignGroup.getVotingDateStart(), campaignGroup.getVotingDateEnd(), false).isPresent()) {
                 return "complete";
             } else {
                 return "possible";
@@ -96,21 +93,28 @@ public class CampaignService {
         }
     }
 
+    // 투표 기간 체크
+    public Boolean getMyVoteCampaign(int year, int month) {
+        CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(year, month).orElseThrow(() -> new BasicException("캠페인 그룹을 찾을 수 없습니다."));
+        
+        if (LocalDateTime.now().isAfter(campaignGroup.getVotingDateStart()) && LocalDateTime.now().isBefore(campaignGroup.getVotingDateEnd())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // 투표하기
     public CampaignsDto voteCampaign(Long targetId, Long userId) {
 
-        String voteStatus = getVoteCampaignStatus(userId, LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue());
+        String voteStatus = getVoteCampaignStatus(userId, LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue());
+        CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue()).orElseThrow(() -> new BasicException("캠페인 그룹을 찾을 수 없습니다."));
         
         if (voteStatus.equals("possible")) {
-            
-            LocalDateTime startTime = LocalDate.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), 1).atStartOfDay();
-            LocalDate nextMonth = LocalDate.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), 1).plusMonths(1);
-            LocalDateTime endTime = nextMonth.minusDays(1).atTime(LocalTime.MAX);
-
             // 삭제한 투표 기록 존재
-            if (campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, startTime, endTime, true).isPresent()) {
-                campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, startTime, endTime, true).get().revive();
-                return getCampaigns(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue());
+            if (campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, campaignGroup.getVotingDateStart(), campaignGroup.getVotingDateEnd(), true).isPresent()) {
+                campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, campaignGroup.getVotingDateStart(), campaignGroup.getVotingDateEnd(), true).get().revive();
+                return getCampaigns(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue());
             } else {
                 User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 유저입니다."));
                 Campaign campaign = campaignRepository.findById(targetId).orElseThrow(() -> new BasicException("없는 캠페인입니다."));
@@ -121,8 +125,7 @@ public class CampaignService {
                 .build();
     
                 campaignUserRepository.save(campaignUser);
-    
-                return getCampaigns(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue());
+                return getCampaigns(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue());
             }
         } else if(voteStatus.equals("complete")) {
             throw new BasicException("이미 투표를 하셨습니다.");
@@ -133,16 +136,13 @@ public class CampaignService {
 
     // 투표취소
     public CampaignsDto unvoteCampaign(Long targetId, Long userId) {
-        String voteStatus = getVoteCampaignStatus(userId, LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue());
-        
+        String voteStatus = getVoteCampaignStatus(userId, LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue());
+        CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue()).orElseThrow(() -> new BasicException("캠페인 그룹을 찾을 수 없습니다."));
+
         if (voteStatus.equals("complete")) {
-            LocalDateTime startTime = LocalDate.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), 1).atStartOfDay();
-            LocalDate nextMonth = LocalDate.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), 1).plusMonths(1);
-            LocalDateTime endTime = nextMonth.minusDays(1).atTime(LocalTime.MAX);
+            campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, campaignGroup.getVotingDateStart(), campaignGroup.getVotingDateEnd(), false).orElseThrow(() -> new BasicException("삭제할 투표 기록이 없습니다.")).delete();
 
-            campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, startTime, endTime, false).orElseThrow(() -> new BasicException("삭제할 투표 기록이 없습니다.")).delete();
-
-            return getCampaigns(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue());
+            return getCampaigns(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue());
         } else {
             throw new BasicException("투표 기록이 없습니다.");
         }
