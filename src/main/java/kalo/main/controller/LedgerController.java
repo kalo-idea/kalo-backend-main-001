@@ -17,7 +17,7 @@ public class LedgerController {
     private final LedgerService ledgerService;
     
     // 출석체크 여부
-    @GetMapping("/isAttend")
+    @GetMapping("/is-attend")
     public Boolean isAttend(Long userId) {
         return ledgerService.isAttend(userId);
     }
@@ -29,7 +29,7 @@ public class LedgerController {
     }
 
     // 이번달 출석일자
-    @GetMapping("/getAttend")
+    @GetMapping("/get-attend")
     public List<LocalDate> getAttend(Long userId, int year, int month) {
         return ledgerService.getAttend(userId, year, month);
     }
