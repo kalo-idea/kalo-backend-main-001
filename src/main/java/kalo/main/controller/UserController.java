@@ -59,7 +59,7 @@ public class UserController {
 
     // 회원 가입
     @PostMapping("/public/create-auth")
-    public Long createAuth(@RequestBody JoinReqDto req) {
+    public UserAuthResDto createAuth(@RequestBody JoinReqDto req) {
         return userService.createAuth(req);
     }
 
