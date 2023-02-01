@@ -1,52 +1,52 @@
-// package kalo.main.domain;
+package kalo.main.domain;
 
-// import javax.persistence.Column;
-// import javax.persistence.Entity;
-// import javax.persistence.FetchType;
-// import javax.persistence.GeneratedValue;
-// import javax.persistence.GenerationType;
-// import javax.persistence.Id;
-// import javax.persistence.JoinColumn;
-// import javax.persistence.ManyToOne;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
-// import lombok.AllArgsConstructor;
-// import lombok.Builder;
-// import lombok.Getter;
-// import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-// @Entity
-// @Getter
-// @NoArgsConstructor
-// @AllArgsConstructor
-// @Builder
-// public class Notis extends BaseEntity {
+@Entity
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Notis extends BaseEntity {
     
-//     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-//     String image;
+    String image;
 
-//     String title;
+    String title;
 
-//     String content;
+    String content;
 
-//     @Column(columnDefinition = "TINYINT", length = 1)
-//     Boolean check;
+    @Column(columnDefinition = "TINYINT", length = 1)
+    Boolean isCheck;
 
-//     @Column(columnDefinition = "TINYINT", length = 1)
-//     Boolean display;
+    @Column(columnDefinition = "TINYINT", length = 1)
+    Boolean isDisplay;
     
-//     @ManyToOne(fetch = FetchType.LAZY)
-//     @JoinColumn(name="sender_id")
-//     User sender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="sender_id")
+    User sender;
 
-//     @ManyToOne(fetch = FetchType.LAZY)
-//     @JoinColumn(name="receiver_id")
-//     User receiver;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="receiver_id")
+    User receiver;
 
-//     Long targetId;
+    Long targetId;
 
-//     String targetUrl;
+    String targetUrl;
 
-//     String target;
-// }
+    String target;
+}
