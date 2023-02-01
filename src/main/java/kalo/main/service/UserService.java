@@ -198,7 +198,7 @@ public class UserService {
         return userRepository.findByNicknameIgnoreCase(nickname).isPresent();
     }
 
-    public Long join(JoinReqDto req) {
+    public Long createAuth(JoinReqDto req) {
         if (isDuplicatedNickname(req.getNickname())) {
             throw new BasicException("불가능한 닉네임입니다.");
         }
@@ -233,7 +233,7 @@ public class UserService {
     }
 
     // 탈퇴
-    public Long out(Long userId) {
+    public Long deleteAuth(Long userId) {
         User user = userRepository.findById(userId).get();
         if (user.getDeleted()) {
             throw new BasicException("이미 탈퇴한 회원입니다.");
