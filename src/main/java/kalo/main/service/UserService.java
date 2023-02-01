@@ -140,33 +140,33 @@ public class UserService {
             // 이미 가입된 회원
             Auth auth = authRepository.findByKakao(kakao).get();
             List<User> users = userRepository.findByAuthId(auth.getId()).orElseThrow(() -> new BasicException("연결된 계정이 없습니다."));
-            List<UserInfoDto> users_res = new ArrayList<UserInfoDto>();
+            List<UserInfoDto> userInfos = new ArrayList<UserInfoDto>();
             for (User user : users) {
-                users_res.add(new UserInfoDto(user));
+                userInfos.add(new UserInfoDto(user));
             }
 
             UserAuthResDto userAuthResDto = UserAuthResDto.builder()
-            .authId(auth.getId())
-            .type(auth.getType())
-            .kakao(auth.getKakao())
-            .email(auth.getEmail())
-            .name(auth.getName())
-            .birth(auth.getBirth())
-            .gender(auth.getGender())
-            .tel(auth.getTel())
-            .address(auth.getAddress())
-            .region1depthName(auth.getRegion1depthName())
-            .region2depthName(auth.getRegion2depthName())
-            .promotionCheck(auth.getPromotionCheck())
-            .fcmToken(auth.getFcmToken())
-            .recentLogin(auth.getRecentLogin())
-            .userInfoDto(users_res)
-            .build();
+                .authId(auth.getId())
+                .type(auth.getType())
+                .kakao(auth.getKakao())
+                .email(auth.getEmail())
+                .name(auth.getName())
+                .birth(auth.getBirth())
+                .gender(auth.getGender())
+                .tel(auth.getTel())
+                .address(auth.getAddress())
+                .region1depthName(auth.getRegion1depthName())
+                .region2depthName(auth.getRegion2depthName())
+                .promotionCheck(auth.getPromotionCheck())
+                .fcmToken(auth.getFcmToken())
+                .recentLogin(auth.getRecentLogin())
+                .userInfos(userInfos)
+                .build();
 
             return userAuthResDto;
         } else {
             // 회원가입 필요
-            return null;
+            return UserAuthResDto.builder().build();
         }
     }
 
@@ -193,14 +193,13 @@ public class UserService {
         user.setPublicInfos(publicInfos);
     }
 
-    // 가능한 닉네임이면 true
-    // 불가능한 닉네임이면 false
+    // 중복되면 true
     public Boolean isDuplicatedNickname(String nickname) {
-        return !userRepository.findByNicknameIgnoreCase(nickname).isPresent();
+        return userRepository.findByNicknameIgnoreCase(nickname).isPresent();
     }
 
     public Long join(JoinReqDto req) {
-        if (!isDuplicatedNickname(req.getNickname())) {
+        if (isDuplicatedNickname(req.getNickname())) {
             throw new BasicException("불가능한 닉네임입니다.");
         }
         Auth auth = Auth.builder()
