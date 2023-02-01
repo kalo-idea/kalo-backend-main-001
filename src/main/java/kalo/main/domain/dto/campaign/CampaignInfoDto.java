@@ -1,7 +1,5 @@
 package kalo.main.domain.dto.campaign;
 
-import java.time.LocalDate;
-
 import kalo.main.domain.Campaign;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CampaignInfoDto {
-    LocalDate votingDate;
+    Long id;
     String title;
     String info;
     String thumbnail;
@@ -20,7 +18,7 @@ public class CampaignInfoDto {
 
     @Builder
     public CampaignInfoDto(Campaign campaign, Double percent) {
-        this.votingDate = campaign.getVotingDate();
+        this.id = campaign.getId();
         this.title = campaign.getTitle();
         this.info = campaign.getInfo();
         this.thumbnail = campaign.getThumbnail();

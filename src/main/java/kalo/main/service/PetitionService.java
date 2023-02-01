@@ -168,7 +168,7 @@ public class PetitionService {
         if (progress.equals("recruit")) {
             if (!petition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
                 if (petition.getSupportCount() >= 100) {
-                    progress = "ing";
+                    progress = "ongoing";
                 } else {
                     progress = "fail";
                 }
@@ -298,7 +298,7 @@ public class PetitionService {
             if (progress.equals("recruit")) {
                 if (!simplePetition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
                     if (simplePetition.getSupportCount() >= 100) {
-                        progress = "ing";
+                        progress = "ongoing";
                     } else {
                         progress = "fail";
                     }
@@ -559,6 +559,7 @@ public class PetitionService {
                 convertNickname += "*";
             }
             supportPetitionUser.setNickname(convertNickname);
+            supportPetitionUser.setCreatedDate(supportPetitionUser.getCreatedDate().toLocalDate().atStartOfDay());
         }
         return res;
     }

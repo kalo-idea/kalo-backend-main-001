@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: main
+    active: test
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test

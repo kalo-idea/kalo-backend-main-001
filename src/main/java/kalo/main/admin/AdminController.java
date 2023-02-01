@@ -18,7 +18,7 @@ import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
 import kalo.main.admin.dto.AdminUserReqDto;
-import kalo.main.admin.dto.AdminUserResDto;
+import kalo.main.admin.dto.AdminUserDataDto;
 import lombok.RequiredArgsConstructor;
 
 
@@ -52,8 +52,14 @@ public class AdminController {
 
     // 유저 조회
     @GetMapping("/get-user")
-    public AdminUserResDto getUser(AdminUserReqDto req) {
+    public AdminUserDataDto getUser(AdminUserReqDto req) {
         return adminService.getUser(req);
+    }
+
+    // 유저 수정
+    @PostMapping("update-user")
+    public String updateUser(@RequestBody(required = false) AdminUserDataDto req) {
+        return adminService.updateUser(req);
     }
 
 }
