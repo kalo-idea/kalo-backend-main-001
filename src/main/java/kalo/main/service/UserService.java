@@ -344,13 +344,13 @@ public class UserService {
     // 남은 포인트, 관심 청원 수, 참여 청원 수 반환
     public MyProfileHomeDto getProfileHome(Long userId) {
         Long ledgers = ledgerRepository.getSumUserLedger(userId);
-        Long supportCount = supportPetitionRepository.countByUserId(userId);
-        Long likeCount = likePetitionRepository.countByUserIdAndDeleted(userId, false);
+        Long supportPetitionCount = supportPetitionRepository.countByUserId(userId);
+        Long likePetitionCount = likePetitionRepository.countByUserIdAndDeleted(userId, false);
         
         if(ledgers == null) {
             ledgers = 0L;
         }
 
-        return new MyProfileHomeDto(ledgers, supportCount, likeCount);
+        return new MyProfileHomeDto(ledgers, supportPetitionCount, likePetitionCount);
     }
 }
