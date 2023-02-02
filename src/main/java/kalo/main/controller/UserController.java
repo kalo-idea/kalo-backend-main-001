@@ -65,8 +65,8 @@ public class UserController {
 
     // 회원 탈퇴
     @PostMapping("/delete-auth")
-    public Long deleteAuth(@RequestBody OnlyIdDto req) {
-        return userService.deleteAuth(req.getId());
+    public void deleteAuth(@RequestBody OnlyIdDto req) {
+        userService.deleteAuth(req.getId());
     }
 
     // 회원 프로필 정보

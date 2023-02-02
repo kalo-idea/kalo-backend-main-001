@@ -93,7 +93,7 @@ public class AdminService {
             res.setRecentLogin(auth.getRecentLogin());
         }
         res.setCreatedDate(auth.getCreatedDate());
-        List<User> users = userRepository.findByAuthId(req.getAuthId()).get();
+        List<User> users = userRepository.findByAuthIdAndDeleted(req.getAuthId(), false).get();
         List<SimpleWriterDto> users_res = new ArrayList<SimpleWriterDto>();
         for (User user : users) {
             users_res.add(new SimpleWriterDto(user));
