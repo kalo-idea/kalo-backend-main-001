@@ -46,6 +46,10 @@ public class ReadPetitionsDto {
 
     String region2depthName;
 
+    Double latitude;
+
+    Double longitude;
+
     Long supportCount;
 
     @Builder
@@ -67,6 +71,8 @@ public class ReadPetitionsDto {
         this.category = readSimplePetitionsDto.getCategory();
         this.region1depthName = readSimplePetitionsDto.getRegion1depthName();
         this.region2depthName = readSimplePetitionsDto.getRegion2depthName();
+        this.latitude = readSimplePetitionsDto.getLatitude();
+        this.longitude = readSimplePetitionsDto.getLongitude();
         this.supportCount = readSimplePetitionsDto.getSupportCount();
     }
 }
