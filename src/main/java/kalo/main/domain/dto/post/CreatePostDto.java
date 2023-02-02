@@ -16,7 +16,7 @@ public class CreatePostDto {
 
     List<String> media = new ArrayList<String>();
 
-    Long userId;
+    Long id;
 
     String topic = "";
 
@@ -35,11 +35,11 @@ public class CreatePostDto {
     Double longitude = 126.97755295059169d;
 
     @Builder
-    public CreatePostDto(String title, String content, List<String> media, Long usersId, String topic, List<String> hashtags, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude) {
+    public CreatePostDto(String title, String content, List<String> media, Long id, String topic, List<String> hashtags, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude) {
         this.title = title;
         this.content = content;
         this.media = media;
-        this.userId = usersId;
+        this.id = id;
         this.topic = topic;
         this.hashtags = hashtags;
         this.addressName = addressName;

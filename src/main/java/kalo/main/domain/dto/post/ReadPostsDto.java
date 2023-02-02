@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReadPostsDto {
     
-    Long postId;
+    Long id;
 
     SimpleWriterDto writer;
     
@@ -43,7 +43,7 @@ public class ReadPostsDto {
     @Builder
     @QueryProjection
     public ReadPostsDto(ReadSimplePostDto readSimplePostDto, SimpleWriterDto writer, List<String> hashtags, List<String> media) {
-        this.postId = readSimplePostDto.getPostId();
+        this.id = readSimplePostDto.getPostId();
         this.writer = writer;
         this.title = readSimplePostDto.getTitle();
         this.createdDate = readSimplePostDto.getCreatedDate();

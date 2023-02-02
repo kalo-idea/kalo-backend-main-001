@@ -68,7 +68,7 @@ public class PostService {
         .title(createPostsDto.getTitle())
         .content(createPostsDto.getContent())
         .viewCount(0L)
-        .user(userRepository.findById(createPostsDto.getUserId()).get())
+        .user(userRepository.findById(createPostsDto.getId()).get())
         .replyCount(0L)
         .likeCount(0L)
         .dislikeCount(0L)
