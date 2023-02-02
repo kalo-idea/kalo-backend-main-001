@@ -31,7 +31,6 @@ import kalo.main.repository.HashtagRepository;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.LikePetitionRepository;
 import kalo.main.repository.MediaRepository;
-import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.SupportPetitionRepository;
 import kalo.main.repository.UserRepository;
@@ -295,6 +294,9 @@ public class UserService {
         res.setIntro(user.getIntro());
         res.setProfileSrc(user.getProfileSrc());
 
+        List<String> publicInfos = Arrays.asList(user.getPublicInfos().split(","));
+        res.setPublicInfos(publicInfos);
+
         if (info.contains("birth")) {
             res.setBirth(auth.getBirth());
         }
@@ -326,6 +328,7 @@ public class UserService {
         Auth auth = user.getAuth();
         
         UserProfileResDto res = new UserProfileResDto();
+        List<String> publicInfos = Arrays.asList(user.getPublicInfos().split(","));
 
         res.setUserId(userId);
         res.setNickname(user.getNickname());
@@ -338,6 +341,9 @@ public class UserService {
         res.setRegion1depthName(auth.getRegion1depthName());
         res.setRegion2depthName(auth.getRegion2depthName());
         res.setTel(auth.getTel());
+        res.setPublicInfos(publicInfos);
+        res.setProfileSrc(user.getProfileSrc());
+        
 
         return res;
     }
