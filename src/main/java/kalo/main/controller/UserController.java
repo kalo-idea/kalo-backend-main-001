@@ -33,21 +33,21 @@ public class UserController {
     // 좋아요 한 청원 리스트
     @GetMapping("/get-like-petitions")
     public List<ReadPetitionsDto> readLikePetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto userId) {
-            return userService.getLikePetitions(pageable, userId.getId());
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto id) {
+            return userService.getLikePetitions(pageable, id.getId());
     }
 
     // 참여한 청원 리스트
     @GetMapping("/get-support-petitions")
     public List<ReadPetitionsDto> readSupportPetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto userId) {
-            return userService.getSupportPetitions(pageable, userId.getId());
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto id) {
+            return userService.getSupportPetitions(pageable, id.getId());
     }
 
     // 카카오로 회원, 비회원 조회
     @GetMapping("/public/get-auth-by-kakao")
-    public UserAuthResDto getAuthByKakao(@RequestParam(required = true) String kakaoId) {
-        return userService.getAuthAndUserByKakao(kakaoId);
+    public UserAuthResDto getAuthByKakao(@RequestParam(required = true) String kakao) {
+        return userService.getAuthAndUserByKakao(kakao);
     }
 
     // 닉네임 검증 (현재 대소문자 판단만 구현)
@@ -71,14 +71,14 @@ public class UserController {
 
     // 회원 프로필 정보
     @GetMapping("/public/get-user-profile")
-    public UserProfileResDto getUserProfile(@RequestParam Long userId) {
-        return userService.getUserProfile(userId);
+    public UserProfileResDto getUserProfile(@RequestParam Long id) {
+        return userService.getUserProfile(id);
     }
 
     // 본인 프로필 정보
     @GetMapping("/get-my-user-profile")
-    public UserProfileResDto getMyUserProfile(@RequestParam Long userId) {
-        return userService.getMyProfile(userId);
+    public UserProfileResDto getMyUserProfile(@RequestParam Long id) {
+        return userService.getMyProfile(id);
     }
 
 
@@ -97,7 +97,7 @@ public class UserController {
 
     // 유저 프로필 홈
     @GetMapping("/get-my-profile-home")
-    public MyProfileHomeDto getProfileHome(@RequestParam Long userId) {
-        return userService.getProfileHome(userId);
+    public MyProfileHomeDto getProfileHome(@RequestParam Long id) {
+        return userService.getProfileHome(id);
     }
 }

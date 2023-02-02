@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReadPetitionsDto {
     
-    Long petitionId;
+    Long id;
 
     SimpleWriterDto writer;
     
@@ -51,7 +51,7 @@ public class ReadPetitionsDto {
     @Builder
     @QueryProjection
     public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> step, List<String> hashtags, List<String> media) {
-        this.petitionId = readSimplePetitionsDto.getPetitionId();
+        this.id = readSimplePetitionsDto.getPetitionId();
         this.writer = writer;
         this.title = readSimplePetitionsDto.getTitle();
         this.createdDate = readSimplePetitionsDto.getCreatedDate();

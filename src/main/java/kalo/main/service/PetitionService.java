@@ -78,7 +78,7 @@ public class PetitionService {
         .content(createPetitionDto.getContent())
         .supportCount(0L)
         .viewCount(0L)
-        .user(userRepository.findById(createPetitionDto.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다.")))
+        .user(userRepository.findById(createPetitionDto.getId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다.")))
         .progress("recruit")
         .goal(createPetitionDto.getGoal())
         .replyCount(0L)
@@ -338,48 +338,36 @@ public class PetitionService {
     // 좋아요 클릭
     public LikeDislikeResDto likePetition(Long petitionId, Long userId) {
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
-        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
+        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
-        // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
+        // 좋아요가 눌려있으면 like -1
         if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
+
             petition.setLikeCount(petition.getLikeCount() - 1);
-            System.out.println("case1");
         }
-        // 싫어요가 눌려있던 상태 : 좋아요 추가, 싫어요 취소 -> 좋아요 +1, 싫어요 -1
-        else if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
-            dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
-             
-            // 좋아요를 누른 기록이 있는 상태
+        // like +1
+        else {
+            // 싫어요가 눌려있으면 dislike -1
+            if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
+                dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
+                
+                petition.setDislikeCount(petition.getDislikeCount() - 1);
+            }
+
+            // like 추가
             if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
                 likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
-                System.out.println("case2");
+
             }
-            // 좋아요를 처음 누른 상태
             else {
                 LikePetition likePetition = LikePetition.builder().petition(petition).user(user).build();
                 likePetitionRepository.save(likePetition);
-                System.out.println("case3");
             }
-            
-            petition.setLikeCount(petition.getLikeCount() + 1);
-            petition.setDislikeCount(petition.getDislikeCount() - 1);
-        }
-        // 아무것도 눌려있지 않지만, 좋아요를 누른 기록이 있는 상태
-        else if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
-            likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
 
             petition.setLikeCount(petition.getLikeCount() + 1);
-            System.out.println("case4");
         }
-        // 아무것도 없던 상태 : 좋아요 추가 -> 좋아요 +1
-        else {
-            LikePetition likePetition = LikePetition.builder().petition(petition).user(user).build();
-            likePetitionRepository.save(likePetition);
 
-            petition.setLikeCount(petition.getLikeCount() + 1);
-            System.out.println("case5");
-        }
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(petitionId)
             .isLike(likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent())
@@ -397,48 +385,34 @@ public class PetitionService {
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
-        // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
-        if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
-            
-            likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
-            // 싫어요를 누른 기록이 있는 상태
-            if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
-                dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
-                
-            System.out.println("case1");
-            }
-            // 싫어요를 누른 기록이 없는 상태
-            else {
-                DislikePetition dislikePetition = DislikePetition.builder().user(user).petition(petition).build();
-                dislikePetitionRepository.save(dislikePetition);
-                System.out.println("case2");
-            }
-            
-            petition.setLikeCount(petition.getLikeCount() - 1);
-            petition.setDislikeCount(petition.getDislikeCount() + 1);
-        }
-        // 싫어요가 이미 눌려있던 상태 : 싫어요 취소 -> 싫어요 -1
-        else if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
+        // 싫어요가 눌려있으면 like -1
+        if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
 
-            System.out.println("case3");
-            petition.setDislikeCount(petition.getDislikeCount() - 1);
+            petition.setDislikeCount(petition.getLikeCount() - 1);
         }
-        // 아무것도 눌려있지 않지만, 싫어요를 누른 기록이 있는 상태
-        else if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
-            dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
+        // like +1
+        else {
+            // 싫어요가 눌려있으면 dislike -1
+            if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
+                dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
+                
+                petition.setDislikeCount(petition.getDislikeCount() - 1);
+            }
 
-            System.out.println("case4");
-            petition.setDislikeCount(petition.getDislikeCount() + 1);
-        }
-        // 아무것도 없던 상태 : 싫어요 추가 -> 싫어요 +1
-        else  {
-            DislikePetition dislikePetition = DislikePetition.builder().user(user).petition(petition).build();
-            dislikePetitionRepository.save(dislikePetition);
-            System.out.println("case5");
+            // like 추가
+            if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
+                likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
 
-            petition.setDislikeCount(petition.getDislikeCount() + 1);
+            }
+            else {
+                LikePetition likePetition = LikePetition.builder().petition(petition).user(user).build();
+                likePetitionRepository.save(likePetition);
+            }
+
+            petition.setLikeCount(petition.getLikeCount() + 1);
         }
+
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(petitionId)
             .isLike(likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent())

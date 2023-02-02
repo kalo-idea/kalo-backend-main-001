@@ -101,8 +101,8 @@ public class PetitionController {
     @GetMapping("/public/get-support-users")
     public List<SupportPetitionUserListDto> getSupportPetitionList(
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-        Long petitionId) {
-        return petitionService.getSupportPetitionList(pageable, petitionId);
+        Long id) {
+        return petitionService.getSupportPetitionList(pageable, id);
     }
 
 }
