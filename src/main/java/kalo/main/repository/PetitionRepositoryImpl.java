@@ -62,6 +62,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             progressFilter(cond.getProgress()),
             stepFilter(cond.getStep()),
             categoryFilter(cond.getCategory()),
+            userFilter(cond.getUserId()),
             recentFilter(recent)
             )
         .offset(pageable.getOffset())
@@ -248,6 +249,13 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         return null;
     }
     
+    private BooleanExpression userFilter(Long userId) {
+        if (userId != null) {
+            return petition.user.id.eq(userId);
+        }
+        return null;
+    }
+
     private BooleanExpression recentFilter(Boolean recent) {
         if (recent) {
             return petition.createdDate.after(LocalDate.now().minusDays(29).atStartOfDay());

@@ -47,6 +47,7 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
             topicFilter(cond.getTopic()),
+            userFilter(cond.getUserId()),
             recentFilter(recent)
          )
          .offset(pageable.getOffset())
@@ -80,6 +81,13 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
     private BooleanExpression topicFilter(String topic) {
         if (StringUtils.hasText(topic)) {
             return post.topic.eq(topic);
+        }
+        return null;
+    }
+
+    private BooleanExpression userFilter(Long userId) {
+        if (userId != null) {
+            return post.user.id.eq(userId);
         }
         return null;
     }
