@@ -280,33 +280,34 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
-        // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
+        // 좋아요가 눌려있으면 like -1
         if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
             likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+
             post.setLikeCount(post.getLikeCount() - 1);
         }
-        // 싫어요가 눌려있던 상태 : 좋아요 추가, 싫어요 취소 -> 좋아요 +1, 싫어요 -1
-        else if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
-            dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
-            LikePost likePost = LikePost.builder().post(post).user(user).build();
-            likePostRepository.save(likePost);
-
-            post.setLikeCount(post.getLikeCount() + 1);
-            post.setDislikeCount(post.getDislikeCount() - 1);
-        }
-        // 아무것도 눌려있지 않지만, 좋아요를 누른 기록이 있는 상태
-        else if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).isPresent()) {
-            likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).get().revive();
-
-            post.setLikeCount(post.getLikeCount() + 1);
-        }
-        // 아무것도 없던 상태 : 좋아요 추가 -> 좋아요 +1
+        // like +1
         else {
-            LikePost likePost = LikePost.builder().post(post).user(user).build();
-            likePostRepository.save(likePost);
+            // 싫어요가 눌려있으면 dislike -1
+            if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+                dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+                
+                post.setDislikeCount(post.getDislikeCount() - 1);
+            }
+
+            // like 추가
+            if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).isPresent()) {
+                likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).get().revive();
+
+            }
+            else {
+                LikePost likePost = LikePost.builder().post(post).user(user).build();
+                likePostRepository.save(likePost);
+            }
 
             post.setLikeCount(post.getLikeCount() + 1);
         }
+
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(postId)
             .isLike(likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent())
@@ -324,34 +325,34 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
-        // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
-        if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
-            likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
-            DislikePost dislikePost = DislikePost.builder().user(user).post(post).build();
-            dislikePostRepository.save(dislikePost);
-            
-            post.setLikeCount(post.getLikeCount() - 1);
-            post.setDislikeCount(post.getDislikeCount() + 1);
-        }
-        // 싫어요가 이미 눌려있던 상태 : 싫어요 취소 -> 싫어요 -1
-        else if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+         // 싫어요가 눌려있으면 dislike -1
+         if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
             dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
 
             post.setDislikeCount(post.getDislikeCount() - 1);
         }
-        // 아무것도 눌려있지 않지만, 싫어요를 누른 기록이 있는 상태
-        else if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).isPresent()) {
-            dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).get().revive();
+        // like +1
+        else {
+            // 좋아요가 눌려있으면 like -1
+            if (likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent()) {
+                likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).get().delete();
+                
+                post.setLikeCount(post.getLikeCount() - 1);
+            }
+
+            // dislike 추가
+            if (dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).isPresent()) {
+                dislikePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, true).get().revive();
+
+            }
+            else {
+                DislikePost dislikePost = DislikePost.builder().post(post).user(user).build();
+                dislikePostRepository.save(dislikePost);
+            }
 
             post.setDislikeCount(post.getDislikeCount() + 1);
         }
-        // 아무것도 없던 상태 : 싫어요 추가 -> 싫어요 +1
-        else  {
-            DislikePost dislikePost = DislikePost.builder().user(user).post(post).build();
-            dislikePostRepository.save(dislikePost);
 
-            post.setDislikeCount(post.getDislikeCount() + 1);
-        }
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(postId)
             .isLike(likePostRepository.findByPostIdAndUserIdAndDeleted(postId, userId, false).isPresent())
@@ -369,33 +370,34 @@ public class PostService {
         PostReply reply = postReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
-        // 이미 좋아요를 누른 상태 : 좋아요를 취소 -> 좋아요 -1
+        // 좋아요가 눌려있으면 like -1
         if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
             likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+
             reply.setLikeCount(reply.getLikeCount() - 1);
         }
-        // 싫어요가 눌려있던 상태 : 좋아요 추가, 싫어요 취소 -> 좋아요 +1, 싫어요 -1
-        else if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
-            dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
-            LikePostReply likePostReply = LikePostReply.builder().postReply(reply).user(user).build();
-            likePostReplyRepository.save(likePostReply);
-
-            reply.setLikeCount(reply.getLikeCount() + 1);
-            reply.setDislikeCount(reply.getDislikeCount() - 1);
-        }
-        // 아무것도 눌려있지 않지만, 좋아요를 누른 기록이 있는 상태
-        else if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).isPresent()) {
-            likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).get().revive();
-
-            reply.setLikeCount(reply.getLikeCount() + 1);
-        }
-        // 아무것도 없던 상태 : 좋아요 추가 -> 좋아요 +1
+        // like +1
         else {
-            LikePostReply likePostReply = LikePostReply.builder().postReply(reply).user(user).build();
-            likePostReplyRepository.save(likePostReply);
+            // 싫어요가 눌려있으면 dislike -1
+            if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+                dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+                
+                reply.setDislikeCount(reply.getDislikeCount() - 1);
+            }
+
+            // like 추가
+            if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).isPresent()) {
+                likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).get().revive();
+
+            }
+            else {
+                LikePostReply likePostReply = LikePostReply.builder().postReply(reply).user(user).build();
+                likePostReplyRepository.save(likePostReply);
+            }
 
             reply.setLikeCount(reply.getLikeCount() + 1);
         }
+
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(replyId)
             .isLike(likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent())
@@ -413,34 +415,34 @@ public class PostService {
         PostReply reply = postReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
-        // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
-        if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
-            likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
-            DislikePostReply dislikePostReply = DislikePostReply.builder().user(user).postReply(reply).build();
-            dislikePostReplyRepository.save(dislikePostReply);
-            
-            reply.setLikeCount(reply.getLikeCount() - 1);
-            reply.setDislikeCount(reply.getDislikeCount() + 1);
-        }
-        // 싫어요가 이미 눌려있던 상태 : 싫어요 취소 -> 싫어요 -1
-        else if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+        // 싫어요가 눌려있으면 dislike -1
+        if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
             dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
 
             reply.setDislikeCount(reply.getDislikeCount() - 1);
         }
-        // 아무것도 눌려있지 않지만, 싫어요를 누른 기록이 있는 상태 : 상태값 true로 변경
-        else if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).isPresent()) {
-            dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).get().revive();
-
-            reply.setDislikeCount(reply.getDislikeCount() + 1);
-        }
-        // 아무것도 없던 상태 : 싫어요 추가 -> 싫어요 +1
+        // like +1
         else {
-            DislikePostReply dislikePostReply = DislikePostReply.builder().user(user).postReply(reply).build();
-            dislikePostReplyRepository.save(dislikePostReply);
+            // 좋아요가 눌려있으면 like -1
+            if (likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
+                likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
+                
+                reply.setLikeCount(reply.getLikeCount() - 1);
+            }
+
+            // dislike 추가
+            if (dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).isPresent()) {
+                dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, true).get().revive();
+
+            }
+            else {
+                DislikePostReply dislikePostReply = DislikePostReply.builder().postReply(reply).user(user).build();
+                dislikePostReplyRepository.save(dislikePostReply);
+            }
 
             reply.setDislikeCount(reply.getDislikeCount() + 1);
         }
+
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(replyId)
             .isLike(likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent())
