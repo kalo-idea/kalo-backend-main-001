@@ -40,7 +40,7 @@ public class LedgerService {
             return ledger.getAmount();
         }
         else {
-            throw new BasicException("이미 출석한 회원입니다.");
+            return 0L;
         }
     }
 
