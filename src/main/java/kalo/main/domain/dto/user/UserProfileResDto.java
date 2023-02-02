@@ -1,6 +1,7 @@
 package kalo.main.domain.dto.user;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,5 @@ public class UserProfileResDto {
     String tel;
     String profileSrc;
     Boolean promotionCheck;
+    List<String> publicInfos;
 }
