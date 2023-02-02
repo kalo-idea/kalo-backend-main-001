@@ -43,8 +43,12 @@ public class ReadPostDto{
 
     String region2depthName;
 
+    Double latitude;
+
+    Double longitude;
+
     @QueryProjection
-    public ReadPostDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName) {
+    public ReadPostDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName, Double latitude, Double longitude) {
         this.writer = writer;
         this.title = title;
         this.createdDate = createdDate;
@@ -59,6 +63,8 @@ public class ReadPostDto{
         this.topic = topic;
         this.region1depthName = region1depthName;
         this.region2depthName = region2depthName;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
     
 

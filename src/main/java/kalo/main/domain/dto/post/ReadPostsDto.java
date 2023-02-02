@@ -40,6 +40,10 @@ public class ReadPostsDto {
 
     String region2depthName;
 
+    Double latitude;
+
+    Double longitude;
+
     @Builder
     @QueryProjection
     public ReadPostsDto(ReadSimplePostDto readSimplePostDto, SimpleWriterDto writer, List<String> hashtags, List<String> media) {
@@ -56,5 +60,7 @@ public class ReadPostsDto {
         this.topic = readSimplePostDto.getTopic();
         this.region1depthName = readSimplePostDto.getRegion1depthName();
         this.region2depthName = readSimplePostDto.getRegion2depthName();
+        this.latitude = readSimplePostDto.getLatitude();
+        this.longitude = readSimplePostDto.getLongitude();
     }
 }

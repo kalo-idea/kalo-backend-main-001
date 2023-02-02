@@ -11,6 +11,8 @@ import kalo.main.domain.Notis;
 import kalo.main.domain.Petition;
 import kalo.main.domain.Post;
 import kalo.main.domain.User;
+import kalo.main.domain.dto.petition.ReadPetitionDto;
+import kalo.main.domain.dto.user.UserAuthResDto;
 import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.PostRepository;
@@ -30,11 +32,12 @@ public class notisAop {
     
     Long kaloId = 112L;
 
-    @AfterReturning(value = "execution(* kalo.main.service.UserService.createAuth(..))", returning = "result")
-    public void joinNotis(JoinPoint joinPoint, Object result) {
-        System.out.println(result);
+    @AfterReturning(value = "execution(* kalo.main.service.UserService.createAuth(..))", returning = "object")
+    public void joinNotis(JoinPoint joinPoint, Object object) {
+        UserAuthResDto result = (UserAuthResDto) object;
         
-        Long userId = 1L;
+
+        Long userId = result.getUserInfos().get(0).getUserId();
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User kalo = userRepository.findById(kaloId).get();
 
@@ -54,7 +57,11 @@ public class notisAop {
         notisRepository.save(notis);
     }
 
-    public void supportMyPetitionNotis(Long petitionWriterId, Long TargetId) {
+    @AfterReturning(value = "execution(* kalo.main.service.PetitionService.supportingPetition(..))", returning = "object")
+    public void supportMyPetitionNotis(JoinPoint joinPoint, Object object) {
+        ReadPetitionDto result = (ReadPetitionDto) object;
+        Long petitionWriterId = 1L;
+        Long TargetId = 1L;
         User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User kalo = userRepository.findById(kaloId).get();
 

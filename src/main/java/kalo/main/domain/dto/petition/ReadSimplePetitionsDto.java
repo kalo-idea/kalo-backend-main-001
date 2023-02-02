@@ -40,11 +40,15 @@ public class ReadSimplePetitionsDto {
 
     String region2depthName;
 
+    Double latitude;
+
+    Double longitude;
+
     Long supportCount;
 
     @Builder
     @QueryProjection
-    public ReadSimplePetitionsDto(Long petitionId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, String progress, String step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount) {
+    public ReadSimplePetitionsDto(Long petitionId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, String progress, String step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Double latitude, Double longitude, Long supportCount) {
         this.petitionId = petitionId;
         this.writerId = writerId;
         this.title = title;
@@ -59,6 +63,8 @@ public class ReadSimplePetitionsDto {
         this.category = category;
         this.region1depthName = region1depthName;
         this.region2depthName = region2depthName;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.supportCount = supportCount;
     }
 }
