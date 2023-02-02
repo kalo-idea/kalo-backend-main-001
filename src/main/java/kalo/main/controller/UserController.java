@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.User;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.domain.dto.user.MyProfileHomeDto;
-import kalo.main.domain.dto.user.OnlyUserIdDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
@@ -33,15 +33,15 @@ public class UserController {
     // 좋아요 한 청원 리스트
     @GetMapping("/get-like-petitions")
     public List<ReadPetitionsDto> readLikePetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyUserIdDto userId) {
-            return userService.getLikePetitions(pageable, userId.getUserId());
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto userId) {
+            return userService.getLikePetitions(pageable, userId.getId());
     }
 
     // 참여한 청원 리스트
     @GetMapping("/get-support-petitions")
     public List<ReadPetitionsDto> readSupportPetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyUserIdDto userId) {
-            return userService.getSupportPetitions(pageable, userId.getUserId());
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto userId) {
+            return userService.getSupportPetitions(pageable, userId.getId());
     }
 
     // 카카오로 회원, 비회원 조회
@@ -65,8 +65,8 @@ public class UserController {
 
     // 회원 탈퇴
     @PostMapping("/delete-auth")
-    public Long deleteAuth(@RequestBody OnlyUserIdDto req) {
-        return userService.deleteAuth(req.getUserId());
+    public Long deleteAuth(@RequestBody OnlyIdDto req) {
+        return userService.deleteAuth(req.getId());
     }
 
     // 회원 프로필 정보
