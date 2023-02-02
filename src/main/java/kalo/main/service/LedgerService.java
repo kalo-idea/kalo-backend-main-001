@@ -12,6 +12,7 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.Ledger;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LedgerHistoryDto;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

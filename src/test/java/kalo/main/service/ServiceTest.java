@@ -19,6 +19,7 @@ import kalo.main.domain.Campaign;
 import kalo.main.domain.CampaignGroup;
 import kalo.main.domain.Petition;
 import kalo.main.domain.SupportPetition;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.repository.CampaignGroupRepository;

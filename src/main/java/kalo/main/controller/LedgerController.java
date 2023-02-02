@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.service.LedgerService;
 import lombok.RequiredArgsConstructor;
 
@@ -27,8 +26,8 @@ public class LedgerController {
 
     // 출석체크
     @PostMapping("/attend")
-    public Long attend(Long id) {
-        return ledgerService.attend(id);
+    public Long attend(@RequestBody OnlyIdDto req) {
+        return ledgerService.attend(req.getId());
     }
 
     // 이번달 출석일자
@@ -38,7 +37,7 @@ public class LedgerController {
     }
 
     @PostMapping("/get-point")
-    public Long getPoint(Long id) {
-        return ledgerService.getPoint(id);
+    public Long getPoint(@RequestBody OnlyIdDto req) {
+        return ledgerService.getPoint(req.getId());
     }
 }
