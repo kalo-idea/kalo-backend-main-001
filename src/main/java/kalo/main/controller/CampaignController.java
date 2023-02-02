@@ -35,8 +35,8 @@ public class CampaignController {
 
     // 캠페인 상태
     @GetMapping("/get-vote-campaign-status")
-    public String getVoteCampaignStatus(Long userId, int year, int month) {
-        return campaignService.getVoteCampaignStatus(userId, year, month);
+    public String getVoteCampaignStatus(Long id, int year, int month) {
+        return campaignService.getVoteCampaignStatus(id, year, month);
     }
 
 }

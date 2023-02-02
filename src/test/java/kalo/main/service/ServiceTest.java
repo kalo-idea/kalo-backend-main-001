@@ -51,6 +51,12 @@ public class ServiceTest {
     CampaignGroupRepository campaignGroupRepository;
 
 
+    @BeforeEach
+    void beforeEach() {
+        campaignRepository.deleteAll();
+        campaignGroupRepository.deleteAll();
+    }
+
     @Test
     void totalTest() {
 
@@ -67,6 +73,7 @@ public class ServiceTest {
         joinReq.setRegion1depthName("경기");
         joinReq.setRegion2depthName("안양");
         joinReq.setTel("010-1234-9173");
+        joinReq.setNickname("닉닉닉이");
         Long userId = usersService.createAuth(joinReq).getUserInfos().get(0).getUserId();
         Long afterCount = userRepository.count();
 
@@ -81,7 +88,7 @@ public class ServiceTest {
         createPetition.setTitle("testTitle");
         createPetition.setContent("testContent");
         createPetition.setMedia(new ArrayList<String>());
-        createPetition.setUserId(userId);
+        createPetition.setId(userId);
         List<String> hashtags = new ArrayList<String>();
         hashtags.add("testHash1");
         hashtags.add("testHash2");

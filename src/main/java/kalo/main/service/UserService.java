@@ -174,7 +174,7 @@ public class UserService {
 
     // 유저 정보 공개 여부 선택
     public void updateUserPublicInfos(UpdateUserProfileReqDto req) {
-        User user = userRepository.findById(req.getUserId()).get();
+        User user = userRepository.findById(req.getId()).get();
         Map<String, Boolean> map = req.getCheck();
         List<String> list = new ArrayList<String>();
         for (String key : map.keySet()) {
@@ -271,7 +271,7 @@ public class UserService {
 
     // 회원 정보 수정
     public Long updateInfo(UpdateUserInfoReqDto req) {
-        Auth auth = authRepository.findById(req.getAuthId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
+        Auth auth = authRepository.findById(req.getId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
 
         auth.setTel(req.getTel());
         auth.setRegion1depthName(req.getRegion1depthName());

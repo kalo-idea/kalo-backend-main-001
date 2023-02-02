@@ -12,5 +12,5 @@ public class UpdateUserProfileReqDto {
     Map<String, Boolean> check;
     String intro;
     String profile;
-    Long userId;
+    Long id;
 }

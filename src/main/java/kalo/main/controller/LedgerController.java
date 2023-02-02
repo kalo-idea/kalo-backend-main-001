@@ -21,24 +21,24 @@ public class LedgerController {
     
     // 출석체크 여부
     @GetMapping("/is-attend")
-    public Boolean isAttend(Long userId) {
-        return ledgerService.isAttend(userId);
+    public Boolean isAttend(Long id) {
+        return ledgerService.isAttend(id);
     }
 
     // 출석체크
-    @GetMapping("/attend")
-    public Long attend(Long userId) {
-        return ledgerService.attend(userId);
+    @PostMapping("/attend")
+    public Long attend(Long id) {
+        return ledgerService.attend(id);
     }
 
     // 이번달 출석일자
     @GetMapping("/get-attend")
-    public List<LocalDate> getAttend(Long userId, int year, int month) {
-        return ledgerService.getAttend(userId, year, month);
+    public List<LocalDate> getAttend(Long id, int year, int month) {
+        return ledgerService.getAttend(id, year, month);
     }
 
     @PostMapping("/get-point")
-    public Long getPoint(Long userId) {
-        return ledgerService.getPoint(userId);
+    public Long getPoint(Long id) {
+        return ledgerService.getPoint(id);
     }
 }
