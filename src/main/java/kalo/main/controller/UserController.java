@@ -21,6 +21,7 @@ import kalo.main.domain.dto.user.MyProfileHomeDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
+import kalo.main.domain.dto.user.UserInfoDto;
 import kalo.main.domain.dto.user.UserProfileResDto;
 import kalo.main.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -90,9 +91,8 @@ public class UserController {
 
     // 유저 프로필 업데이트
     @PostMapping("/update-user-profile")
-    public String updateUserProfile(@Valid @RequestBody UpdateUserProfileReqDto req) {
-        userService.updateUserPublicInfos(req);
-        return "성공";
+    public UserInfoDto updateUserProfile(@Valid @RequestBody UpdateUserProfileReqDto req) {
+        return userService.updateUserPublicInfos(req);
     }
 
     // 유저 프로필 홈

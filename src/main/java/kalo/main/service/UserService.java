@@ -173,7 +173,7 @@ public class UserService {
     }
 
     // 유저 정보 공개 여부 선택
-    public void updateUserPublicInfos(UpdateUserProfileReqDto req) {
+    public UserInfoDto updateUserPublicInfos(UpdateUserProfileReqDto req) {
         User user = userRepository.findById(req.getId()).get();
         Map<String, Boolean> map = req.getCheck();
         List<String> list = new ArrayList<String>();
@@ -193,6 +193,8 @@ public class UserService {
         user.setProfileSrc(req.getProfile());
         user.setIntro(req.getIntro());
         user.setPublicInfos(publicInfos);
+
+        return new UserInfoDto(user);
     }
 
     // 중복되면 true
