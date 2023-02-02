@@ -137,10 +137,10 @@ public class UserService {
     }
 
     public UserAuthResDto getAuthAndUserByKakao(String kakao) {
-        if (authRepository.findByKakao(kakao).isPresent()) {
+        if (authRepository.findByKakaoAndDeleted(kakao, false).isPresent()) {
             // 이미 가입된 회원
-            Auth auth = authRepository.findByKakao(kakao).get();
-            List<User> users = userRepository.findByAuthId(auth.getId()).orElseThrow(() -> new BasicException("연결된 계정이 없습니다."));
+            Auth auth = authRepository.findByKakaoAndDeleted(kakao, false).orElseThrow(() -> new BasicException("카카오 계정에 문제가 있습니다."));
+            List<User> users = userRepository.findByAuthIdAndDeleted(auth.getId(), false).orElseThrow(() -> new BasicException("연결된 계정이 없습니다."));
             List<UserInfoDto> userInfos = new ArrayList<UserInfoDto>();
             for (User user : users) {
                 userInfos.add(new UserInfoDto(user));
@@ -257,13 +257,13 @@ public class UserService {
     }
 
     // 탈퇴
-    public Long deleteAuth(Long userId) {
-        User user = userRepository.findById(userId).get();
-        if (user.getDeleted()) {
-            throw new BasicException("이미 탈퇴한 회원입니다.");
+    public void deleteAuth(Long authId) {
+        Auth auth = authRepository.findById(authId).orElseThrow(() -> new BasicException("계정을 찾을 수 없습니다."));
+        List<User> users = userRepository.findByAuthIdAndDeleted(authId, false).orElseThrow(() -> new BasicException("연결된 계정이 없습니다."));
+        for (User user : users) {
+            user.delete();
         }
-        user.delete();
-        return userId;
+        auth.delete();
     }
 
     // 회원 정보 수정
