@@ -21,5 +21,6 @@ public class UserProfileResDto {
     String region1depthName;
     String region2depthName;
     String tel;
+    String profileSrc;
     Boolean promotionCheck;
 }

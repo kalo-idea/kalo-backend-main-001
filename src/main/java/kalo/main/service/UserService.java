@@ -254,8 +254,6 @@ public class UserService {
             .userInfos(userInfos)
             .build();
 
-        notisService.joinNotis(user.getId());
-
         return userAuthResDto;
     }
 
@@ -293,6 +291,7 @@ public class UserService {
         res.setNickname(user.getNickname());
         res.setPromotionCheck(auth.getPromotionCheck());
         res.setIntro(user.getIntro());
+        res.setProfileSrc(user.getProfileSrc());
 
         if (info.contains("birth")) {
             res.setBirth(auth.getBirth());
