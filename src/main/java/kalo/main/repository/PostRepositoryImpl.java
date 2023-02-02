@@ -39,7 +39,10 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
             post.replyCount, 
             post.topic, 
             post.region1depthName,
-            post.region2depthName)
+            post.region2depthName,
+            post.latitude,
+            post.longitude
+            )
          )
          .from(post)
          .where(

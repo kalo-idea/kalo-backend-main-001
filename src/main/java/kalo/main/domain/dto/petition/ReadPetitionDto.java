@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@Builder
 public class ReadPetitionDto {
     
     SimpleWriterDto writer;
@@ -53,7 +52,12 @@ public class ReadPetitionDto {
 
     Boolean isSupport;
 
-    public ReadPetitionDto(SimpleWriterDto writer, Long id, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, List<String> step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Long supportCount, Boolean isSupport) {
+    Double latitude;
+
+    Double longitude;
+
+    @Builder
+    public ReadPetitionDto(SimpleWriterDto writer, Long id, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, List<String> step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Double latitude, Double longitude, Long supportCount, Boolean isSupport) {
         this.writer = writer;
         this.id = id;
         this.title = title;
@@ -72,6 +76,8 @@ public class ReadPetitionDto {
         this.category = category;
         this.region1depthName = region1depthName;
         this.region2depthName = region2depthName;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.supportCount = supportCount;
         this.isSupport = isSupport;
     }

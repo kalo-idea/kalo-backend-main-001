@@ -165,6 +165,8 @@ public class PostService {
             .topic(post.getTopic())
             .region1depthName(post.getRegion1depthName())
             .region2depthName(post.getRegion2depthName())
+            .longitude(post.getLongitude())
+            .latitude(post.getLatitude())
             .build();
         }
 
@@ -183,6 +185,8 @@ public class PostService {
         .topic(post.getTopic())
         .region1depthName(post.getRegion1depthName())
         .region2depthName(post.getRegion2depthName())
+        .longitude(post.getLongitude())
+        .latitude(post.getLatitude())
         .build();
     }
 
@@ -319,7 +323,7 @@ public class PostService {
         return result;
     }
 
-    // 청원 싫어요, 싫어요 취소
+    // 게시글 싫어요, 싫어요 취소
     // 싫어요 클릭
     public LikeDislikeResDto dislikePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));

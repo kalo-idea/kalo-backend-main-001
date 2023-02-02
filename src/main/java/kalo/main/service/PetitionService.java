@@ -199,6 +199,8 @@ public class PetitionService {
             .category(petition.getCategory())
             .region1depthName(petition.getRegion1depthName())
             .region2depthName(petition.getRegion2depthName())
+            .latitude(petition.getLatitude())
+            .longitude(petition.getLongitude())
             .supportCount(petition.getSupportCount())
             .isSupport(isSupport)
             .build();
@@ -223,6 +225,8 @@ public class PetitionService {
         .category(petition.getCategory())
         .region1depthName(petition.getRegion1depthName())
         .region2depthName(petition.getRegion2depthName())
+        .latitude(petition.getLatitude())
+        .longitude(petition.getLongitude())
         .supportCount(petition.getSupportCount())
         .isSupport(isSupport)
         .build();

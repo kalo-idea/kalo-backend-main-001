@@ -34,9 +34,13 @@ public class ReadSimplePostDto {
 
     String region2depthName;
 
+    Double latitude;
+
+    Double longitude;
+
     @Builder
     @QueryProjection
-    public ReadSimplePostDto(Long postId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, Long replyCount, String topic, String region1depthName, String region2depthName) {
+    public ReadSimplePostDto(Long postId, Long writerId, String title, LocalDateTime createdDate, String content, Long likeCount, Long dislikeCount, Long replyCount, String topic, String region1depthName, String region2depthName, Double latitude, Double longitude) {
         this.postId = postId;
         this.writerId = writerId;
         this.title = title;
@@ -48,5 +52,7 @@ public class ReadSimplePostDto {
         this.topic = topic;
         this.region1depthName = region1depthName;
         this.region2depthName = region2depthName;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
