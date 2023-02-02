@@ -68,6 +68,7 @@ public class PetitionService {
     private final MediaRepository mediaRepository;
     private final MediaPetitionRepository mediaPetitionRepository;
     private final LedgerRepository ledgerRepository;
+    private final NotisService notisService;
 
     // 청원 생성
     public Long createPetition(CreatePetitionDto createPetitionDto) {
@@ -181,6 +182,7 @@ public class PetitionService {
         // 탈퇴회원 -> 유저정보 제외하고 반환
         if (writer.getDeleted()) {
             return ReadPetitionDto.builder()
+            .id(petition.getId())
             .title(petition.getTitle())
             .createdDate(petition.getCreatedDate())
             .content(petition.getContent())
@@ -204,6 +206,7 @@ public class PetitionService {
         // 정상회원
         return ReadPetitionDto.builder()
         .writer(new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()))
+        .id(petition.getId())
         .title(petition.getTitle())
         .createdDate(petition.getCreatedDate())
         .content(petition.getContent())
@@ -341,13 +344,24 @@ public class PetitionService {
         if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
             petition.setLikeCount(petition.getLikeCount() - 1);
+            System.out.println("case1");
         }
         // 싫어요가 눌려있던 상태 : 좋아요 추가, 싫어요 취소 -> 좋아요 +1, 싫어요 -1
         else if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
-            LikePetition likePetition = LikePetition.builder().petition(petition).user(user).build();
-            likePetitionRepository.save(likePetition);
-
+             
+            // 좋아요를 누른 기록이 있는 상태
+            if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
+                likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
+                System.out.println("case2");
+            }
+            // 좋아요를 처음 누른 상태
+            else {
+                LikePetition likePetition = LikePetition.builder().petition(petition).user(user).build();
+                likePetitionRepository.save(likePetition);
+                System.out.println("case3");
+            }
+            
             petition.setLikeCount(petition.getLikeCount() + 1);
             petition.setDislikeCount(petition.getDislikeCount() - 1);
         }
@@ -356,6 +370,7 @@ public class PetitionService {
             likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
 
             petition.setLikeCount(petition.getLikeCount() + 1);
+            System.out.println("case4");
         }
         // 아무것도 없던 상태 : 좋아요 추가 -> 좋아요 +1
         else {
@@ -363,6 +378,7 @@ public class PetitionService {
             likePetitionRepository.save(likePetition);
 
             petition.setLikeCount(petition.getLikeCount() + 1);
+            System.out.println("case5");
         }
         LikeDislikeResDto result = LikeDislikeResDto.builder()
             .id(petitionId)
@@ -383,9 +399,20 @@ public class PetitionService {
         
         // 좋아요가 눌려있던 상태 : 좋아요를 취소, 싫어요 추가 -> 좋아요 -1, 싫어요 + 1
         if (likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
+            
             likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
-            DislikePetition dislikePetition = DislikePetition.builder().user(user).petition(petition).build();
-            dislikePetitionRepository.save(dislikePetition);
+            // 싫어요를 누른 기록이 있는 상태
+            if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
+                dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
+                
+            System.out.println("case1");
+            }
+            // 싫어요를 누른 기록이 없는 상태
+            else {
+                DislikePetition dislikePetition = DislikePetition.builder().user(user).petition(petition).build();
+                dislikePetitionRepository.save(dislikePetition);
+                System.out.println("case2");
+            }
             
             petition.setLikeCount(petition.getLikeCount() - 1);
             petition.setDislikeCount(petition.getDislikeCount() + 1);
@@ -394,18 +421,21 @@ public class PetitionService {
         else if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().delete();
 
+            System.out.println("case3");
             petition.setDislikeCount(petition.getDislikeCount() - 1);
         }
         // 아무것도 눌려있지 않지만, 싫어요를 누른 기록이 있는 상태
         else if (dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).isPresent()) {
             dislikePetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, true).get().revive();
 
+            System.out.println("case4");
             petition.setDislikeCount(petition.getDislikeCount() + 1);
         }
         // 아무것도 없던 상태 : 싫어요 추가 -> 싫어요 +1
         else  {
             DislikePetition dislikePetition = DislikePetition.builder().user(user).petition(petition).build();
             dislikePetitionRepository.save(dislikePetition);
+            System.out.println("case5");
 
             petition.setDislikeCount(petition.getDislikeCount() + 1);
         }
@@ -435,6 +465,7 @@ public class PetitionService {
         else if (dislikePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(replyId, userId, false).isPresent()) {
             dislikePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(replyId, userId, false).get().delete();
             LikePetitionReply likePetitionReply = LikePetitionReply.builder().petitionReply(reply).user(user).build();
+            
             likePetitionReplyRepository.save(likePetitionReply);
 
             reply.setLikeCount(reply.getLikeCount() + 1);
@@ -542,6 +573,8 @@ public class PetitionService {
         supportPetitionRepository.save(supportPetition);
 
         petition.setSupportCount(petition.getSupportCount() + 1);
+
+        notisService.supportMyPetitionNotis(petition.getUser().getId(), petitionId);
 
         return readPetition(petitionId, userId);
     }

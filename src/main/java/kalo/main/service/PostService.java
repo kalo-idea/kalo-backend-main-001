@@ -36,6 +36,7 @@ import kalo.main.repository.LikePostReplyRepository;
 import kalo.main.repository.LikePostRepository;
 import kalo.main.repository.MediaPostRepository;
 import kalo.main.repository.MediaRepository;
+import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PostHashtagRepository;
 import kalo.main.repository.PostReplyRepository;
 import kalo.main.repository.PostRepository;
@@ -58,6 +59,7 @@ public class PostService {
     private final DislikePostReplyRepository dislikePostReplyRepository;
     private final MediaRepository mediaRepository;
     private final MediaPostRepository mediaPostRepository;
+    private final NotisRepository notisRepository;
 
     // 게시글 생성
     public Long createPost(CreatePostDto createPostsDto) {

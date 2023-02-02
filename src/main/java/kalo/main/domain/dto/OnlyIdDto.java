@@ -1,4 +1,4 @@
-package kalo.main.domain.dto.user;
+package kalo.main.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OnlyUserIdDto {
-    Long userId;
+public class OnlyIdDto {
+    Long id;
 }

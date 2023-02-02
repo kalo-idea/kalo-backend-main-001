@@ -28,6 +28,8 @@ public class NotisService {
     private final NotisRepository notisRepository;
     private final PetitionRepository petitionRepository;
     private final PostRepository postRepository;
+    
+    Long kaloId = 112L;
 
     public List<NotisResDto> getMyNotis(Pageable pageable, Long userId) {
         List<Notis> notis = notisRepository.findNotisByReceiverIdAndDeletedAndIsDisplay(pageable, userId, false, true);
@@ -45,7 +47,7 @@ public class NotisService {
 
     public void joinNotis(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-        User kalo = userRepository.findById(112L).get();
+        User kalo = userRepository.findById(kaloId).get();
 
         Notis notis = Notis.builder()
         .image("kalo")
@@ -65,7 +67,7 @@ public class NotisService {
 
     public void supportMyPetitionNotis(Long petitionWriterId, Long TargetId) {
         User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-        User kalo = userRepository.findById(112L).get();
+        User kalo = userRepository.findById(kaloId).get();
 
         Notis notis = Notis.builder()
         .image(null)
