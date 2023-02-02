@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import kalo.main.domain.Auth;
 
 public interface AuthRepository extends JpaRepository<Auth, Long> {   
-    Optional<Auth> findByKakao(String kakao); 
+    Optional<Auth> findByKakaoAndDeleted(String kakao, Boolean deleted); 
 }
