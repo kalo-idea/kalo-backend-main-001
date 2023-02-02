@@ -12,6 +12,7 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.Ledger;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LedgerHistoryDto;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,9 @@ public class LedgerService {
     }
 
     // 출석
-    public Long attend(Long userId) {
+    public Long attend(OnlyIdDto onlyIdDto) {
+        Long userId = onlyIdDto.getId();
+
         if (!isAttend(userId)) {
             User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 회원입니다."));
 
@@ -66,8 +69,8 @@ public class LedgerService {
         return history;
     }
 
-    public Long getPoint(Long userId) {
-        Long ledgers = ledgerRepository.getSumUserLedger(userId);
+    public Long getPoint(OnlyIdDto onlyIdDto) {
+        Long ledgers = ledgerRepository.getSumUserLedger(onlyIdDto.getId());
         return ledgers;
     }
 }

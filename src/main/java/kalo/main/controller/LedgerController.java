@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.service.LedgerService;
 import lombok.RequiredArgsConstructor;
 
@@ -27,8 +28,8 @@ public class LedgerController {
 
     // 출석체크
     @GetMapping("/attend")
-    public Long attend(Long userId) {
-        return ledgerService.attend(userId);
+    public Long attend(@RequestBody OnlyIdDto onlyIdDto) {
+        return ledgerService.attend(onlyIdDto);
     }
 
     // 이번달 출석일자
@@ -38,7 +39,7 @@ public class LedgerController {
     }
 
     @PostMapping("/get-point")
-    public Long getPoint(Long userId) {
-        return ledgerService.getPoint(userId);
+    public Long getPoint(@RequestBody OnlyIdDto onlyIdDto) {
+        return ledgerService.getPoint(onlyIdDto);
     }
 }

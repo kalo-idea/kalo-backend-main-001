@@ -19,6 +19,7 @@ import kalo.main.domain.Campaign;
 import kalo.main.domain.CampaignGroup;
 import kalo.main.domain.Petition;
 import kalo.main.domain.SupportPetition;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.repository.CampaignGroupRepository;
@@ -103,11 +104,14 @@ public class ServiceTest {
         
         Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(petitionId, userId)).hasMessage("포인트가 부족합니다.");
         
-        ledgerService.attend(userId);
+        OnlyIdDto onlyIdDto = new OnlyIdDto();
+        onlyIdDto.setId(userId);
+        
+        ledgerService.attend(onlyIdDto);
         nowPoint = usersService.getProfileHome(userId).getPoint();
         assertThat(nowPoint).isEqualTo(500);
 
-        Assertions.assertThatThrownBy(() -> ledgerService.attend(userId)).hasMessage("이미 출석한 회원입니다.");
+        Assertions.assertThatThrownBy(() -> ledgerService.attend(onlyIdDto)).hasMessage("이미 출석한 회원입니다.");
         nowPoint = usersService.getProfileHome(userId).getPoint();
         assertThat(nowPoint).isEqualTo(500);
         
