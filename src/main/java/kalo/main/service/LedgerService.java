@@ -31,9 +31,7 @@ public class LedgerService {
     }
 
     // 출석
-    public Long attend(OnlyIdDto onlyIdDto) {
-        Long userId = onlyIdDto.getId();
-
+    public Long attend(Long userId) {
         if (!isAttend(userId)) {
             User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 회원입니다."));
 
@@ -69,8 +67,8 @@ public class LedgerService {
         return history;
     }
 
-    public Long getPoint(OnlyIdDto onlyIdDto) {
-        Long ledgers = ledgerRepository.getSumUserLedger(onlyIdDto.getId());
+    public Long getPoint(Long userId) {
+        Long ledgers = ledgerRepository.getSumUserLedger(userId);
         return ledgers;
     }
 }

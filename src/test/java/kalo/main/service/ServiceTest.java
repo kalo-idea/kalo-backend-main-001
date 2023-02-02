@@ -111,14 +111,11 @@ public class ServiceTest {
         
         Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(petitionId, userId)).hasMessage("포인트가 부족합니다.");
         
-        OnlyIdDto onlyIdDto = new OnlyIdDto();
-        onlyIdDto.setId(userId);
-        
-        ledgerService.attend(onlyIdDto);
+        ledgerService.attend(userId);
         nowPoint = usersService.getProfileHome(userId).getPoint();
         assertThat(nowPoint).isEqualTo(500);
 
-        Assertions.assertThatThrownBy(() -> ledgerService.attend(onlyIdDto)).hasMessage("이미 출석한 회원입니다.");
+        Assertions.assertThatThrownBy(() -> ledgerService.attend(userId)).hasMessage("이미 출석한 회원입니다.");
         nowPoint = usersService.getProfileHome(userId).getPoint();
         assertThat(nowPoint).isEqualTo(500);
         
