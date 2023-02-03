@@ -68,24 +68,24 @@ public class PostController {
     // 게시글 좋아요
     @PostMapping("/like-post")
     public LikeDislikeResDto likePost(@Valid @RequestBody TargetIdUserIdDto req) {
-        return postService.likePost(req.getTargetId(), req.getUserId());
+        return postService.likePost(req);
     }
  
     // 게시글 싫어요
     @PostMapping("/dislike-post")
     public LikeDislikeResDto dislikePost(@Valid @RequestBody TargetIdUserIdDto req) {
-        return postService.dislikePost(req.getTargetId(), req.getUserId());
+        return postService.dislikePost(req);
     }
 
     // 게시글 댓글 좋아요
     @PostMapping("/like-post-reply")
     public LikeDislikeResDto likePostReply(@Valid @RequestBody TargetIdUserIdDto req) {
-        return postService.likePostReply(req.getTargetId(), req.getUserId());
+        return postService.likePostReply(req);
     }
  
     // 게시글 댓글 싫어요
     @PostMapping("/dislike-post-reply")
     public LikeDislikeResDto dislikePostReply(@Valid @RequestBody TargetIdUserIdDto req) {
-        return postService.dislikePostReply(req.getTargetId(), req.getUserId());
+        return postService.dislikePostReply(req);
     }
 }
