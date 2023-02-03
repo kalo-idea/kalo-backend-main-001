@@ -31,8 +31,8 @@ public class PostController {
 
     // 글 작성
     @PostMapping("/create-post")
-    public void createPost(@RequestBody CreatePostDto createPostsDto) {
-        postService.createPost(createPostsDto);
+    public Long createPost(@RequestBody CreatePostDto createPostsDto) {
+        return postService.createPost(createPostsDto);
     }
 
     // 글 단건 조회
