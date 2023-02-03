@@ -153,6 +153,7 @@ public class PostService {
 
         if (writer.getDeleted()) {
             ReadPostDto.builder()
+            .writer(new SimpleDeletedWriterDto())
             .title(post.getTitle())
             .createdDate(post.getCreatedDate())
             .content(post.getContent())
@@ -224,6 +225,7 @@ public class PostService {
             if (reply.getUser().getDeleted()) {
                 ReplyDto commentDto = ReplyDto.builder()
                 .commentId(reply.getId())
+                .writer(new SimpleDeletedWriterDto())
                 .isLike(isLike)
                 .likeCount(reply.getLikeCount())
                 .isDislike(isDislike)

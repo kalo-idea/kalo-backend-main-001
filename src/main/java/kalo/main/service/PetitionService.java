@@ -27,6 +27,7 @@ import kalo.main.domain.SupportPetition;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
+import kalo.main.domain.dto.SimpleDeletedWriterDto;
 import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
@@ -184,6 +185,7 @@ public class PetitionService {
         if (writer.getDeleted()) {
             return ReadPetitionDto.builder()
             .id(petition.getId())
+            .writer(new SimpleDeletedWriterDto())
             .title(petition.getTitle())
             .createdDate(petition.getCreatedDate())
             .content(petition.getContent())
@@ -267,6 +269,7 @@ public class PetitionService {
             if (reply.getUser().getDeleted()) {
                 ReplyDto commentDto = ReplyDto.builder()
                 .commentId(reply.getId())
+                .writer(new SimpleDeletedWriterDto())
                 .isLike(isLike)
                 .likeCount(reply.getLikeCount())
                 .isDislike(isDislike)
@@ -329,7 +332,7 @@ public class PetitionService {
             }
 
             if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, steps, words, fileNames));
+                result.add(new ReadPetitionsDto(simplePetition, new SimpleDeletedWriterDto(), steps, words, fileNames));
             }
             else {
                 result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
