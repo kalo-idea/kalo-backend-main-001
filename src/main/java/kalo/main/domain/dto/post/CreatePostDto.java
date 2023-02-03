@@ -10,13 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CreatePostDto {
+    
     String title = "";
 
     String content = "";
 
     List<String> media = new ArrayList<String>();
-
-    Long id;
 
     String topic = "";
 
@@ -34,12 +33,13 @@ public class CreatePostDto {
 
     Double longitude = 126.97755295059169d;
 
+    Long writerId;
+
     @Builder
-    public CreatePostDto(String title, String content, List<String> media, Long id, String topic, List<String> hashtags, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude) {
+    public CreatePostDto(String title, String content, List<String> media, String topic, List<String> hashtags, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, Long writerId) {
         this.title = title;
         this.content = content;
-        this.media = media;
-        this.id = id;
+        this.media = media;        
         this.topic = topic;
         this.hashtags = hashtags;
         this.addressName = addressName;
@@ -48,5 +48,6 @@ public class CreatePostDto {
         this.region3depthName = region3depthName;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.writerId = writerId;
     }
 }

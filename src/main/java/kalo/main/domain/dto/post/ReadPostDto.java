@@ -25,7 +25,7 @@ public class ReadPostDto{
 
     List<String> hashtags;
 
-    List<String> media;
+    List<String> medium;
 
     Long likeCount;
 
@@ -48,13 +48,13 @@ public class ReadPostDto{
     Double longitude;
 
     @QueryProjection
-    public ReadPostDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName, Double latitude, Double longitude) {
+    public ReadPostDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> medium, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName, Double latitude, Double longitude) {
         this.writer = writer;
         this.title = title;
         this.createdDate = createdDate;
         this.content = content;
         this.hashtags = hashtags;
-        this.media = media;
+        this.medium = medium;
         this.likeCount = likeCount;
         this.isLike = isLike;
         this.dislikeCount = dislikeCount;

@@ -22,6 +22,7 @@ import kalo.main.domain.PostReply;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
+import kalo.main.domain.dto.SimpleDeletedWriterDto;
 import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.post.CreatePostDto;
 import kalo.main.domain.dto.post.CreatePostReplyDto;
@@ -36,7 +37,6 @@ import kalo.main.repository.LikePostReplyRepository;
 import kalo.main.repository.LikePostRepository;
 import kalo.main.repository.MediaPostRepository;
 import kalo.main.repository.MediaRepository;
-import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PostHashtagRepository;
 import kalo.main.repository.PostReplyRepository;
 import kalo.main.repository.PostRepository;
@@ -59,16 +59,16 @@ public class PostService {
     private final DislikePostReplyRepository dislikePostReplyRepository;
     private final MediaRepository mediaRepository;
     private final MediaPostRepository mediaPostRepository;
-    private final NotisRepository notisRepository;
 
     // 게시글 생성
     public Long createPost(CreatePostDto createPostsDto) {
+        User user = userRepository.findByIdAndDeleted(createPostsDto.getWriterId(), false).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
 
         Post post = Post.builder()
         .title(createPostsDto.getTitle())
         .content(createPostsDto.getContent())
         .viewCount(0L)
-        .user(userRepository.findById(createPostsDto.getId()).get())
+        .user(user)
         .replyCount(0L)
         .likeCount(0L)
         .dislikeCount(0L)
@@ -156,7 +156,7 @@ public class PostService {
             .createdDate(post.getCreatedDate())
             .content(post.getContent())
             .hashtags(hashtags_res)
-            .media(media_res)
+            .medium(media_res)
             .likeCount(post.getLikeCount())
             .isLike(isLike)
             .dislikeCount(post.getDislikeCount())
@@ -176,7 +176,7 @@ public class PostService {
         .createdDate(post.getCreatedDate())
         .content(post.getContent())
         .hashtags(hashtags_res)
-        .media(media_res)
+        .medium(media_res)
         .likeCount(post.getLikeCount())
         .isLike(isLike)
         .dislikeCount(post.getDislikeCount())
@@ -255,24 +255,30 @@ public class PostService {
         List<ReadPostsDto> result = new ArrayList<>();
 
         for (ReadSimplePostDto simplePost : posts) {
-            User writer = userRepository.findById(simplePost.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            User writer = userRepository.findByIdAndDeleted(simplePost.getWriterId(), false).orElse(
+                User.builder().build()
+            );
+
             List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPostHashtags(simplePost.getPostId());
             for (Hashtag hashtag : hashtags) {
                 words.add(hashtag.getWord());
             }
+            
             List<String> fileNames = new ArrayList<String>();
             List<Media> media = mediaRepository.findPostMedia(simplePost.getPostId());
             for (Media medium : media) {
                 fileNames.add(medium.getFileName());
             }
-            if (writer.getDeleted()) {
-                result.add(new ReadPostsDto(simplePost, null, words, fileNames));
+            
+            SimpleWriterDto writerDto = null;
+            if (writer.getId() != null) {
+                writerDto = new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc());
+            } else {
+                writerDto = new SimpleDeletedWriterDto();
             }
-            else {
-                SimpleWriterDto writerDto = new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc());
-                result.add(new ReadPostsDto(simplePost, writerDto, words, fileNames));
-            }
+            
+            result.add(new ReadPostsDto(simplePost, writerDto, words, fileNames));
         }
 
         return result;
