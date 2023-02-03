@@ -28,6 +28,7 @@ import kalo.main.domain.User;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
 import kalo.main.domain.dto.SimpleWriterDto;
+import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
 import kalo.main.domain.dto.petition.PetitionCondDto;
@@ -340,7 +341,11 @@ public class PetitionService {
 
     // 청원 좋아요, 좋아요 취소
     // 좋아요 클릭
-    public LikeDislikeResDto likePetition(Long petitionId, Long userId) {
+    public LikeDislikeResDto likePetition(TargetIdUserIdDto req) 
+    {
+        Long petitionId = req.getTargetId();
+        Long userId = req.getUserId();
+
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
@@ -385,7 +390,10 @@ public class PetitionService {
 
     // 청원 싫어요, 싫어요 취소
     // 싫어요 클릭
-    public LikeDislikeResDto dislikePetition(Long petitionId, Long userId) {
+    public LikeDislikeResDto dislikePetition(TargetIdUserIdDto req) {
+        Long petitionId = req.getTargetId();
+        Long userId = req.getUserId();
+
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
@@ -430,7 +438,10 @@ public class PetitionService {
 
     // 댓글 좋아요 좋아요 취소
     // 댓글 좋아요 클릭
-    public LikeDislikeResDto likePetitionReply(Long replyId, Long userId) {
+    public LikeDislikeResDto likePetitionReply(TargetIdUserIdDto req) {
+        Long replyId = req.getTargetId();
+        Long userId = req.getUserId();
+
         PetitionReply reply = petitionReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
@@ -475,7 +486,10 @@ public class PetitionService {
 
     // 댓글 싫어요 싫어요 취소
     // 댓글 싫어요 클릭
-    public LikeDislikeResDto dislikePetitionReply(Long replyId, Long userId) {
+    public LikeDislikeResDto dislikePetitionReply(TargetIdUserIdDto req) {
+        Long replyId = req.getTargetId();
+        Long userId = req.getUserId();
+        
         PetitionReply reply = petitionReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
