@@ -44,5 +44,12 @@ public class NotisService {
     public Long checkMyNotis(Long userId) {
         return notisRepository.countNotisByReceiverIdAndDeletedAndIsDisplayAndIsCheck(userId, false, true, false);
     }
+
+    public Boolean notisCheck(Long noticeId) {
+        Notis notis = notisRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
+        notis.setIsCheck(true);
+        
+        return true;
+    }
     
 }

@@ -28,4 +28,8 @@ public class NotisController {
         return notisService.checkMyNotis(id);
     }
 
+    @PostMapping("/check-notis")
+    public Boolean notisCheck(Long id) {
+        return notisService.notisCheck(id);
+    }
 }
