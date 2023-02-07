@@ -104,7 +104,7 @@ public class PostService {
             }
         }
 
-        List<String> media = createPostsDto.getMedia();
+        List<String> media = createPostsDto.getMedium();
         for (String fileName : media) {
             Media medium = new Media(fileName);
             mediaRepository.save(medium);
