@@ -3,6 +3,7 @@ package kalo.main.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kalo.main.admin.dto.AdminAuthDataDto;
 import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
+import kalo.main.admin.dto.AdminAuthsReqDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
 import kalo.main.admin.dto.AdminUserReqDto;
 import kalo.main.admin.dto.AdminUserDataDto;
@@ -62,7 +64,7 @@ public class AdminService {
         if (req.getEmail()) {
             res.setEmail(auth.getEmail());
         }
-        if (req.getName()) {
+        if (req.getName()) { 
             res.setName(auth.getName());
         }
         if (req.getBirth()) {
@@ -101,6 +103,68 @@ public class AdminService {
         res.setUsers(users_res);
 
         return res;
+    }
+
+    // auths 조회
+    public List<AdminAuthResDto> getAuths(Pageable pageable, AdminAuthsReqDto req) {
+        Page<Auth> auths = authRepository.findAll(pageable);
+        List<AdminAuthResDto> result = new ArrayList();
+        for (Auth auth : auths) {
+            AdminAuthResDto res = new AdminAuthResDto();
+            res.setId(auth.getId());
+        
+            if (req.getType()) {
+                res.setType(auth.getType());
+            }
+            if (req.getKakao()) {
+                res.setKakao(auth.getKakao());
+            }
+            if (req.getEmail()) {
+                res.setEmail(auth.getEmail());
+            }
+            if (req.getName()) { 
+                res.setName(auth.getName());
+            }
+            if (req.getBirth()) {
+                res.setBirth(auth.getBirth());
+            }
+            if (req.getGender()) {
+                res.setGender(auth.getGender());
+            }
+            if (req.getTel()) {
+                res.setTel(auth.getTel());
+            }
+            if (req.getAddress()) {
+                res.setAddress(auth.getAddress());
+            }
+            if (req.getRegion1depthName()) {
+                res.setRegion1depthName(auth.getRegion1depthName());
+            }
+            if (req.getRegion2depthName()) {
+                res.setRegion2depthName(auth.getRegion2depthName());
+            }
+            if (req.getPromotionCheck()) {
+                res.setPromotionCheck(auth.getPromotionCheck());
+            }
+            if (req.getFcmToken()) {
+                res.setFcmToken(auth.getFcmToken());
+            }
+            if (req.getRecentLogin()) {
+                res.setRecentLogin(auth.getRecentLogin());
+            }
+            res.setCreatedDate(auth.getCreatedDate());
+            
+            List<User> users = userRepository.findByAuthIdAndDeleted(auth.getId(), false).get();
+            List<SimpleWriterDto> users_res = new ArrayList<SimpleWriterDto>();
+            for (User user : users) {
+                users_res.add(new SimpleWriterDto(user));
+            }
+            res.setUsers(users_res);
+
+            result.add(res);
+        }
+        
+        return result;
     }
 
     // Auth 수정
@@ -147,7 +211,7 @@ public class AdminService {
             res.setRecentLogin(req.getRecentLogin());
         }
 
-        return "성공";
+        return "success";
     }
 
     // User 조회

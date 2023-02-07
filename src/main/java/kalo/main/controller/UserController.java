@@ -82,7 +82,6 @@ public class UserController {
         return userService.getMyProfile(id);
     }
 
-
     // 회원 정보 수정
     @PostMapping("/update-auth-info")
     public Long updateInfo(@RequestBody UpdateUserInfoReqDto req) {
