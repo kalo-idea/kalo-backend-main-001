@@ -171,6 +171,7 @@ public class PostService {
         }
 
         return ReadPostDto.builder()
+        .id(post.getId())
         .writer(new SimpleWriterDto(writer.getId(),writer.getNickname(),writer.getProfileSrc()))
         .title(post.getTitle())
         .createdDate(post.getCreatedDate())
