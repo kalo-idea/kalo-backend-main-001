@@ -24,6 +24,7 @@ import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
 import kalo.main.domain.dto.SimpleDeletedWriterDto;
 import kalo.main.domain.dto.SimpleWriterDto;
+import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.post.CreatePostDto;
 import kalo.main.domain.dto.post.CreatePostReplyDto;
 import kalo.main.domain.dto.post.PostCondDto;
@@ -258,7 +259,10 @@ public class PostService {
     
     // 게시글 좋아요, 좋아요 취소
     // 좋아요 클릭
-    public LikeDislikeResDto likePost(Long postId, Long userId) {
+    public LikeDislikeResDto likePost(TargetIdUserIdDto req) {
+        Long postId = req.getTargetId();
+        Long userId = req.getUserId();
+        
         Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
@@ -303,7 +307,10 @@ public class PostService {
 
     // 게시글 싫어요, 싫어요 취소
     // 싫어요 클릭
-    public LikeDislikeResDto dislikePost(Long postId, Long userId) {
+    public LikeDislikeResDto dislikePost(TargetIdUserIdDto req) {
+        Long postId = req.getTargetId();
+        Long userId = req.getUserId();
+
         Post post = postRepository.findById(postId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));;
         
@@ -348,7 +355,10 @@ public class PostService {
 
     // 댓글 좋아요 좋아요 취소
     // 댓글 좋아요 클릭
-    public LikeDislikeResDto likePostReply(Long replyId, Long userId) {
+    public LikeDislikeResDto likePostReply(TargetIdUserIdDto req) {
+        Long replyId = req.getTargetId();
+        Long userId = req.getUserId();
+
         PostReply reply = postReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         
@@ -393,7 +403,10 @@ public class PostService {
     
     // 댓글 싫어요 싫어요 취소
     // 댓글 싫어요 클릭
-    public LikeDislikeResDto dislikePostReply(Long replyId, Long userId) {
+    public LikeDislikeResDto dislikePostReply(TargetIdUserIdDto req) {
+        Long replyId = req.getTargetId();
+        Long userId = req.getUserId();
+
         PostReply reply = postReplyRepository.findById(replyId).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         

@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import kalo.main.admin.dto.AdminAuthDataDto;
 import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
+import kalo.main.admin.dto.AdminAuthsReqDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
 import kalo.main.admin.dto.AdminUserReqDto;
 import kalo.main.admin.dto.AdminUserDataDto;
@@ -35,6 +36,12 @@ public class AdminController {
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
         @Valid Long userId) {
             return adminService.getLedgersHistory(pageable, userId);
+    }
+
+    // 계정 리스트 조회
+    @GetMapping("/get-auths")
+    public List<AdminAuthResDto> getAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, AdminAuthsReqDto req) {
+        return adminService.getAuths(pageable, req);
     }
 
     // 계정 조회
@@ -59,6 +66,19 @@ public class AdminController {
     // 유저 수정
     @PostMapping("update-user")
     public String updateUser(@RequestBody(required = false) AdminUserDataDto req) {
+        return adminService.updateUser(req);
+    }
+
+    // 청원 수정
+    @PostMapping("update-petiton")
+    public String updatePetition(@RequestBody(required = false) AdminUserDataDto req) {
+        return adminService.updateUser(req);
+    }
+    
+
+    // 게시글 수정
+    @PostMapping("update-post")
+    public String updatePost(@RequestBody(required = false) AdminUserDataDto req) {
         return adminService.updateUser(req);
     }
 

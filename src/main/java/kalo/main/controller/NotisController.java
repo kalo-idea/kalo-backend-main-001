@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.dto.NotisResDto;
@@ -25,5 +26,10 @@ public class NotisController {
     @GetMapping("/count-my-notis")
     public Long countMyNotis(Long id) {
         return notisService.checkMyNotis(id);
+    }
+
+    @PostMapping("/check-notis")
+    public Boolean notisCheck(Long id) {
+        return notisService.notisCheck(id);
     }
 }

@@ -70,25 +70,25 @@ public class PetitionController {
     // 청원 게시글 좋아요
     @PostMapping("/like-petition")
     public LikeDislikeResDto likePetition(@Valid @RequestBody TargetIdUserIdDto req) {
-        return petitionService.likePetition(req.getTargetId(), req.getUserId());
+        return petitionService.likePetition(req);
     }
  
     // 청원 게시글 싫어요
     @PostMapping("/dislike-petition")
     public LikeDislikeResDto dislikePetition(@Valid @RequestBody TargetIdUserIdDto req) {
-        return petitionService.dislikePetition(req.getTargetId(), req.getUserId());
+        return petitionService.dislikePetition(req);
     }
 
     // 청원 댓글 좋아요
     @PostMapping("/like-petition-reply")
     public LikeDislikeResDto likePetitionReply(@Valid @RequestBody TargetIdUserIdDto req) {
-        return petitionService.likePetitionReply(req.getTargetId(), req.getUserId());
+        return petitionService.likePetitionReply(req);
     }
  
     // 청원 댓글 싫어요
-    @PostMapping("/dislike-petition-reply")
+    @PostMapping("/dislike-petition-reply") 
     public LikeDislikeResDto dislikePetitionReply(@Valid @RequestBody TargetIdUserIdDto req) {
-        return petitionService.dislikePetitionReply(req.getTargetId(), req.getUserId());
+        return petitionService.dislikePetitionReply(req);
     }
 
     // 청원 참여하기
