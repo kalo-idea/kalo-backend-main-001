@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReadPostDto{
 
+    Long id;
+
     SimpleWriterDto writer;
     
     String title;
@@ -48,7 +50,8 @@ public class ReadPostDto{
     Double longitude;
 
     @QueryProjection
-    public ReadPostDto(SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> medium, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName, Double latitude, Double longitude) {
+    public ReadPostDto(Long id, SimpleWriterDto writer, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> medium, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, Long replyCount, String topic, String region1depthName, String region2depthName, Double latitude, Double longitude) {
+        this.id = id;
         this.writer = writer;
         this.title = title;
         this.createdDate = createdDate;
