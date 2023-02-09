@@ -1,5 +1,7 @@
 package kalo.main.domain.dto;
 
+import java.time.LocalDateTime;
+
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
@@ -10,12 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReplyDto {
     
-    Long commentId;
+    Long id;
 
     SimpleWriterDto writer;
+    LocalDateTime createdDate;
 
     Boolean isLike;
     Long likeCount;
+
     Boolean isDislike;
     Long dislikeCount;
 
@@ -23,9 +27,10 @@ public class ReplyDto {
 
     @QueryProjection
     @Builder
-    public ReplyDto(Long commentId, SimpleWriterDto writer, Boolean isLike, Long likeCount, Boolean isDislike, Long dislikeCount, String content) {
-        this.commentId = commentId;
+    public ReplyDto(Long id, SimpleWriterDto writer, LocalDateTime createdDate,  Boolean isLike, Long likeCount, Boolean isDislike, Long dislikeCount, String content) {
+        this.id = id;
         this.writer = writer;
+        this.createdDate = createdDate;
         this.isLike = isLike;
         this.likeCount = likeCount;
         this.isDislike = isDislike;
