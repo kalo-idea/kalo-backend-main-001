@@ -113,6 +113,10 @@ public class CampaignService {
         String voteStatus = getVoteCampaignStatus(userId, LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue());
         CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue()).orElseThrow(() -> new BasicException("캠페인 그룹을 찾을 수 없습니다."));
         
+        if(campaignGroup.getVotingDateStart().isAfter(LocalDateTime.now()) || campaignGroup.getVotingDateEnd().isBefore(LocalDateTime.now())) {
+            throw new BasicException("투표 기간이 아닙니다.");
+        }
+
         if (voteStatus.equals("possible")) {
             // 삭제한 투표 기록 존재
             if (campaignUserRepository.findByUserIdAndCreatedDateBetweenAndDeleted(userId, campaignGroup.getVotingDateStart(), campaignGroup.getVotingDateEnd(), true).isPresent()) {

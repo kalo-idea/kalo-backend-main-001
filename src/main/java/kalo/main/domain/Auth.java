@@ -54,10 +54,8 @@ public class Auth extends BaseEntity {
 
     String fcmToken;
 
-    LocalDateTime recentLogin;
-
     @Builder
-    public Auth(Long id, String type, String kakao, String email, String name, LocalDate birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken, LocalDateTime recentLogin) {
+    public Auth(Long id, String type, String kakao, String email, String name, LocalDate birth, String gender, String tel, String address, String region1depthName, String region2depthName, Boolean promotionCheck, String fcmToken) {
         this.id = id;
         this.type = type;
         this.kakao = kakao;
@@ -71,7 +69,6 @@ public class Auth extends BaseEntity {
         this.region2depthName = region2depthName;
         this.promotionCheck = promotionCheck;
         this.fcmToken = fcmToken;
-        this.recentLogin = recentLogin;
     }
     
 }

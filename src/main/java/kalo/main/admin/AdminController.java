@@ -18,7 +18,10 @@ import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
 import kalo.main.admin.dto.AdminAuthsReqDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
+import kalo.main.admin.dto.AdminUserAuthReqDto;
+import kalo.main.admin.dto.AdminUserAuthResDto;
 import kalo.main.admin.dto.AdminUserReqDto;
+import kalo.main.admin.dto.AdminUsersAuthsReqDto;
 import kalo.main.admin.dto.AdminUserDataDto;
 import lombok.RequiredArgsConstructor;
 
@@ -64,22 +67,35 @@ public class AdminController {
     }
 
     // 유저 수정
-    @PostMapping("update-user")
+    @PostMapping("/update-user")
     public String updateUser(@RequestBody(required = false) AdminUserDataDto req) {
         return adminService.updateUser(req);
     }
 
     // 청원 수정
-    @PostMapping("update-petiton")
+    @PostMapping("/update-petiton")
     public String updatePetition(@RequestBody(required = false) AdminUserDataDto req) {
         return adminService.updateUser(req);
     }
     
 
     // 게시글 수정
-    @PostMapping("update-post")
+    @PostMapping("/update-post")
     public String updatePost(@RequestBody(required = false) AdminUserDataDto req) {
         return adminService.updateUser(req);
+    }
+
+    // 유저 계정 조회
+    @GetMapping("/get-user-auth")
+    public AdminUserAuthResDto getUserAuth(AdminUserAuthReqDto req) {
+        return adminService.getUserAndAuth(req);
+    }
+
+    // 유저s 계정s 조회
+    @GetMapping("/get-users-auths")
+    public List<AdminUserAuthResDto> getUsersAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, 
+    AdminUsersAuthsReqDto req) {
+        return adminService.getUsersAndAuths(pageable, req);
     }
 
 }

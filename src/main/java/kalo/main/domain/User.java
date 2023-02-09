@@ -1,5 +1,7 @@
 package kalo.main.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,19 +35,21 @@ public class User extends BaseEntity {
     String profileSrc;
     String publicInfos;
 
+    LocalDateTime recentLogin;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="auth_id")
     Auth auth;
 
     @Builder
-    public User(Long id, String type, String nickname, String intro, String profileSrc, String publicInfos, Auth auth) {
+    public User(Long id, String type, String nickname, String intro, String profileSrc, String publicInfos, LocalDateTime recentLogin, Auth auth) {
         this.id = id;
         this.type = type;
         this.nickname = nickname;
         this.intro = intro;
         this.profileSrc = profileSrc;
         this.publicInfos = publicInfos;
+        this.recentLogin = recentLogin;
         this.auth = auth;
     }
-
 }

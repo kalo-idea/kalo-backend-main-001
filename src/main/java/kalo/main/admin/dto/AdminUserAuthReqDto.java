@@ -1,14 +1,25 @@
 package kalo.main.admin.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AdminAuthReqDto {
+public class AdminUserAuthReqDto {
+    Long userId;
 
-    Long authId;
-    Boolean type;
+    Boolean userType;
+    Boolean nickname;
+    Boolean intro;
+    Boolean profileSrc;
+    Boolean publicInfos;
+    Boolean ledger;
+    Boolean recentLogin;
+    
+    Boolean authType;
     Boolean kakao;
     Boolean email;
     Boolean name;

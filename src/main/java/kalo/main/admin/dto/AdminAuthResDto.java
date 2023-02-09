@@ -25,7 +25,6 @@ public class AdminAuthResDto {
     String region2depthName;
     Boolean promotionCheck;
     String fcmToken;
-    LocalDateTime recentLogin;
     LocalDateTime createdDate;
 
     List<SimpleWriterDto> users;

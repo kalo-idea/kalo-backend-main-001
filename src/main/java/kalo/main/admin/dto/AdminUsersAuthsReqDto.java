@@ -5,10 +5,16 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AdminAuthReqDto {
-
-    Long authId;
-    Boolean type;
+public class AdminUsersAuthsReqDto {
+    Boolean userType;
+    Boolean nickname;
+    Boolean intro;
+    Boolean profileSrc;
+    Boolean publicInfos;
+    Boolean ledger;
+    Boolean recentLogin;
+    
+    Boolean authType;
     Boolean kakao;
     Boolean email;
     Boolean name;
