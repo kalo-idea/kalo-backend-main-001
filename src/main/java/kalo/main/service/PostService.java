@@ -133,7 +133,6 @@ public class PostService {
             throw new BasicException("삭제된 게시글입니다.");
         }
 
-        User writer = userRepository.findById(post.getUser().getId()).get();
         List<Hashtag> hashtags = hashtagRepository.findPostHashtags(postId);
         List<String> hashtags_res = new ArrayList<String>();
 
@@ -150,29 +149,12 @@ public class PostService {
         
         post.setViewCount(post.getViewCount() + 1);
 
-        if (writer.getDeleted()) {
-            ReadPostDto.builder()
-            .title(post.getTitle())
-            .createdDate(post.getCreatedDate())
-            .content(post.getContent())
-            .hashtags(hashtags_res)
-            .medium(media_res)
-            .likeCount(post.getLikeCount())
-            .isLike(isLike)
-            .dislikeCount(post.getDislikeCount())
-            .isDislike(isDislike)
-            .replyCount(post.getReplyCount())
-            .topic(post.getTopic())
-            .region1depthName(post.getRegion1depthName())
-            .region2depthName(post.getRegion2depthName())
-            .longitude(post.getLongitude())
-            .latitude(post.getLatitude())
-            .build();
-        }
+        User user = userRepository.findById(post.getUser().getId()).get();
+        SimpleWriterDto writer = user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
 
         return ReadPostDto.builder()
         .id(post.getId())
-        .writer(new SimpleWriterDto(writer.getId(),writer.getNickname(),writer.getProfileSrc()))
+        .writer(writer)
         .title(post.getTitle())
         .createdDate(post.getCreatedDate())
         .content(post.getContent())
@@ -220,32 +202,21 @@ public class PostService {
                 isLike = likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
                 isDislike = dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
             }
-            // 댓글 작성자 탈퇴의 경우
-            if (reply.getUser().getDeleted()) {
-                ReplyDto commentDto = ReplyDto.builder()
-                .commentId(reply.getId())
-                .isLike(isLike)
-                .likeCount(reply.getLikeCount())
-                .isDislike(isDislike)
-                .dislikeCount(reply.getDislikeCount())
-                .content(reply.getContent())
-                .build();
-    
-                result.add(commentDto);
-            }
-            if (!reply.getUser().getDeleted()) {
-                ReplyDto commentDto = ReplyDto.builder()
-                .commentId(reply.getId())
-                .writer(new SimpleWriterDto(reply.getUser().getId(), reply.getUser().getNickname(), reply.getUser().getProfileSrc()))
-                .isLike(isLike)
-                .likeCount(reply.getLikeCount())
-                .isDislike(isDislike)
-                .dislikeCount(reply.getDislikeCount())
-                .content(reply.getContent())
-                .build();
-    
-                result.add(commentDto);
-            }
+
+            SimpleWriterDto writer = reply.getUser().getDeleted() ? new SimpleWriterDto(reply.getUser()) : new SimpleDeletedWriterDto();
+
+            ReplyDto commentDto = ReplyDto.builder()
+            .id(reply.getId())
+            .writer(writer)
+            .createdDate(reply.getCreatedDate())
+            .isLike(isLike)
+            .likeCount(reply.getLikeCount())
+            .isDislike(isDislike)
+            .dislikeCount(reply.getDislikeCount())
+            .content(reply.getContent())
+            .build();
+
+            result.add(commentDto);
         }
         return result;
     }

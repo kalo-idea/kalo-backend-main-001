@@ -27,6 +27,7 @@ import kalo.main.domain.SupportPetition;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
+import kalo.main.domain.dto.SimpleDeletedWriterDto;
 import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
@@ -262,32 +263,20 @@ public class PetitionService {
                 isLike = likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
                 isDislike = dislikePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
             }
-            // 댓글 작성자 탈퇴의 경우
-            if (reply.getUser().getDeleted()) {
-                ReplyDto commentDto = ReplyDto.builder()
-                .commentId(reply.getId())
-                .isLike(isLike)
-                .likeCount(reply.getLikeCount())
-                .isDislike(isDislike)
-                .dislikeCount(reply.getDislikeCount())
-                .content(reply.getContent())
-                .build();
-    
-                result.add(commentDto);
-            }
-            if (!reply.getUser().getDeleted()) {
-                ReplyDto commentDto = ReplyDto.builder()
-                .commentId(reply.getId())
-                .writer(new SimpleWriterDto(reply.getUser().getId(), reply.getUser().getNickname(), reply.getUser().getProfileSrc()))
-                .isLike(isLike)
-                .likeCount(reply.getLikeCount())
-                .isDislike(isDislike)
-                .dislikeCount(reply.getDislikeCount())
-                .content(reply.getContent())
-                .build();
-    
-                result.add(commentDto);
-            }
+
+            SimpleWriterDto writer = reply.getUser().getDeleted() ? new SimpleWriterDto(reply.getUser()) : new SimpleDeletedWriterDto();
+            ReplyDto commentDto = ReplyDto.builder()
+            .id(reply.getId())
+            .writer(writer)
+            .createdDate(reply.getCreatedDate())
+            .isLike(isLike)
+            .likeCount(reply.getLikeCount())
+            .isDislike(isDislike)
+            .dislikeCount(reply.getDislikeCount())
+            .content(reply.getContent())
+            .build();
+
+            result.add(commentDto);
         }
         return result;
     }
