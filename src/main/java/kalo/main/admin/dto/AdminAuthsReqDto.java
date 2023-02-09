@@ -19,5 +19,4 @@ public class AdminAuthsReqDto {
     Boolean region2depthName;
     Boolean promotionCheck;
     Boolean fcmToken;
-    Boolean recentLogin;
 }

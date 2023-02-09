@@ -48,7 +48,6 @@ public class UserService {
     private final LedgerRepository ledgerRepository;
     private final SupportPetitionRepository supportPetitionRepository;
     private final LikePetitionRepository likePetitionRepository;
-    private final NotisService notisService;
 
     // 유저 청원 좋아요 리스트조회
     public List<ReadPetitionsDto> getLikePetitions(Pageable pageable, Long userId) {
@@ -160,7 +159,6 @@ public class UserService {
                 .region2depthName(auth.getRegion2depthName())
                 .promotionCheck(auth.getPromotionCheck())
                 .fcmToken(auth.getFcmToken())
-                .recentLogin(auth.getRecentLogin())
                 .userInfos(userInfos)
                 .build();
 
@@ -219,7 +217,6 @@ public class UserService {
         .region2depthName(req.getRegion2depthName())
         .promotionCheck(req.getPromotionCheck())
         .fcmToken(req.getFcmToken())
-        .recentLogin(LocalDateTime.now())
         .build();
         authRepository.save(auth);
 
@@ -229,6 +226,7 @@ public class UserService {
         .intro("")
         .profileSrc("")
         .publicInfos("region1depthName,region2depthName")
+        .recentLogin(LocalDateTime.now())
         .auth(auth)
         .build();
 
@@ -251,7 +249,6 @@ public class UserService {
             .region2depthName(auth.getRegion2depthName())
             .promotionCheck(auth.getPromotionCheck())
             .fcmToken(auth.getFcmToken())
-            .recentLogin(auth.getRecentLogin())
             .userInfos(userInfos)
             .build();
 

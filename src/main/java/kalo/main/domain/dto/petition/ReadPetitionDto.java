@@ -56,8 +56,10 @@ public class ReadPetitionDto {
 
     Double longitude;
 
+    LocalDateTime supportingDateEnd;
+
     @Builder
-    public ReadPetitionDto(SimpleWriterDto writer, Long id, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, List<String> step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Double latitude, Double longitude, Long supportCount, Boolean isSupport) {
+    public ReadPetitionDto(SimpleWriterDto writer, Long id, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> media, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, List<String> step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Double latitude, Double longitude, Long supportCount, Boolean isSupport, LocalDateTime supportingDateEnd) {
         this.writer = writer;
         this.id = id;
         this.title = title;
@@ -80,6 +82,7 @@ public class ReadPetitionDto {
         this.longitude = longitude;
         this.supportCount = supportCount;
         this.isSupport = isSupport;
+        this.supportingDateEnd = supportingDateEnd;
     }
     
 }

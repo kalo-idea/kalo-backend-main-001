@@ -65,26 +65,27 @@ public class notisAop {
     @AfterReturning(value = "execution(* kalo.main.service.PetitionService.supportingPetition(..))", returning = "object")
     public void supportMyPetitionNotis(JoinPoint joinPoint, Object object) {
         ReadPetitionDto result = (ReadPetitionDto) object;
-        
         Long petitionWriterId = result.getWriter().getUserId();
-        Long TargetId = result.getId();
-        User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-        User kalo = userRepository.findById(kaloId).get();
-
-        Notis notis = Notis.builder()
-        .image(null)
-        .isCheck(false)
-        .title("누군가 내 청원에 참여했어요.")
-        .content(null)
-        .isDisplay(true)
-        .targetId(TargetId)
-        .sender(kalo)
-        .receiver(petitionWriter)
-        .targetUrl("/community/petition/" + TargetId)
-        .target("petition")
-        .build();
-
-        notisRepository.save(notis);
+        if (petitionWriterId != null) {
+            Long TargetId = result.getId();
+            User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+            User kalo = userRepository.findById(kaloId).get();
+    
+            Notis notis = Notis.builder()
+            .image(null)
+            .isCheck(false)
+            .title("누군가 내 청원에 참여했어요.")
+            .content(null)
+            .isDisplay(true)
+            .targetId(TargetId)
+            .sender(kalo)
+            .receiver(petitionWriter)
+            .targetUrl("/community/petition/" + TargetId)
+            .target("petition")
+            .build();
+    
+            notisRepository.save(notis);
+        }
     }
 
     @Around("execution(* kalo.main.service.PetitionService.likePetition(..))")

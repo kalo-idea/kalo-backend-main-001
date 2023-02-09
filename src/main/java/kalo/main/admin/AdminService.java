@@ -13,7 +13,10 @@ import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
 import kalo.main.admin.dto.AdminAuthsReqDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
+import kalo.main.admin.dto.AdminUserAuthReqDto;
+import kalo.main.admin.dto.AdminUserAuthResDto;
 import kalo.main.admin.dto.AdminUserReqDto;
+import kalo.main.admin.dto.AdminUsersAuthsReqDto;
 import kalo.main.admin.dto.AdminUserDataDto;
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Auth;
@@ -25,6 +28,7 @@ import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.PostRepository;
 import kalo.main.repository.UserRepository;
+import kalo.main.service.LedgerService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,11 +36,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class AdminService {
 
-    private final LedgerRepository ledgerRepository;
     private final UserRepository userRepository;
     private final PetitionRepository petitionRepository;
     private final PostRepository postRepository;
     private final AuthRepository authRepository;
+    private final LedgerRepository ledgerRepository;
+    private final LedgerService ledgerService;
     
     // 관리자용 거래내역 조회
     public List<AdminLedgerHistoryDto> getLedgersHistory(Pageable pageable, Long userId) {        
@@ -90,9 +95,6 @@ public class AdminService {
         }
         if (req.getFcmToken()) {
             res.setFcmToken(auth.getFcmToken());
-        }
-        if (req.getRecentLogin()) {
-            res.setRecentLogin(auth.getRecentLogin());
         }
         res.setCreatedDate(auth.getCreatedDate());
         List<User> users = userRepository.findByAuthIdAndDeleted(req.getAuthId(), false).get();
@@ -149,9 +151,6 @@ public class AdminService {
             if (req.getFcmToken()) {
                 res.setFcmToken(auth.getFcmToken());
             }
-            if (req.getRecentLogin()) {
-                res.setRecentLogin(auth.getRecentLogin());
-            }
             res.setCreatedDate(auth.getCreatedDate());
             
             List<User> users = userRepository.findByAuthIdAndDeleted(auth.getId(), false).get();
@@ -207,9 +206,6 @@ public class AdminService {
         if (req.getFcmToken() != null) {
             res.setFcmToken(req.getFcmToken());
         }
-        if (req.getRecentLogin() != null) {
-            res.setRecentLogin(req.getRecentLogin());
-        }
 
         return "success";
     }
@@ -236,7 +232,7 @@ public class AdminService {
             res.setPublicInfos(user.getPublicInfos());
         }
         if (req.getLedger()) {
-            res.setLedger(ledgerRepository.getSumUserLedger(req.getUserId()));
+            res.setLedger(ledgerService.getPoint(user.getId()));
         }
 
         return res;
@@ -265,4 +261,151 @@ public class AdminService {
         return "성공";
     }
 
+    // User, Auth 조회
+    public AdminUserAuthResDto getUserAndAuth(AdminUserAuthReqDto req) {
+        User user = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        Auth auth = authRepository.findById(user.getAuth().getId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
+        
+        AdminUserAuthResDto res = new AdminUserAuthResDto();
+        
+        res.setUserId(user.getId());
+        if (req.getUserType()) {
+            res.setUserType(user.getType());
+        }
+        if (req.getNickname()) {
+            res.setNickname(user.getNickname());
+        }
+        if (req.getIntro()) {
+            res.setIntro(user.getIntro());
+        }
+        if (req.getProfileSrc()) {
+            res.setProfileSrc(user.getProfileSrc());
+        }
+        if (req.getPublicInfos()) {
+            res.setPublicInfos(user.getPublicInfos());
+        }
+        if (req.getLedger()) {
+            res.setLedger(ledgerService.getPoint(user.getId()));
+        }
+
+        res.setAuthId(auth.getId());
+        
+        if (req.getAuthType()) {
+            res.setAuthType(auth.getType());
+        }
+        if (req.getKakao()) {
+            res.setKakao(auth.getKakao());
+        }
+        if (req.getEmail()) {
+            res.setEmail(auth.getEmail());
+        }
+        if (req.getName()) { 
+            res.setName(auth.getName());
+        }
+        if (req.getBirth()) {
+            res.setBirth(auth.getBirth());
+        }
+        if (req.getGender()) {
+            res.setGender(auth.getGender());
+        }
+        if (req.getTel()) {
+            res.setTel(auth.getTel());
+        }
+        if (req.getAddress()) {
+            res.setAddress(auth.getAddress());
+        }
+        if (req.getRegion1depthName()) {
+            res.setRegion1depthName(auth.getRegion1depthName());
+        }
+        if (req.getRegion2depthName()) {
+            res.setRegion2depthName(auth.getRegion2depthName());
+        }
+        if (req.getPromotionCheck()) {
+            res.setPromotionCheck(auth.getPromotionCheck());
+        }
+        if (req.getFcmToken()) {
+            res.setFcmToken(auth.getFcmToken());
+        }
+        res.setCreatedDate(auth.getCreatedDate());
+
+        return res;
+    }
+
+    // Users, Auths 조회
+    public List<AdminUserAuthResDto> getUsersAndAuths(Pageable pageable, AdminUsersAuthsReqDto req) {
+        Page<User> users = userRepository.findAll(pageable);
+        List<AdminUserAuthResDto> result = new ArrayList();
+        for (User user : users) {
+            Auth auth = authRepository.findById(user.getAuth().getId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
+            
+            AdminUserAuthResDto res = new AdminUserAuthResDto();
+            
+            res.setUserId(user.getId());
+            if (req.getUserType()) {
+                res.setUserType(user.getType());
+            }
+            if (req.getNickname()) {
+                res.setNickname(user.getNickname());
+            }
+            if (req.getIntro()) {
+                res.setIntro(user.getIntro());
+            }
+            if (req.getProfileSrc()) {
+                res.setProfileSrc(user.getProfileSrc());
+            }
+            if (req.getPublicInfos()) {
+                res.setPublicInfos(user.getPublicInfos());
+            }
+            if (req.getLedger()) {
+                res.setLedger(ledgerService.getPoint(user.getId()));
+            }
+            if (req.getRecentLogin()) {
+                res.setRecentLogin(user.getRecentLogin());
+            }
+
+            res.setAuthId(auth.getId());
+            
+            if (req.getAuthType()) {
+                res.setAuthType(auth.getType());
+            }
+            if (req.getKakao()) {
+                res.setKakao(auth.getKakao());
+            }
+            if (req.getEmail()) {
+                res.setEmail(auth.getEmail());
+            }
+            if (req.getName()) { 
+                res.setName(auth.getName());
+            }
+            if (req.getBirth()) {
+                res.setBirth(auth.getBirth());
+            }
+            if (req.getGender()) {
+                res.setGender(auth.getGender());
+            }
+            if (req.getTel()) {
+                res.setTel(auth.getTel());
+            }
+            if (req.getAddress()) {
+                res.setAddress(auth.getAddress());
+            }
+            if (req.getRegion1depthName()) {
+                res.setRegion1depthName(auth.getRegion1depthName());
+            }
+            if (req.getRegion2depthName()) {
+                res.setRegion2depthName(auth.getRegion2depthName());
+            }
+            if (req.getPromotionCheck()) {
+                res.setPromotionCheck(auth.getPromotionCheck());
+            }
+            if (req.getFcmToken()) {
+                res.setFcmToken(auth.getFcmToken());
+            }
+            res.setCreatedDate(auth.getCreatedDate());
+
+            result.add(res);
+        }
+
+        return result;
+    }
 }

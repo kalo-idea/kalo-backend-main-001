@@ -52,6 +52,8 @@ public class ReadPetitionsDto {
 
     Long supportCount;
 
+    LocalDateTime supportingDateEnd;
+
     @Builder
     @QueryProjection
     public ReadPetitionsDto(ReadSimplePetitionsDto readSimplePetitionsDto, SimpleWriterDto writer, List<String> step, List<String> hashtags, List<String> media) {
@@ -74,5 +76,6 @@ public class ReadPetitionsDto {
         this.latitude = readSimplePetitionsDto.getLatitude();
         this.longitude = readSimplePetitionsDto.getLongitude();
         this.supportCount = readSimplePetitionsDto.getSupportCount();
+        this.supportingDateEnd = readSimplePetitionsDto.getSupportingDateEnd();
     }
 }

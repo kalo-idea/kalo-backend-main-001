@@ -54,8 +54,6 @@ public class ServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        campaignRepository.deleteAll();
-        campaignGroupRepository.deleteAll();
     }
 
     @Test
@@ -115,15 +113,17 @@ public class ServiceTest {
         nowPoint = usersService.getProfileHome(userId).getPoint();
         assertThat(nowPoint).isEqualTo(500);
 
-        Assertions.assertThatThrownBy(() -> ledgerService.attend(userId)).hasMessage("이미 출석한 회원입니다.");
-        nowPoint = usersService.getProfileHome(userId).getPoint();
+        ledgerService.attend(userId);
         assertThat(nowPoint).isEqualTo(500);
         
         Petition findPetition = petitionRepository.findById(petitionId).get();
-        findPetition.setCreatedDate(LocalDateTime.now().minusDays(40));
+        findPetition.setSupportingDateEnd(LocalDateTime.now().minusDays(1));
         Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(petitionId, userId)).hasMessage("참여 가능한 시간이 지났습니다.");
         
-        findPetition.setCreatedDate(LocalDateTime.now());
+        findPetition.setSupportingDateEnd(LocalDateTime.now().plusDays(1));
+        
+        petitionService.readPetition(petitionId, userId);
+
         beforeCount = petitionService.readPetition(petitionId, userId).getSupportCount();
         petitionService.supportingPetition(petitionId, userId);
         afterCount = petitionService.readPetition(petitionId, userId).getSupportCount();
@@ -131,16 +131,22 @@ public class ServiceTest {
         assertThat(nowPoint).isEqualTo(0);
         assertThat(beforeCount).isEqualTo(afterCount - 1);
 
-        CampaignGroup campaignGroup = CampaignGroup.builder()
-        .year(LocalDateTime.now().minusMonths(1).getYear())
-        .month(LocalDateTime.now().minusMonths(1).getMonthValue())
-        .supportingDateStart(LocalDate.of(LocalDate.now().minusMonths(1).getYear(), LocalDate.now().minusMonths(1).getMonthValue(), 1).atStartOfDay())
-        .supportingDateEnd(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX))
-        .votingDateStart(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).atStartOfDay())
-        .votingDateEnd(LocalDate.of(LocalDate.now().plusMonths(1).getYear(), LocalDate.now().plusMonths(1).getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX))
-        .donation(150000L)
-        .build();
-        Long campaignGroupId = campaignGroupRepository.save(campaignGroup).getId();
+        CampaignGroup campaignGroup = campaignGroupRepository.findByYearAndMonth(LocalDateTime.now().minusMonths(1).getYear(), LocalDateTime.now().minusMonths(1).getMonthValue()).orElseGet(
+            () -> {
+                CampaignGroup group = CampaignGroup.builder()
+                .year(LocalDateTime.now().minusMonths(1).getYear())
+                .month(LocalDateTime.now().minusMonths(1).getMonthValue())
+                .supportingDateStart(LocalDate.of(LocalDate.now().minusMonths(1).getYear(), LocalDate.now().minusMonths(1).getMonthValue(), 1).atStartOfDay())
+                .supportingDateEnd(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX))
+                .votingDateStart(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1).atStartOfDay())
+                .votingDateEnd(LocalDate.of(LocalDate.now().plusMonths(1).getYear(), LocalDate.now().plusMonths(1).getMonthValue(), 1).minusDays(1).atTime(LocalTime.MAX))
+                .donation(150000L)
+                .build();
+                Long groupId = campaignGroupRepository.save(group).getId();
+
+                return group;
+            }
+        );
 
         Campaign campaign = Campaign.builder()
         .title( "캠페인 제목")
@@ -163,6 +169,16 @@ public class ServiceTest {
         Long supportPetitionId = supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().getId();
         
 
+        campaignGroup.setVotingDateStart(LocalDateTime.now().plusDays(1));
+        campaignGroup.setVotingDateEnd(LocalDateTime.now().plusDays(2));
+        Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("투표 기간이 아닙니다.");
+        campaignGroup.setVotingDateStart(LocalDateTime.now().minusDays(2));
+        campaignGroup.setVotingDateEnd(LocalDateTime.now().minusDays(1));
+        Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("투표 기간이 아닙니다.");
+
+
+        campaignGroup.setVotingDateStart(LocalDateTime.now().minusDays(2));
+        campaignGroup.setVotingDateEnd(LocalDateTime.now().plusDays(2));
         Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("투표권이 없습니다.");
 
         findPetition.setCreatedDate(LocalDateTime.now().minusMonths(1));

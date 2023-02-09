@@ -14,7 +14,6 @@ public class MessageController {
 
     @GetMapping("/notice")
     public void notice(Message message) throws Exception {
-        System.out.println("notice message : " + message);
         simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getChannelId(), message);
     }
 

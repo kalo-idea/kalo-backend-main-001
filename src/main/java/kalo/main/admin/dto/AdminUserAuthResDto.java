@@ -8,9 +8,19 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AdminAuthDataDto {
-    Long id;
-    String type;
+public class AdminUserAuthResDto {
+    Long userId;
+
+    String userType;
+    String nickname;
+    String intro;
+    String profileSrc;
+    String publicInfos;
+    Long ledger;
+    LocalDateTime recentLogin;
+
+    Long authId;
+    String authType;
     String kakao;
     String email;
     String name;
