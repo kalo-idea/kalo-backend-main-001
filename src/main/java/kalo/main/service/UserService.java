@@ -48,7 +48,6 @@ public class UserService {
     private final LedgerRepository ledgerRepository;
     private final SupportPetitionRepository supportPetitionRepository;
     private final LikePetitionRepository likePetitionRepository;
-    private final NotisService notisService;
 
     // 유저 청원 좋아요 리스트조회
     public List<ReadPetitionsDto> getLikePetitions(Pageable pageable, Long userId) {

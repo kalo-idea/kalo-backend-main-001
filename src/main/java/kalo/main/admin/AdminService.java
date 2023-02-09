@@ -335,11 +335,9 @@ public class AdminService {
     public List<AdminUserAuthResDto> getUsersAndAuths(Pageable pageable, AdminUsersAuthsReqDto req) {
         Page<User> users = userRepository.findAll(pageable);
         List<AdminUserAuthResDto> result = new ArrayList();
-        System.out.println("users : " + users);
         for (User user : users) {
             Auth auth = authRepository.findById(user.getAuth().getId()).orElseThrow(() -> new BasicException("없는 계정입니다."));
             
-            System.out.println("auth : " + auth);
             AdminUserAuthResDto res = new AdminUserAuthResDto();
             
             res.setUserId(user.getId());

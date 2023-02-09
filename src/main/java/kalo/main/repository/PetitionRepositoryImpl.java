@@ -54,7 +54,8 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             petition.region2depthName,
             petition.latitude,
             petition.longitude,
-            petition.supportCount
+            petition.supportCount,
+            petition.supportingDateEnd
             ))
         .from(petition)
         .where(
@@ -103,7 +104,8 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.region2depthName,
         petition.latitude,
         petition.longitude,
-        petition.supportCount
+        petition.supportCount,
+        petition.supportingDateEnd
         ))
         .from(likePetition)
         .join(likePetition.petition, petition)
@@ -147,7 +149,9 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.region2depthName,
         petition.latitude,
         petition.longitude,
-        petition.supportCount))
+        petition.supportCount,
+        petition.supportingDateEnd
+        ))
         .from(supportPetition)
         .join(supportPetition.petition, petition)
         .where(

@@ -117,10 +117,10 @@ public class ServiceTest {
         assertThat(nowPoint).isEqualTo(500);
         
         Petition findPetition = petitionRepository.findById(petitionId).get();
-        findPetition.setCreatedDate(LocalDateTime.now().minusDays(40));
+        findPetition.setSupportingDateEnd(LocalDateTime.now().minusDays(1));
         Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(petitionId, userId)).hasMessage("참여 가능한 시간이 지났습니다.");
         
-        findPetition.setCreatedDate(LocalDateTime.now());
+        findPetition.setSupportingDateEnd(LocalDateTime.now().plusDays(1));
         
         petitionService.readPetition(petitionId, userId);
 

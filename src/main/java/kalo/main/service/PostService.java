@@ -151,7 +151,7 @@ public class PostService {
         post.setViewCount(post.getViewCount() + 1);
 
         User user = userRepository.findById(post.getUser().getId()).get();
-        SimpleWriterDto writer = user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+        SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
 
         return ReadPostDto.builder()
         .id(post.getId())
@@ -204,7 +204,7 @@ public class PostService {
                 isDislike = dislikePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
             }
 
-            SimpleWriterDto writer = reply.getUser().getDeleted() ? new SimpleWriterDto(reply.getUser()) : new SimpleDeletedWriterDto();
+            SimpleWriterDto writer = !reply.getUser().getDeleted() ? new SimpleWriterDto(reply.getUser()) : new SimpleDeletedWriterDto();
 
             ReplyDto commentDto = ReplyDto.builder()
             .id(reply.getId())
@@ -228,10 +228,7 @@ public class PostService {
         List<ReadPostsDto> result = new ArrayList<>();
 
         for (ReadSimplePostDto simplePost : posts) {
-            User writer = userRepository.findByIdAndDeleted(simplePost.getWriterId(), false).orElse(
-                User.builder().build()
-            );
-
+            
             List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPostHashtags(simplePost.getPostId());
             for (Hashtag hashtag : hashtags) {
@@ -243,15 +240,11 @@ public class PostService {
             for (Media medium : media) {
                 fileNames.add(medium.getFileName());
             }
+
+            User user = userRepository.findById(simplePost.getWriterId()).get();
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
             
-            SimpleWriterDto writerDto = null;
-            if (writer.getId() != null) {
-                writerDto = new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc());
-            } else {
-                writerDto = new SimpleDeletedWriterDto();
-            }
-            
-            result.add(new ReadPostsDto(simplePost, writerDto, words, fileNames));
+            result.add(new ReadPostsDto(simplePost, writer, words, fileNames));
         }
 
         return result;

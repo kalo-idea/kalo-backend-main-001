@@ -70,7 +70,7 @@ public class PetitionService {
     private final MediaRepository mediaRepository;
     private final MediaPetitionRepository mediaPetitionRepository;
     private final LedgerRepository ledgerRepository;
-    private final NotisService notisService;
+    private final LedgerService ledgerService;
 
     // 청원 생성
     public Long createPetition(CreatePetitionDto createPetitionDto) {
@@ -93,6 +93,7 @@ public class PetitionService {
         .latitude(createPetitionDto.getLatitude())
         .longitude(createPetitionDto.getLongitude())
         .category(createPetitionDto.getCategory())
+        .supportingDateEnd(LocalDate.now().plusDays(29).atStartOfDay())
         .build();
 
         Petition resultPetition = petitionRepository.save(petition);
@@ -151,7 +152,6 @@ public class PetitionService {
             throw new BasicException("삭제된 청원입니다.");
         }
 
-        User writer = userRepository.findById(petition.getUser().getId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
         List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(petitionId);
         List<String> hashtags_res = new ArrayList<String>();
 
@@ -169,8 +169,8 @@ public class PetitionService {
         }
         String progress = petition.getProgress();
         if (progress.equals("recruit")) {
-            if (!petition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
-                if (petition.getSupportCount() >= 100) {
+            if (LocalDateTime.now().isAfter(petition.getSupportingDateEnd())) {
+                if (petition.getSupportCount() >= petition.getGoal()) {
                     progress = "ongoing";
                 } else {
                     progress = "fail";
@@ -179,38 +179,12 @@ public class PetitionService {
         }
 
         List<String> steps = Arrays.asList(petition.getStep().split(","));
-        
 
-        // 탈퇴회원 -> 유저정보 제외하고 반환
-        if (writer.getDeleted()) {
-            return ReadPetitionDto.builder()
-            .id(petition.getId())
-            .writer(new SimpleDeletedWriterDto())
-            .title(petition.getTitle())
-            .createdDate(petition.getCreatedDate())
-            .content(petition.getContent())
-            .hashtags(hashtags_res)
-            .media(media_res)
-            .likeCount(petition.getLikeCount())
-            .isLike(isLike)
-            .dislikeCount(petition.getDislikeCount())
-            .isDislike(isDislike)
-            .progress(progress)
-            .step(steps)
-            .goal(petition.getGoal())
-            .replyCount(petition.getReplyCount())
-            .category(petition.getCategory())
-            .region1depthName(petition.getRegion1depthName())
-            .region2depthName(petition.getRegion2depthName())
-            .latitude(petition.getLatitude())
-            .longitude(petition.getLongitude())
-            .supportCount(petition.getSupportCount())
-            .isSupport(isSupport)
-            .build();
-        }
-        // 정상회원
+        User user = userRepository.findById(petition.getUser().getId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+        SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+
         return ReadPetitionDto.builder()
-        .writer(new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()))
+        .writer(writer)
         .id(petition.getId())
         .title(petition.getTitle())
         .createdDate(petition.getCreatedDate())
@@ -232,6 +206,7 @@ public class PetitionService {
         .longitude(petition.getLongitude())
         .supportCount(petition.getSupportCount())
         .isSupport(isSupport)
+        .supportingDateEnd(petition.getSupportingDateEnd())
         .build();
     }
 
@@ -266,7 +241,7 @@ public class PetitionService {
                 isDislike = dislikePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(reply.getId(), viewerId, false).isPresent();
             }
 
-            SimpleWriterDto writer = reply.getUser().getDeleted() ? new SimpleWriterDto(reply.getUser()) : new SimpleDeletedWriterDto();
+            SimpleWriterDto writer = !reply.getUser().getDeleted() ? new SimpleWriterDto(reply.getUser()) : new SimpleDeletedWriterDto();
             ReplyDto commentDto = ReplyDto.builder()
             .id(reply.getId())
             .writer(writer)
@@ -290,12 +265,11 @@ public class PetitionService {
 
         List<ReadPetitionsDto> result = new ArrayList<>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
-            User writer = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));;
             
             String progress = simplePetition.getProgress();
             if (progress.equals("recruit")) {
-                if (!simplePetition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
-                    if (simplePetition.getSupportCount() >= 100) {
+                if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
+                    if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
                         progress = "ongoing";
                     } else {
                         progress = "fail";
@@ -318,12 +292,11 @@ public class PetitionService {
                 fileNames.add(medium.getFileName());
             }
 
-            if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleDeletedWriterDto(), steps, words, fileNames));
-            }
-            else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
-            }
+            User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            
+            result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
+
         }
 
         return result;
@@ -527,8 +500,7 @@ public class PetitionService {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         
-        LocalDate startDate = petition.getCreatedDate().toLocalDate();
-        if (startDate.plusDays(29).isBefore(LocalDateTime.now().toLocalDate())) {
+        if (LocalDateTime.now().isAfter(petition.getSupportingDateEnd())) {
             throw new BasicException("참여 가능한 시간이 지났습니다.");
         }
 
@@ -537,11 +509,7 @@ public class PetitionService {
         if (supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).isPresent()) {
             throw new BasicException("이미 참여한 청원입니다.");
         }
-
-        Long getSum = ledgerRepository.getSumUserLedger(userId);
-        if (getSum == null) {
-            getSum = 0L;
-        }
+        Long getSum = ledgerService.getPoint(userId);
         if (getSum < 500) {
             throw new BasicException("포인트가 부족합니다.");
         }

@@ -1,5 +1,7 @@
 package kalo.main.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -65,8 +67,10 @@ public class Petition extends BaseEntity {
 
     String category;
 
+    LocalDateTime supportingDateEnd;
+
     @Builder
-    public Petition(Long id, String title, String content, Long supportCount, Long viewCount, User user, String progress, Long goal, Long replyCount, Long likeCount, Long dislikeCount, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, String category) {
+    public Petition(Long id, String title, String content, Long supportCount, Long viewCount, User user, String progress, Long goal, Long replyCount, Long likeCount, Long dislikeCount, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, String category, LocalDateTime supportingDateEnd) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -85,6 +89,7 @@ public class Petition extends BaseEntity {
         this.latitude = latitude;
         this.longitude = longitude;
         this.category = category;
+        this.supportingDateEnd = supportingDateEnd;
     }
 
 }

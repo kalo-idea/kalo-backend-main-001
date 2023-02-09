@@ -9,14 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Notis;
-import kalo.main.domain.Petition;
-import kalo.main.domain.Post;
-import kalo.main.domain.User;
 import kalo.main.domain.dto.NotisResDto;
 import kalo.main.repository.NotisRepository;
-import kalo.main.repository.PetitionRepository;
-import kalo.main.repository.PostRepository;
-import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,10 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotisService {
     
-    private final UserRepository userRepository;
     private final NotisRepository notisRepository;
-    private final PetitionRepository petitionRepository;
-    private final PostRepository postRepository;
     
     Long kaloId = 112L;
 

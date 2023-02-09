@@ -56,7 +56,6 @@ public class AdminController {
     // 계정 수정
     @PostMapping("/update-auth")
     public String updateAuth(@RequestBody(required = false) AdminAuthDataDto req) {
-        System.out.println("req : " + req);
         return adminService.updateAuth(req);
     }
 
