@@ -81,7 +81,7 @@ public class PetitionService {
         .supportCount(0L)
         .viewCount(0L)
         .user(userRepository.findById(createPetitionDto.getWriterId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다.")))
-        .progress("recruit")
+        .progress("unchecked")
         .goal(createPetitionDto.getGoal())
         .replyCount(0L)
         .likeCount(0L)
@@ -167,14 +167,17 @@ public class PetitionService {
         for (Media media : medium) {
             medium_res.add(media.getFileName());
         }
+
         String progress = petition.getProgress();
-        if (progress.equals("recruit")) {
+        if (progress.equals("unchecked")) {
             if (LocalDateTime.now().isAfter(petition.getSupportingDateEnd())) {
                 if (petition.getSupportCount() >= petition.getGoal()) {
                     progress = "ongoing";
                 } else {
                     progress = "fail";
                 }
+            } else {
+                progress = "recruit";
             }
         }
 
@@ -270,15 +273,18 @@ public class PetitionService {
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             
             String progress = simplePetition.getProgress();
-            if (progress.equals("recruit")) {
+            if (progress.equals("unchecked")) {
                 if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
                     if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
                         progress = "ongoing";
                     } else {
                         progress = "fail";
                     }
+                } else {
+                    progress = "recruit";
                 }
             }
+
             simplePetition.setProgress(progress);
 
             List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
