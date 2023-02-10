@@ -214,19 +214,20 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
     private BooleanExpression progressFilter(String progress) {
         if (StringUtils.hasText(progress)) {
             if (progress.equals("fail")) { // 실패
-                return petition.progress.eq("recruit")
-                    .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
-                      .and(petition.supportCount.lt(100)))
+                return petition.progress.eq("unchecked")
+                    .and(petition.supportingDateEnd.lt(LocalDateTime.now()))
+                      .and(petition.supportCount.lt(petition.goal))
                 .or(petition.progress.eq("fail"));
             }
             else if (progress.equals("recruit")) { // 모집 중
-                return petition.progress.eq("recruit")
-                .and(petition.createdDate.goe(LocalDate.now().minusDays(29).atStartOfDay()));
+                return petition.progress.eq("unchecked")
+                    .and(petition.supportingDateEnd.gt(LocalDateTime.now()))
+                .and(petition.progress.eq("recruit"));
             }
             else if (progress.equals("ongoing")) { // 민원/건의, 언론 제보, 법률 검토
-                return petition.progress.eq("recruit")
-                    .and(petition.createdDate.lt(LocalDate.now().minusDays(29).atStartOfDay())
-                        .and(petition.supportCount.goe(100)))
+                return petition.progress.eq("unchecked")
+                    .and(petition.supportingDateEnd.lt(LocalDateTime.now())
+                        .and(petition.supportCount.goe(petition.goal)))
                 .or(petition.progress.eq("ongoing"));
             }
             else if (progress.equals("complete")) { // 사회 참여 완료
