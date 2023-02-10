@@ -212,10 +212,13 @@ public class PetitionService {
 
     // 청원 댓글 추가
     public Long createPetitionReply(CreatePetitionReplyDto createPetitionReplyDto) {
+        Petition petition = petitionRepository.findById(createPetitionReplyDto.getPetitionId()).orElseThrow(() -> new BasicException("없는 청원입니다."));
+        petition.setReplyCount(petition.getReplyCount() + 1);
+
         PetitionReply petitionReply = PetitionReply.builder()
         .user(userRepository.findById(createPetitionReplyDto.getUserId()).orElseThrow(() -> new BasicException("없는 회원입니다.")))
         .content(createPetitionReplyDto.getContent())
-        .petition(petitionRepository.findById(createPetitionReplyDto.getPetitionId()).orElseThrow(() -> new BasicException("없는 청원입니다.")))
+        .petition(petition)
         .likeCount(0L)
         .dislikeCount(0L)
         .build();
@@ -444,6 +447,8 @@ public class PetitionService {
             .likeCount(reply.getLikeCount())
             .dislikeCount(reply.getDislikeCount())
             .build();
+        
+        System.out.println("aaaa");
 
         return result;
     }
