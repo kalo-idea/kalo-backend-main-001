@@ -75,12 +75,12 @@ public class PetitionService {
     // 청원 생성
     public Long createPetition(CreatePetitionDto createPetitionDto) {
         
-        Petition petition = Petition.builder()
+        Petition petition = Petition.builder()  
         .title(createPetitionDto.getTitle())
         .content(createPetitionDto.getContent())
         .supportCount(0L)
         .viewCount(0L)
-        .user(userRepository.findById(createPetitionDto.getId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다.")))
+        .user(userRepository.findById(createPetitionDto.getWriterId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다.")))
         .progress("recruit")
         .goal(createPetitionDto.getGoal())
         .replyCount(0L)
@@ -119,12 +119,12 @@ public class PetitionService {
             }
         }
 
-        List<String> media = createPetitionDto.getMedia();
-        for (String fileName : media) {
-            Media medium = new Media(fileName);
-            mediaRepository.save(medium);
+        List<String> medium = createPetitionDto.getMedium();
+        for (String fileName : medium) {
+            Media media = new Media(fileName);
+            mediaRepository.save(media);
             MediaPetition mediaPetition = MediaPetition.builder()
-                .media(medium)
+                .media(media)
                 .petition(petition)
                 .build();
             mediaPetitionRepository.save(mediaPetition);
@@ -161,11 +161,11 @@ public class PetitionService {
 
         petition.setViewCount(petition.getViewCount() + 1);
 
-        List<Media> media = mediaRepository.findPetitionMedia(petitionId);
-        List<String> media_res = new ArrayList<String>();
+        List<Media> medium = mediaRepository.findPetitionMedia(petitionId);
+        List<String> medium_res = new ArrayList<String>();
 
-        for (Media medium : media) {
-            media_res.add(medium.getFileName());
+        for (Media media : medium) {
+            medium_res.add(media.getFileName());
         }
         String progress = petition.getProgress();
         if (progress.equals("recruit")) {
@@ -190,7 +190,7 @@ public class PetitionService {
         .createdDate(petition.getCreatedDate())
         .content(petition.getContent())
         .hashtags(hashtags_res)
-        .media(media_res)
+        .medium(medium_res)
         .likeCount(petition.getLikeCount())
         .isLike(isLike)
         .dislikeCount(petition.getDislikeCount())
@@ -279,24 +279,25 @@ public class PetitionService {
             simplePetition.setProgress(progress);
 
             List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
-
             
             List<String> words = new ArrayList<String>();
             List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
             for (Hashtag hashtag : hashtags) {
                 words.add(hashtag.getWord());
             }
+
+
             List<String> fileNames = new ArrayList<String>();
-            List<Media> media = new ArrayList<Media>();
-            for (Media medium : media) {
-                fileNames.add(medium.getFileName());
+            List<Media> medium = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
+            // List<Media> medium = new ArrayList<Media>();
+            for (Media media : medium) {
+                fileNames.add(media.getFileName());
             }
 
             User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
             SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
             
             result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
-
         }
 
         return result;

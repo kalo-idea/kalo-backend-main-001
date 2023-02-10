@@ -13,9 +13,9 @@ public class CreatePetitionDto {
 
     String content = "";
 
-    List<String> media = new ArrayList<String>();
+    List<String> medium = new ArrayList<String>();
 
-    Long id;
+    Long writerId;
 
     List<String> hashtags = new ArrayList<String>();
 
