@@ -2,12 +2,15 @@ package kalo.main.controller;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import kalo.main.domain.dto.user.NicknameValidResDto;
 
 @RestControllerAdvice
 public class ExceptionController {
@@ -38,5 +41,13 @@ public class ExceptionController {
     public ExceptionResponse invalidRequst(InvalidDataAccessApiUsageException e) {
         return ExceptionResponse.builder().message("잘못된 요청입니다.").build();
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(BindException.class)
+    @ResponseBody
+    public NicknameValidResDto invalidRequst(BindException e) {
+        return new NicknameValidResDto("error", e.getBindingResult().getFieldError().getDefaultMessage());
+    }
+
 
 }

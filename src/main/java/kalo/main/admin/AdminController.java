@@ -37,7 +37,7 @@ public class AdminController {
     @GetMapping("/get-ledger")
     public List<AdminLedgerHistoryDto> getLedger(
         @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-        @Valid Long userId) {
+        Long userId) {
             return adminService.getLedgersHistory(pageable, userId);
     }
 

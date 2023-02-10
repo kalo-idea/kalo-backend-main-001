@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.domain.dto.user.MyProfileHomeDto;
+import kalo.main.domain.dto.user.NicknameValidResDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
@@ -197,6 +199,37 @@ public class UserService {
     // 중복되면 true
     public Boolean isDuplicatedNickname(String nickname) {
         return userRepository.findByNicknameIgnoreCase(nickname).isPresent();
+    }
+
+    // 닉네임 유효성 체크
+    public NicknameValidResDto isValidNickname(String nickname) {
+
+        // 닉네임 입력
+        if (nickname.length() == 0) {
+            return new NicknameValidResDto("error", "닉네임을 입력해주세요.");
+        }
+        // 닉네임 길이
+        if ((nickname.length() < 2)) {
+            return new NicknameValidResDto("error", "닉네임은 최소 2자입니다.");
+        }
+
+        // 닉네임 길이
+        if (nickname.length() > 10) {
+            return new NicknameValidResDto("error", "닉네임은 최대 10자입니다.");
+        }
+
+        // 닉네임 불가능 문자
+        Pattern pattern = Pattern.compile("^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣!?@#$%^&*]{2,10}$");
+        if (!pattern.matcher(nickname).find()) {
+            return new NicknameValidResDto("error", "허용되지 않은 문자가 있습니다.");
+        }
+
+        // 닉네임 중복
+        if (isDuplicatedNickname(nickname)) {
+            return new NicknameValidResDto("error", "사용 중인 닉네임입니다.");
+        }
+
+        return new NicknameValidResDto("success", "사용 가능한 닉네임입니다.");
     }
 
     // 회원가입
