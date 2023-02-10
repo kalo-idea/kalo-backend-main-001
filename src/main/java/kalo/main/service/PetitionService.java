@@ -289,10 +289,10 @@ public class PetitionService {
 
             List<String> fileNames = new ArrayList<String>();
             List<Media> medium = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
-            // List<Media> medium = new ArrayList<Media>();
             for (Media media : medium) {
                 fileNames.add(media.getFileName());
             }
+            System.out.println("");
 
             User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
             SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
