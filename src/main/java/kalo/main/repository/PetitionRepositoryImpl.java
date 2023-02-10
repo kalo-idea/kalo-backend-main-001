@@ -222,7 +222,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             else if (progress.equals("recruit")) { // 모집 중
                 return petition.progress.eq("unchecked")
                     .and(petition.supportingDateEnd.gt(LocalDateTime.now()))
-                .and(petition.progress.eq("recruit"));
+                .or(petition.progress.eq("recruit"));
             }
             else if (progress.equals("ongoing")) { // 민원/건의, 언론 제보, 법률 검토
                 return petition.progress.eq("unchecked")
