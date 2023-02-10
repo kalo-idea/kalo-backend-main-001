@@ -2,7 +2,6 @@ package kalo.main.aop;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,17 +10,20 @@ import org.springframework.stereotype.Component;
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Notis;
 import kalo.main.domain.Petition;
+import kalo.main.domain.PetitionReply;
 import kalo.main.domain.Post;
+import kalo.main.domain.PostReply;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.post.CreatePostReplyDto;
-import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
 import kalo.main.repository.NotisRepository;
+import kalo.main.repository.PetitionReplyRepository;
 import kalo.main.repository.PetitionRepository;
+import kalo.main.repository.PostReplyRepository;
 import kalo.main.repository.PostRepository;
 import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,8 @@ public class notisAop {
     private final NotisRepository notisRepository;
     private final PetitionRepository petitionRepository;
     private final PostRepository postRepository;
+    private final PetitionReplyRepository petitionReplyRepository;
+    private final PostReplyRepository postReplyRepository;
     
     Long kaloId = 112L;
 
@@ -97,11 +101,11 @@ public class notisAop {
         }
         
         LikeDislikeResDto result = (LikeDislikeResDto) joinPoint.proceed();
+        User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        Petition petition = petitionRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
 
-        if (result.getIsLike()) {
-            User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-            Petition petition = petitionRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
-    
+
+        if (result.getIsLike() && petition.getUser().getId() != null) {
             Notis notis = Notis.builder()
             .image(null)
             .isCheck(false)
@@ -130,11 +134,10 @@ public class notisAop {
         }
 
         LikeDislikeResDto result = (LikeDislikeResDto) joinPoint.proceed();
+        User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        Post post = postRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
 
-        if (result.getIsLike()) {
-            User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-            Post post = postRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
-    
+        if (result.getIsLike() && post.getUser().getId() != null) {
             Notis notis = Notis.builder()
             .image(null)
             .isCheck(false)
@@ -166,20 +169,22 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User receiver = petitionRepository.findById(req.getPetitionId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다.")).getUser();
 
-        Notis notis = Notis.builder()
-        .image(null)
-        .isCheck(false)
-        .title(sender.getNickname() + "님이 내 청원에 댓글을 작성했습니다.")
-        .content(req.getContent())
-        .isDisplay(true)
-        .targetId(req.getPetitionId())
-        .sender(sender)
-        .receiver(receiver)
-        .targetUrl("/community/petition/" + req.getPetitionId())
-        .target("petition")
-        .build();
+        if (receiver.getId() != null) {
+            Notis notis = Notis.builder()
+            .image(null)
+            .isCheck(false)
+            .title(sender.getNickname() + "님이 내 청원에 댓글을 작성했습니다.")
+            .content(req.getContent())
+            .isDisplay(true)
+            .targetId(req.getPetitionId())
+            .sender(sender)
+            .receiver(receiver)
+            .targetUrl("/community/petition/" + req.getPetitionId())
+            .target("petition")
+            .build();
 
-        notisRepository.save(notis);
+            notisRepository.save(notis);
+        }
         
         return result;
     }
@@ -196,20 +201,22 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User receiver = postRepository.findById(req.getPostId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다.")).getUser();
 
-        Notis notis = Notis.builder()
-        .image(null)
-        .isCheck(false)
-        .title(sender.getNickname() + "님이 내 게시글에 댓글을 작성했습니다.")
-        .content(req.getContent())
-        .isDisplay(true)
-        .targetId(req.getPostId())
-        .sender(sender)
-        .receiver(receiver)
-        .targetUrl("/community/post/" + req.getPostId())
-        .target("post")
-        .build();
-
-        notisRepository.save(notis);
+        if (receiver.getId() != null) {
+            Notis notis = Notis.builder()
+            .image(null)
+            .isCheck(false)
+            .title(sender.getNickname() + "님이 내 게시글에 댓글을 작성했습니다.")
+            .content(req.getContent())
+            .isDisplay(true)
+            .targetId(req.getPostId())
+            .sender(sender)
+            .receiver(receiver)
+            .targetUrl("/community/post/" + req.getPostId())
+            .target("post")
+            .build();
+    
+            notisRepository.save(notis);
+        }
 
         return result;
     }
@@ -222,20 +229,20 @@ public class notisAop {
             req = (TargetIdUserIdDto) a;
         }
         LikeDislikeResDto result = (LikeDislikeResDto) joinPoint.proceed();
+        User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        PetitionReply petitionReply = petitionReplyRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
 
-        if (result.getIsLike()) {
-            User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-            Petition petition = petitionRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
-    
+
+        if (result.getIsLike() && petitionReply.getUser().getId() != null) {
             Notis notis = Notis.builder()
             .image(null)
             .isCheck(false)
             .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
-            .content(petition.getContent())
+            .content(petitionReply.getContent())
             .isDisplay(true)
             .targetId(req.getTargetId())
             .sender(sender)
-            .receiver(petition.getUser())
+            .receiver(petitionReply.getUser())
             .targetUrl("/community/petition/" + req.getTargetId())
             .target("petition")
             .build();
@@ -254,20 +261,20 @@ public class notisAop {
             req = (TargetIdUserIdDto) a;
         }
         LikeDislikeResDto result = (LikeDislikeResDto) joinPoint.proceed();
+        User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        PostReply postReply = postReplyRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
 
-        if (result.getIsLike()) {
-            User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-            Post post = postRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
-    
+
+        if (result.getIsLike() && postReply.getUser().getId() != null) {
             Notis notis = Notis.builder()
             .image(null)
             .isCheck(false)
             .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
-            .content(post.getContent())
+            .content(postReply.getContent())
             .isDisplay(true)
             .targetId(req.getTargetId())
             .sender(sender)
-            .receiver(post.getUser())
+            .receiver(postReply.getUser())
             .targetUrl("/community/post/" + req.getTargetId())
             .target("post")
             .build();

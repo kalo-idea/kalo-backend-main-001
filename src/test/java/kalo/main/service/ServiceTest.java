@@ -19,7 +19,6 @@ import kalo.main.domain.Campaign;
 import kalo.main.domain.CampaignGroup;
 import kalo.main.domain.Petition;
 import kalo.main.domain.SupportPetition;
-import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.repository.CampaignGroupRepository;
@@ -168,14 +167,12 @@ public class ServiceTest {
 
         Long supportPetitionId = supportPetitionRepository.findByPetitionIdAndUserIdAndDeleted(petitionId, userId, false).get().getId();
         
-
         campaignGroup.setVotingDateStart(LocalDateTime.now().plusDays(1));
         campaignGroup.setVotingDateEnd(LocalDateTime.now().plusDays(2));
         Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("투표 기간이 아닙니다.");
         campaignGroup.setVotingDateStart(LocalDateTime.now().minusDays(2));
         campaignGroup.setVotingDateEnd(LocalDateTime.now().minusDays(1));
         Assertions.assertThatThrownBy(() -> campaignService.voteCampaign(campaignId, userId)).hasMessage("투표 기간이 아닙니다.");
-
 
         campaignGroup.setVotingDateStart(LocalDateTime.now().minusDays(2));
         campaignGroup.setVotingDateEnd(LocalDateTime.now().plusDays(2));
