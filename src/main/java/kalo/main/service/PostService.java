@@ -176,15 +176,18 @@ public class PostService {
 
     // 게시글 댓글 추가
     public Long createPostReply(CreatePostReplyDto createPostReplyDto) {
+        Post post = postRepository.findById(createPostReplyDto.getPostId()).orElseThrow(() -> new BasicException("없는 게시글입니다."));
+        post.setReplyCount(post.getReplyCount() + 1);
         PostReply postReply = PostReply.builder()
         .user(userRepository.findById(createPostReplyDto.getUserId()).orElseThrow(() -> new BasicException("없는 회원입니다.")))
         .content(createPostReplyDto.getContent())
-        .post(postRepository.findById(createPostReplyDto.getPostId()).orElseThrow(() -> new BasicException("없는 게시글입니다.")))
+        .post(post)
         .likeCount(0L)
         .dislikeCount(0L)
         .build();
 
         PostReply result = postReplyRepository.save(postReply);
+        System.out.println();
 
         return result.getId();
     }
