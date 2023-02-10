@@ -18,6 +18,7 @@ import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.domain.dto.user.MyProfileHomeDto;
+import kalo.main.domain.dto.user.NicknameValidResDto;
 import kalo.main.domain.dto.user.UpdateUserInfoReqDto;
 import kalo.main.domain.dto.user.UpdateUserProfileReqDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
@@ -56,6 +57,13 @@ public class UserController {
     public Boolean isDuplicatedNickname(@RequestParam(required = true) String nickname) {
         
         return userService.isDuplicatedNickname(nickname);
+    }
+
+    // 닉네임 검증 (현재 대소문자 판단만 구현)
+    @GetMapping("/public/is-valid-nickname")
+    public NicknameValidResDto isValidNickname(String nickname) {
+        
+        return userService.isValidNickname(nickname);
     }
 
     // 회원 가입
