@@ -86,8 +86,8 @@ public class ServiceTest {
         CreatePetitionDto createPetition = new CreatePetitionDto();
         createPetition.setTitle("testTitle");
         createPetition.setContent("testContent");
-        createPetition.setMedia(new ArrayList<String>());
-        createPetition.setId(userId);
+        createPetition.setMedium(new ArrayList<String>());
+        createPetition.setWriterId(userId);
         List<String> hashtags = new ArrayList<String>();
         hashtags.add("testHash1");
         hashtags.add("testHash2");

@@ -33,8 +33,8 @@ public class PetitionController {
 
     // 청원 작성
     @PostMapping("/create-petition")
-    public void createPetition(@Valid @RequestBody CreatePetitionDto createPetitionDto) {
-        petitionService.createPetition(createPetitionDto);
+    public Long createPetition(@Valid @RequestBody CreatePetitionDto createPetitionDto) {
+        return petitionService.createPetition(createPetitionDto);
     }
 
     // 청원 단건 조회
