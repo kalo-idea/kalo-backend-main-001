@@ -66,11 +66,17 @@ public class notisAop {
         notisRepository.save(notis);
     }
 
-    @AfterReturning(value = "execution(* kalo.main.service.PetitionService.supportingPetition(..))", returning = "object")
-    public void supportMyPetitionNotis(JoinPoint joinPoint, Object object) {
-        ReadPetitionDto result = (ReadPetitionDto) object;
+    @Around("execution(* kalo.main.service.PetitionService.supportingPetition(..))")
+    public ReadPetitionDto supportMyPetitionNotis(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object[] args = joinPoint.getArgs();
+        TargetIdUserIdDto req = null;
+        for (Object a : args) {
+            req = (TargetIdUserIdDto) a;
+        }
+
+        ReadPetitionDto result = (ReadPetitionDto) joinPoint.proceed();
         Long petitionWriterId = result.getWriter().getUserId();
-        if (petitionWriterId != null) {
+        if (petitionWriterId != null && req.getUserId() != petitionWriterId) {
             Long TargetId = result.getId();
             User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
             User kalo = userRepository.findById(kaloId).get();
@@ -90,6 +96,8 @@ public class notisAop {
     
             notisRepository.save(notis);
         }
+
+        return result;
     }
 
     @Around("execution(* kalo.main.service.PetitionService.likePetition(..))")

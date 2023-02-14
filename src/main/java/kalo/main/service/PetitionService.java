@@ -519,7 +519,9 @@ public class PetitionService {
     }
 
     // 청원 참여
-    public ReadPetitionDto supportingPetition(Long petitionId, Long userId) {
+    public ReadPetitionDto supportingPetition(TargetIdUserIdDto req) {
+        Long petitionId = req.getTargetId();
+        Long userId = req.getUserId();
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         
