@@ -194,8 +194,8 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
     }
 
     // Important 청원
-    public List<ImportantPetitionResDto> getImportantPetitions(Pageable pageable) {
-        JPAQuery<ImportantPetitionResDto> query = queryFactory.select(new QImportantPetitionResDto(
+    public List<ImportantPetitionResDto> getImportantPetitions() {
+        return queryFactory.select(new QImportantPetitionResDto(
         importantPetition.title,
         importantPetition.content,
         importantPetition.imageSrc,
@@ -211,18 +211,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
             importantPetition.deleted.eq(false),
             importantPetition.importantEndDate.after(LocalDateTime.now())
         )
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize());
-
-        for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(petition.getType(), petition.getMetadata());
-            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
-                    pathBuilder.get(o.getProperty())));
-        }
-        
-        List<ImportantPetitionResDto> result = query.fetch();
-
-        return result;
+        .fetch();
     }
 
     private BooleanExpression searchFilter(String search) {
