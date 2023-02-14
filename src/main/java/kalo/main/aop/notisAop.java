@@ -84,7 +84,7 @@ public class notisAop {
             .targetId(TargetId)
             .sender(kalo)
             .receiver(petitionWriter)
-            .targetUrl("/community/petition/" + TargetId)
+            .targetUrl("/community/view/petition/" + TargetId)
             .target("petition")
             .build();
     
@@ -115,7 +115,7 @@ public class notisAop {
             .targetId(req.getTargetId())
             .sender(sender)
             .receiver(petition.getUser())
-            .targetUrl("/community/petition/" + req.getTargetId())
+            .targetUrl("/community/view/petition/" + req.getTargetId())
             .target("petition")
             .build();
 
@@ -147,7 +147,7 @@ public class notisAop {
             .targetId(req.getTargetId())
             .sender(sender)
             .receiver(post.getUser())
-            .targetUrl("/community/post/" + req.getTargetId())
+            .targetUrl("/community/view/post/" + req.getTargetId())
             .target("post")
             .build();
     
@@ -179,7 +179,7 @@ public class notisAop {
             .targetId(req.getPetitionId())
             .sender(sender)
             .receiver(receiver)
-            .targetUrl("/community/petition/" + req.getPetitionId())
+            .targetUrl("/community/view/petition/" + req.getPetitionId())
             .target("petition")
             .build();
 
@@ -211,7 +211,7 @@ public class notisAop {
             .targetId(req.getPostId())
             .sender(sender)
             .receiver(receiver)
-            .targetUrl("/community/post/" + req.getPostId())
+            .targetUrl("/community/view/post/" + req.getPostId())
             .target("post")
             .build();
     
@@ -243,7 +243,7 @@ public class notisAop {
             .targetId(req.getTargetId())
             .sender(sender)
             .receiver(petitionReply.getUser())
-            .targetUrl("/community/petition/" + req.getTargetId())
+            .targetUrl("/community/view/petition/" + req.getTargetId())
             .target("petition")
             .build();
     
@@ -275,7 +275,7 @@ public class notisAop {
             .targetId(req.getTargetId())
             .sender(sender)
             .receiver(postReply.getUser())
-            .targetUrl("/community/post/" + req.getTargetId())
+            .targetUrl("/community/view/post/" + req.getTargetId())
             .target("post")
             .build();
     

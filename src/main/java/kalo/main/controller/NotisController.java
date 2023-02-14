@@ -32,4 +32,9 @@ public class NotisController {
     public Boolean notisCheck(Long id) {
         return notisService.notisCheck(id);
     }
+
+    @PostMapping("/undisplay-notis")
+    public Boolean notisUndisplay(Long id) {
+        return notisService.notisUndisplay(id);
+    }
 }

@@ -8,4 +8,10 @@ import lombok.NoArgsConstructor;
 public class SimpleImportantPetitionDto {
     String imageSrc;
     String content;
+
+
+    public SimpleImportantPetitionDto(String imageSrc, String content) {
+        this.imageSrc = imageSrc;
+        this.content = content;
+    }
 }

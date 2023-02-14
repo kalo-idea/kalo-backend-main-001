@@ -37,6 +37,7 @@ import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
+import kalo.main.domain.dto.petition.SimpleImportantPetitionDto;
 import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import kalo.main.repository.DislikePetitionReplyRepository;
 import kalo.main.repository.DislikePetitionRepository;
@@ -187,11 +188,20 @@ public class PetitionService {
         User user = userRepository.findById(petition.getUser().getId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
         SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
 
+        SimpleImportantPetitionDto importantInfo = new SimpleImportantPetitionDto();
+        if (petition.getImportantPetition() != null) {
+            importantInfo.setImageSrc(petition.getImportantPetition().getImageSrc());
+            importantInfo.setContent(petition.getImportantPetition().getContent());
+        } else {
+            importantInfo = null;
+        }
+        
         return ReadPetitionDto.builder()
         .writer(writer)
         .id(petition.getId())
         .title(petition.getTitle())
         .createdDate(petition.getCreatedDate())
+        .important(importantInfo)
         .content(petition.getContent())
         .hashtags(hashtags_res)
         .medium(medium_res)
