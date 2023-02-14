@@ -29,12 +29,12 @@ public class NotisController {
     }
 
     @PostMapping("/check-noti")
-    public Boolean notiCheck(Long userId) {
-        return notisService.notiCheck(userId);
+    public Boolean notiCheck(Long id) {
+        return notisService.notiCheck(id);
     }
 
     @PostMapping("/undisplay-noti")
-    public Boolean notisUndisplay(Long userId) {
-        return notisService.notiUndisplay(userId);
+    public Boolean notisUndisplay(Long id) {
+        return notisService.notiUndisplay(id);
     }
 }
