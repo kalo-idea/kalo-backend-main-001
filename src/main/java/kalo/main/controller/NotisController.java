@@ -7,9 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.dto.NotisResDto;
+import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.service.NotisService;
 import lombok.RequiredArgsConstructor;
 
@@ -29,12 +31,12 @@ public class NotisController {
     }
 
     @PostMapping("/check-noti")
-    public Boolean notiCheck(Long id) {
-        return notisService.notiCheck(id);
+    public Boolean notiCheck(@RequestBody OnlyIdDto req) {
+        return notisService.notiCheck(req.getId());
     }
 
     @PostMapping("/undisplay-noti")
-    public Boolean notisUndisplay(Long id) {
-        return notisService.notiUndisplay(id);
+    public Boolean notisUndisplay(@RequestBody OnlyIdDto req) {
+        return notisService.notiUndisplay(req.getId());
     }
 }
