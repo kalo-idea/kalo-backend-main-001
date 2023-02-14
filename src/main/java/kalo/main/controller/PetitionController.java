@@ -95,7 +95,7 @@ public class PetitionController {
     // 청원 참여하기
     @PostMapping("/support-petition")
     public ReadPetitionDto TargetId (@Valid @RequestBody TargetIdUserIdDto req) {
-        return petitionService.supportingPetition(req.getTargetId(), req.getUserId());
+        return petitionService.supportingPetition(req);
     }
 
     // 청원 참여 리스트

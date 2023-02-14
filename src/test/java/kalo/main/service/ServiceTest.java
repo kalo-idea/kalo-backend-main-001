@@ -19,6 +19,7 @@ import kalo.main.domain.Campaign;
 import kalo.main.domain.CampaignGroup;
 import kalo.main.domain.Petition;
 import kalo.main.domain.SupportPetition;
+import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.repository.CampaignGroupRepository;
@@ -105,8 +106,10 @@ public class ServiceTest {
         afterCount = petitionRepository.count();
 
         assertThat(beforeCount).isEqualTo(afterCount - 1);
-        
-        Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(petitionId, userId)).hasMessage("포인트가 부족합니다.");
+        TargetIdUserIdDto req = new TargetIdUserIdDto();
+        req.setTargetId(petitionId);
+        req.setUserId(userId);
+        Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(req)).hasMessage("포인트가 부족합니다.");
         
         ledgerService.attend(userId);
         nowPoint = usersService.getProfileHome(userId).getPoint();
@@ -117,14 +120,14 @@ public class ServiceTest {
         
         Petition findPetition = petitionRepository.findById(petitionId).get();
         findPetition.setSupportingDateEnd(LocalDateTime.now().minusDays(1));
-        Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(petitionId, userId)).hasMessage("참여 가능한 시간이 지났습니다.");
+        Assertions.assertThatThrownBy(() -> petitionService.supportingPetition(req)).hasMessage("참여 가능한 시간이 지났습니다.");
         
         findPetition.setSupportingDateEnd(LocalDateTime.now().plusDays(1));
         
         petitionService.readPetition(petitionId, userId);
 
         beforeCount = petitionService.readPetition(petitionId, userId).getSupportCount();
-        petitionService.supportingPetition(petitionId, userId);
+        petitionService.supportingPetition(req);
         afterCount = petitionService.readPetition(petitionId, userId).getSupportCount();
         nowPoint = usersService.getProfileHome(userId).getPoint();
         assertThat(nowPoint).isEqualTo(0);
