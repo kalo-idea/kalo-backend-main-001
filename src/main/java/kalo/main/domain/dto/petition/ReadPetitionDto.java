@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class 
-ReadPetitionDto {
+public class ReadPetitionDto {
     
     SimpleWriterDto writer;
 

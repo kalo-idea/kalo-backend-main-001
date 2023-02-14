@@ -616,7 +616,7 @@ public class PetitionService {
     }
 
     // 중요청원 출력
-    public List<ImportantPetitionResDto> getImportantPetitons(Pageable pageable) {
-        return petitionRepository.getImportantPetitions(pageable);
+    public List<ImportantPetitionResDto> getImportantPetitons() {
+        return petitionRepository.getImportantPetitions();
     }
 }
