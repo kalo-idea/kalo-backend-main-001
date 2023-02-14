@@ -33,6 +33,12 @@ public class CampaignService {
     private final SupportPetitionRepository supportPetitionRepository;
     private final UserRepository userRepository;
 
+    public CampaignInfoDto getCampaign(Long id) {
+        Campaign campaign = campaignRepository.findById(id).orElseThrow(() -> new BasicException("없는 캠페인입니다."));
+        
+        return new CampaignInfoDto(campaign, null);
+    }
+
     // 캠페인 목록
     public CampaignsDto getCampaigns(int year, int month) {
 
