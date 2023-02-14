@@ -117,9 +117,7 @@ public class PetitionController {
 
     // 중요 청원 검색
     @GetMapping("/public/get-important-petitions")
-    public List<ImportantPetitionResDto> getImportantPetiton(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return petitionService.getImportantPetitons(pageable);
+    public List<ImportantPetitionResDto> getImportantPetiton() {
+        return petitionService.getImportantPetitons();
     }
 }

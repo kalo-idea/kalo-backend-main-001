@@ -14,18 +14,18 @@ public class ImportantPetitionResDto {
     String priotityContent;
     String priorityImageSrc;
 
-    Long id;
+    Long petitionid;
     String title;
     String content;
     LocalDateTime supportingDateEnd;
 
     @Builder
     @QueryProjection
-    public ImportantPetitionResDto(String priorityTitle, String priotityContent, String priorityImageSrc, Long id, String title, String content, LocalDateTime supportingDateEnd) {
+    public ImportantPetitionResDto(String priorityTitle, String priotityContent, String priorityImageSrc, Long petitionid, String title, String content, LocalDateTime supportingDateEnd) {
         this.priorityTitle = priorityTitle;
         this.priotityContent = priotityContent;
         this.priorityImageSrc = priorityImageSrc;
-        this.id = id;
+        this.petitionid = petitionid;
         this.title = title;
         this.content = content;
         this.supportingDateEnd = supportingDateEnd;
