@@ -12,6 +12,7 @@ import kalo.main.admin.dto.AdminAuthDataDto;
 import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
 import kalo.main.admin.dto.AdminAuthsReqDto;
+import kalo.main.admin.dto.AdminImportantPetitionDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
 import kalo.main.admin.dto.AdminUserAuthReqDto;
 import kalo.main.admin.dto.AdminUserAuthResDto;
@@ -20,10 +21,13 @@ import kalo.main.admin.dto.AdminUsersAuthsReqDto;
 import kalo.main.admin.dto.AdminUserDataDto;
 import kalo.main.controller.BasicException;
 import kalo.main.domain.Auth;
+import kalo.main.domain.ImportantPetition;
 import kalo.main.domain.Ledger;
+import kalo.main.domain.Petition;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.repository.AuthRepository;
+import kalo.main.repository.ImportantPetitionRepository;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.PostRepository;
@@ -42,6 +46,7 @@ public class AdminService {
     private final AuthRepository authRepository;
     private final LedgerRepository ledgerRepository;
     private final LedgerService ledgerService;
+    private final ImportantPetitionRepository importantPetitionRepository;
     
     // 관리자용 거래내역 조회
     public List<AdminLedgerHistoryDto> getLedgersHistory(Pageable pageable, Long userId) {        
@@ -407,5 +412,19 @@ public class AdminService {
         }
 
         return result;
+    }
+
+    public void updateImportantPetition(AdminImportantPetitionDto req) {
+        Petition petition = petitionRepository.findById(req.getId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
+        
+        ImportantPetition importantPetition = ImportantPetition.builder()
+        .title(req.getTitle())
+        .content(req.getContent())
+        .imageSrc(req.getImageSrc())
+        .importantEndDate(req.getImportantEndDate())
+        .build();
+        importantPetitionRepository.save(importantPetition);
+
+        petition.setImportantPetition(importantPetition);
     }
 }

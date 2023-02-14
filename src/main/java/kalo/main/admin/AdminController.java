@@ -9,14 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import kalo.main.admin.dto.AdminAuthDataDto;
 import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
 import kalo.main.admin.dto.AdminAuthsReqDto;
+import kalo.main.admin.dto.AdminImportantPetitionDto;
 import kalo.main.admin.dto.AdminLedgerHistoryDto;
 import kalo.main.admin.dto.AdminUserAuthReqDto;
 import kalo.main.admin.dto.AdminUserAuthResDto;
@@ -95,6 +96,14 @@ public class AdminController {
     public List<AdminUserAuthResDto> getUsersAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, 
     AdminUsersAuthsReqDto req) {
         return adminService.getUsersAndAuths(pageable, req);
+    }
+
+    // 중요 청원 지정
+    @PostMapping("/update-important-petition")
+    public String updateImportantPetition(@RequestBody AdminImportantPetitionDto req) {
+        System.out.println("req@@@" + req);
+        adminService.updateImportantPetition(req);
+        return "성공";
     }
 
 }

@@ -20,6 +20,8 @@ public class ReadPetitionDto {
 
     LocalDateTime createdDate;
 
+    SimpleImportantPetitionDto important;
+
     String content;
 
     List<String> hashtags;

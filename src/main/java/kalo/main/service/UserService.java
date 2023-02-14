@@ -219,7 +219,7 @@ public class UserService {
         }
 
         // 닉네임 불가능 문자
-        Pattern pattern = Pattern.compile("^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣!?@#$%^&*]{2,10}$");
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9ㄱ-ㅎ가-힣!?@#$%^&*]{2,10}$");
         if (!pattern.matcher(nickname).find()) {
             return new NicknameValidResDto("error", "허용되지 않은 문자가 있습니다.");
         }

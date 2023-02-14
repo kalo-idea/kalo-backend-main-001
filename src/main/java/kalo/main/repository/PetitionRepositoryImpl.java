@@ -1,5 +1,6 @@
 package kalo.main.repository;
 
+import static kalo.main.domain.QImportantPetition.importantPetition;
 import static kalo.main.domain.QLikePetition.likePetition;
 import static kalo.main.domain.QPetition.petition;
 import static kalo.main.domain.QSupportPetition.supportPetition;
@@ -21,7 +22,9 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import kalo.main.domain.dto.petition.ImportantPetitionResDto;
 import kalo.main.domain.dto.petition.PetitionCondDto;
+import kalo.main.domain.dto.petition.QImportantPetitionResDto;
 import kalo.main.domain.dto.petition.QReadSimplePetitionsDto;
 import kalo.main.domain.dto.petition.QSupportPetitionUserListDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
@@ -94,7 +97,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         petition.createdDate,
         petition.content,
         petition.likeCount,
-        petition.dislikeCount,
+        petition.dislikeCount, 
         petition.progress,
         petition.step,
         petition.goal,
@@ -188,6 +191,37 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .limit(pageable.getPageSize())
         .orderBy(supportPetition.createdDate.desc())
         .fetch();
+    }
+
+    // Important 청원
+    public List<ImportantPetitionResDto> getImportantPetitions(Pageable pageable) {
+        JPAQuery<ImportantPetitionResDto> query = queryFactory.select(new QImportantPetitionResDto(
+        importantPetition.title,
+        importantPetition.content,
+        importantPetition.imageSrc,
+        petition.title,
+        petition.content,
+        petition.supportingDateEnd
+        ))
+        .from(petition)
+        .join(petition.importantPetition, importantPetition)
+        .where(
+            petition.deleted.eq(false),
+            importantPetition.deleted.eq(false),
+            importantPetition.importantEndDate.after(LocalDateTime.now())
+        )
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(petition.getType(), petition.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+        
+        List<ImportantPetitionResDto> result = query.fetch();
+
+        return result;
     }
 
     private BooleanExpression searchFilter(String search) {

@@ -32,6 +32,7 @@ import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
+import kalo.main.domain.dto.petition.ImportantPetitionResDto;
 import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
@@ -555,5 +556,57 @@ public class PetitionService {
             supportPetitionUser.setCreatedDate(supportPetitionUser.getCreatedDate().toLocalDate().atStartOfDay());
         }
         return res;
+    }
+
+    public List<ReadPetitionsDto> getPetitionsByHashtag(Pageable pageable, String hash) {
+
+        List<ReadSimplePetitionsDto> simplePetitions = hashtagRepository.getPetitionsByHashtag(pageable, hash);
+
+        List<ReadPetitionsDto> result = new ArrayList<>();
+        for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
+            
+            String progress = simplePetition.getProgress();
+            if (progress.equals("unchecked")) {
+                if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
+                    if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
+                        progress = "ongoing";
+                    } else {
+                        progress = "fail";
+                    }
+                } else {
+                    progress = "recruit";
+                }
+            }
+
+            simplePetition.setProgress(progress);
+
+            List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
+            
+            List<String> words = new ArrayList<String>();
+            List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
+            for (Hashtag hashtag : hashtags) {
+                words.add(hashtag.getWord());
+            }
+
+
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> medium = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
+            for (Media media : medium) {
+                fileNames.add(media.getFileName());
+            }
+            System.out.println("");
+
+            User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            
+            result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
+        }
+
+        return result;
+    }
+
+    // 중요청원 출력
+    public List<ImportantPetitionResDto> getImportantPetitons(Pageable pageable) {
+        return petitionRepository.getImportantPetitions(pageable);
     }
 }

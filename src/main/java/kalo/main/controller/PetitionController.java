@@ -18,6 +18,7 @@ import kalo.main.domain.dto.ReplyDto;
 import kalo.main.domain.dto.TargetIdUserIdDto;
 import kalo.main.domain.dto.petition.CreatePetitionDto;
 import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
+import kalo.main.domain.dto.petition.ImportantPetitionResDto;
 import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
@@ -105,4 +106,20 @@ public class PetitionController {
         return petitionService.getSupportPetitionList(pageable, id);
     }
 
+    // 해쉬태그 검색
+    @GetMapping("/get-petition-hashtag")
+    public List<ReadPetitionsDto> getHashtags(
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        String hashtag
+    ) {
+        return petitionService.getPetitionsByHashtag(pageable, hashtag);
+    }
+
+    // 중요 청원 검색
+    @GetMapping("/get-important-petiton")
+    public List<ImportantPetitionResDto> getImportantPetiton(
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return petitionService.getImportantPetitons(pageable);
+    }
 }
