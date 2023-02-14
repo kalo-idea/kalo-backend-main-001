@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ReadPetitionDto {
+public class 
+ReadPetitionDto {
     
     SimpleWriterDto writer;
 
@@ -61,11 +62,12 @@ public class ReadPetitionDto {
     LocalDateTime supportingDateEnd;
 
     @Builder
-    public ReadPetitionDto(SimpleWriterDto writer, Long id, String title, LocalDateTime createdDate, String content, List<String> hashtags, List<String> medium, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, List<String> step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Double latitude, Double longitude, Long supportCount, Boolean isSupport, LocalDateTime supportingDateEnd) {
+    public ReadPetitionDto(SimpleWriterDto writer, Long id, String title, LocalDateTime createdDate, SimpleImportantPetitionDto important, String content, List<String> hashtags, List<String> medium, Long likeCount, Boolean isLike, Long dislikeCount, Boolean isDislike, String progress, List<String> step, Long goal, Long replyCount, String category, String region1depthName, String region2depthName, Double latitude, Double longitude, Long supportCount, Boolean isSupport, LocalDateTime supportingDateEnd) {
         this.writer = writer;
         this.id = id;
         this.title = title;
         this.createdDate = createdDate;
+        this.important = important;
         this.content = content;
         this.hashtags = hashtags;
         this.medium = medium;

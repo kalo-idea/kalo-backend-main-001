@@ -42,5 +42,12 @@ public class NotisService {
         
         return true;
     }
+
+    public Boolean notisUndisplay(Long noticeId) {
+        Notis notis = notisRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
+        notis.setIsDisplay(false);
+        
+        return true;
+    }
     
 }

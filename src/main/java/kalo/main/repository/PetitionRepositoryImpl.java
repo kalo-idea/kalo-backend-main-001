@@ -199,6 +199,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         importantPetition.title,
         importantPetition.content,
         importantPetition.imageSrc,
+        petition.id,
         petition.title,
         petition.content,
         petition.supportingDateEnd
