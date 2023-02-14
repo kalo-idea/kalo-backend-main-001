@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -69,8 +70,12 @@ public class Petition extends BaseEntity {
 
     LocalDateTime supportingDateEnd;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "important_petition_id")
+    ImportantPetition importantPetition;
+
     @Builder
-    public Petition(Long id, String title, String content, Long supportCount, Long viewCount, User user, String progress, Long goal, Long replyCount, Long likeCount, Long dislikeCount, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, String category, LocalDateTime supportingDateEnd) {
+    public Petition(Long id, String title, String content, Long supportCount, Long viewCount, User user, String progress, Long goal, Long replyCount, Long likeCount, Long dislikeCount, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, String category, LocalDateTime supportingDateEnd, ImportantPetition importantPetition) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -90,6 +95,7 @@ public class Petition extends BaseEntity {
         this.longitude = longitude;
         this.category = category;
         this.supportingDateEnd = supportingDateEnd;
+        this.importantPetition = importantPetition;
     }
 
 }

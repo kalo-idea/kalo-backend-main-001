@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import kalo.main.domain.Post;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
 import kalo.main.domain.dto.TargetIdUserIdDto;
@@ -87,5 +88,14 @@ public class PostController {
     @PostMapping("/dislike-post-reply")
     public LikeDislikeResDto dislikePostReply(@Valid @RequestBody TargetIdUserIdDto req) {
         return postService.dislikePostReply(req);
+    }
+
+    // 해쉬태그 검색
+    @GetMapping("/get-post-hashtag")
+    public List<ReadPostsDto> getHashtags(
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        String hashtag
+    ) {
+        return postService.getPostsByHashtag(pageable, hashtag);
     }
 }

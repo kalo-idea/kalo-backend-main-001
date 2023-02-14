@@ -33,7 +33,7 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
             post.user.id,
             post.title,
             post.createdDate,
-            post.content,
+            post.content.substring(0, 100),
             post.likeCount,
             post.dislikeCount,
             post.replyCount, 

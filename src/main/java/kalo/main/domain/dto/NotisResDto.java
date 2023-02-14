@@ -1,5 +1,7 @@
 package kalo.main.domain.dto;
 
+import java.time.LocalDateTime;
+
 import kalo.main.domain.Notis;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,7 @@ public class NotisResDto {
     Long targetId;
     String targetUrl;
     String target;
+    LocalDateTime createdDate;
 
     public NotisResDto(Notis notis) {
         this.id = notis.getId();
@@ -31,5 +34,6 @@ public class NotisResDto {
         this.targetId = notis.getTargetId();
         this.targetUrl = notis.getTargetUrl();
         this.target = notis.getTarget();
+        this.createdDate = notis.getCreatedDate();
     }
 }

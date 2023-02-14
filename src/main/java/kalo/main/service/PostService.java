@@ -52,7 +52,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final HashtagRepository hashtagRepository;
-    private final PostHashtagRepository postsHashtagRepository;
+    private final PostHashtagRepository postHashtagRepository;
     private final LikePostRepository likePostRepository;
     private final DislikePostRepository dislikePostRepository;
     private final PostReplyRepository postReplyRepository;
@@ -92,7 +92,7 @@ public class PostService {
                     .post(resultPost)
                     .hashtag(hashtagRepository.findByWordAndDeleted(hashtag, false).orElseThrow())
                     .build();
-                postsHashtagRepository.save(postsHashtags);
+                postHashtagRepository.save(postsHashtags);
             } catch(NoSuchElementException e) {
                 // hashtag make
                 Hashtag makeHashtag = new Hashtag(hashtag);
@@ -101,7 +101,7 @@ public class PostService {
                     .post(resultPost)
                     .hashtag(makeHashtag)
                     .build();
-                postsHashtagRepository.save(postsHashtags);
+                postHashtagRepository.save(postsHashtags);
             }
         }
 
@@ -441,6 +441,33 @@ public class PostService {
             .likeCount(reply.getLikeCount())
             .dislikeCount(reply.getDislikeCount())
             .build();
+
+        return result;
+    }
+
+    public List<ReadPostsDto> getPostsByHashtag(Pageable pageable, String hash) {
+        List<ReadSimplePostDto> posts = hashtagRepository.getPostByHashtag(pageable, hash);
+        List<ReadPostsDto> result = new ArrayList<>();
+
+        for (ReadSimplePostDto simplePost : posts) {
+            
+            List<String> words = new ArrayList<String>();
+            List<Hashtag> hashtags = hashtagRepository.findPostHashtags(simplePost.getPostId());
+            for (Hashtag hashtag : hashtags) {
+                words.add(hashtag.getWord());
+            }
+            
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> media = mediaRepository.findPostMedia(simplePost.getPostId());
+            for (Media medium : media) {
+                fileNames.add(medium.getFileName());
+            }
+
+            User user = userRepository.findById(simplePost.getWriterId()).get();
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            
+            result.add(new ReadPostsDto(simplePost, writer, words, fileNames));
+        }
 
         return result;
     }
