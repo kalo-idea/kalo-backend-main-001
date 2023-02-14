@@ -19,13 +19,13 @@ public class NotisController {
     private final NotisService notisService;
 
     @GetMapping("/get-my-notis")
-    public List<NotisResDto> getMyNotis(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Long id) {
-        return notisService.getMyNotis(pageable, id);
+    public List<NotisResDto> getMyNotis(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Long userId) {
+        return notisService.getMyNotis(pageable, userId);
     }
 
     @GetMapping("/count-my-notis")
-    public Long countMyNotis(Long id) {
-        return notisService.checkMyNotis(id);
+    public Long countMyNotis(Long userId) {
+        return notisService.checkMyNotis(userId);
     }
 
     @PostMapping("/check-notis")
