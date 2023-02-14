@@ -25,16 +25,16 @@ public class NotisController {
 
     @GetMapping("/count-my-notis")
     public Long countMyNotis(Long userId) {
-        return notisService.checkMyNotis(userId);
+        return notisService.countMyNotis(userId);
     }
 
-    @PostMapping("/check-notis")
-    public Boolean notisCheck(Long id) {
-        return notisService.notisCheck(id);
+    @PostMapping("/check-noti")
+    public Boolean notiCheck(Long userId) {
+        return notisService.notiCheck(userId);
     }
 
-    @PostMapping("/undisplay-notis")
-    public Boolean notisUndisplay(Long id) {
-        return notisService.notisUndisplay(id);
+    @PostMapping("/undisplay-noti")
+    public Boolean notisUndisplay(Long userId) {
+        return notisService.notiUndisplay(userId);
     }
 }

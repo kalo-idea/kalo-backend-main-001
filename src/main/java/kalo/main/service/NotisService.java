@@ -32,18 +32,18 @@ public class NotisService {
         return res;
     }
 
-    public Long checkMyNotis(Long userId) {
+    public Long countMyNotis(Long userId) {
         return notisRepository.countNotisByReceiverIdAndDeletedAndIsDisplayAndIsCheck(userId, false, true, false);
     }
 
-    public Boolean notisCheck(Long noticeId) {
+    public Boolean notiCheck(Long noticeId) {
         Notis notis = notisRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
         notis.setIsCheck(true);
         
         return true;
     }
 
-    public Boolean notisUndisplay(Long noticeId) {
+    public Boolean notiUndisplay(Long noticeId) {
         Notis notis = notisRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
         notis.setIsDisplay(false);
         
