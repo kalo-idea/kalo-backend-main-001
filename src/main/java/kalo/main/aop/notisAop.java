@@ -8,6 +8,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import kalo.main.controller.BasicException;
+import kalo.main.domain.LikePetition;
+import kalo.main.domain.LikePetitionReply;
+import kalo.main.domain.LikePost;
+import kalo.main.domain.LikePostReply;
 import kalo.main.domain.Notis;
 import kalo.main.domain.Petition;
 import kalo.main.domain.PetitionReply;
@@ -20,6 +24,10 @@ import kalo.main.domain.dto.petition.CreatePetitionReplyDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.post.CreatePostReplyDto;
 import kalo.main.domain.dto.user.UserAuthResDto;
+import kalo.main.repository.LikePetitionReplyRepository;
+import kalo.main.repository.LikePetitionRepository;
+import kalo.main.repository.LikePostReplyRepository;
+import kalo.main.repository.LikePostRepository;
 import kalo.main.repository.NotisRepository;
 import kalo.main.repository.PetitionReplyRepository;
 import kalo.main.repository.PetitionRepository;
@@ -40,6 +48,10 @@ public class notisAop {
     private final PostRepository postRepository;
     private final PetitionReplyRepository petitionReplyRepository;
     private final PostReplyRepository postReplyRepository;
+    private final LikePetitionRepository likePetitionRepository;
+    private final LikePostRepository likePostRepository;
+    private final LikePetitionReplyRepository likePetitionReplyRepository;
+    private final LikePostReplyRepository likePostReplyRepository;
     
     Long kaloId = 112L;
 
@@ -111,24 +123,29 @@ public class notisAop {
         LikeDislikeResDto result = (LikeDislikeResDto) joinPoint.proceed();
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         Petition petition = petitionRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        
+        if (result.getIsLike()) {
+            LikePetition likePetition = likePetitionRepository.findByPetitionIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
+            if (petition.getUser().getId() != null && req.getUserId() != petition.getUser().getId() && likePetition.getCreatedDate() == likePetition.getLastModifiedDate()) {
 
-        if (result.getIsLike() && petition.getUser().getId() != null) {
-            Notis notis = Notis.builder()
-            .image(null)
-            .isCheck(false)
-            .title(sender.getNickname() + "님이 내 청원을 좋아합니다.")
-            .content(petition.getTitle())
-            .isDisplay(true)
-            .targetId(req.getTargetId())
-            .sender(sender)
-            .receiver(petition.getUser())
-            .targetUrl("/community/view/petition/" + req.getTargetId())
-            .target("petition")
-            .build();
-
-            notisRepository.save(notis);
+                Notis notis = Notis.builder()
+                .image(null)
+                .isCheck(false)
+                .title(sender.getNickname() + "님이 내 청원을 좋아합니다.")
+                .content(petition.getTitle())
+                .isDisplay(true)
+                .targetId(req.getTargetId())
+                .sender(sender)
+                .receiver(petition.getUser())
+                .targetUrl("/community/view/petition/" + req.getTargetId())
+                .target("petition")
+                .build();
+    
+                notisRepository.save(notis);
+            }
         }
+
 
         return result;
     }
@@ -145,21 +162,25 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         Post post = postRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다."));
 
-        if (result.getIsLike() && post.getUser().getId() != null) {
-            Notis notis = Notis.builder()
-            .image(null)
-            .isCheck(false)
-            .title(sender.getNickname() + "님이 내 게시글을 좋아합니다.")
-            .content(post.getTitle())
-            .isDisplay(true)
-            .targetId(req.getTargetId())
-            .sender(sender)
-            .receiver(post.getUser())
-            .targetUrl("/community/view/post/" + req.getTargetId())
-            .target("post")
-            .build();
-    
-            notisRepository.save(notis);
+        if (result.getIsLike()) {
+            LikePost likePost = likePostRepository.findByPostIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
+
+            if (post.getUser().getId() != null && sender.getId() != post.getUser().getId() && likePost.getCreatedDate() == likePost.getLastModifiedDate()) {
+                Notis notis = Notis.builder()
+                .image(null)
+                .isCheck(false)
+                .title(sender.getNickname() + "님이 내 게시글을 좋아합니다.")
+                .content(post.getTitle())
+                .isDisplay(true)
+                .targetId(req.getTargetId())
+                .sender(sender)
+                .receiver(post.getUser())
+                .targetUrl("/community/view/post/" + req.getTargetId())
+                .target("post")
+                .build();
+        
+                notisRepository.save(notis);
+            }
         }
 
         return result;
@@ -175,9 +196,11 @@ public class notisAop {
         Long result = (Long) joinPoint.proceed();
         
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
-        User receiver = petitionRepository.findById(req.getPetitionId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다.")).getUser();
+        Petition petition = petitionRepository.findById(req.getPetitionId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        User receiver = petition.getUser();
 
-        if (receiver.getId() != null) {
+        if (receiver.getId() != null && receiver.getId() != sender.getId()) {
+
             Notis notis = Notis.builder()
             .image(null)
             .isCheck(false)
@@ -209,7 +232,7 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User receiver = postRepository.findById(req.getPostId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다.")).getUser();
 
-        if (receiver.getId() != null) {
+        if (receiver.getId() != null && sender.getId() != receiver.getId()) {
             Notis notis = Notis.builder()
             .image(null)
             .isCheck(false)
@@ -240,22 +263,25 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         PetitionReply petitionReply = petitionReplyRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
 
+        if (result.getIsLike()) {
+            LikePetitionReply reply = likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
-        if (result.getIsLike() && petitionReply.getUser().getId() != null) {
-            Notis notis = Notis.builder()
-            .image(null)
-            .isCheck(false)
-            .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
-            .content(petitionReply.getContent())
-            .isDisplay(true)
-            .targetId(req.getTargetId())
-            .sender(sender)
-            .receiver(petitionReply.getUser())
-            .targetUrl("/community/view/petition/" + req.getTargetId())
-            .target("petition")
-            .build();
-    
-            notisRepository.save(notis);
+            if (result.getIsLike() && petitionReply.getUser().getId() != null && sender.getId() != petitionReply.getUser().getId() && reply.getCreatedDate() == reply.getLastModifiedDate()) {
+                Notis notis = Notis.builder()
+                .image(null)
+                .isCheck(false)
+                .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
+                .content(petitionReply.getContent())
+                .isDisplay(true)
+                .targetId(req.getTargetId())
+                .sender(sender)
+                .receiver(petitionReply.getUser())
+                .targetUrl("/community/view/petition/" + req.getTargetId())
+                .target("petition")
+                .build();
+        
+                notisRepository.save(notis);
+            }
         }
 
         return result;
@@ -272,22 +298,25 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         PostReply postReply = postReplyRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
 
+        if (result.getIsLike()) {
+            LikePostReply reply = likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
-        if (result.getIsLike() && postReply.getUser().getId() != null) {
-            Notis notis = Notis.builder()
-            .image(null)
-            .isCheck(false)
-            .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
-            .content(postReply.getContent())
-            .isDisplay(true)
-            .targetId(req.getTargetId())
-            .sender(sender)
-            .receiver(postReply.getUser())
-            .targetUrl("/community/view/post/" + req.getTargetId())
-            .target("post")
-            .build();
-    
-            notisRepository.save(notis);
+            if (postReply.getUser().getId() != null && sender.getId() != postReply.getUser().getId() && reply.getCreatedDate() == reply.getLastModifiedDate()) {
+                Notis notis = Notis.builder()
+                .image(null)
+                .isCheck(false)
+                .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
+                .content(postReply.getContent())
+                .isDisplay(true)
+                .targetId(req.getTargetId())
+                .sender(sender)
+                .receiver(postReply.getUser())
+                .targetUrl("/community/view/post/" + req.getTargetId())
+                .target("post")
+                .build();
+        
+                notisRepository.save(notis);
+            }
         }
 
         return result;
