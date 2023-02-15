@@ -17,6 +17,7 @@ import kalo.main.domain.Auth;
 import kalo.main.domain.Hashtag;
 import kalo.main.domain.Media;
 import kalo.main.domain.User;
+import kalo.main.domain.dto.SimpleDeletedWriterDto;
 import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
@@ -100,8 +101,6 @@ public class UserService {
 
         List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
-            User writer = userRepository.findById(simplePetition.getWriterId()).get();
-
             String progress = simplePetition.getProgress();
             if (progress.equals("recruit")) {
                 if (!simplePetition.getCreatedDate().isAfter(LocalDate.now().minusDays(29).atStartOfDay())) {
@@ -126,12 +125,10 @@ public class UserService {
             for (Media medium : media) {
                 fileNames.add(medium.getFileName());
             }
-            if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, steps, words, fileNames));
-            }
-            else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
-            }
+
+            User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
         }
 
         return result;
