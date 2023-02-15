@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.dto.TargetIdUserIdDto;
+import kalo.main.domain.dto.campaign.CampaignInfoDto;
 import kalo.main.domain.dto.campaign.CampaignStatusDto;
 import kalo.main.domain.dto.campaign.CampaignsDto;
 import kalo.main.service.CampaignService;
@@ -38,6 +39,11 @@ public class CampaignController {
     @GetMapping("/get-vote-campaign-status")
     public CampaignStatusDto getVoteCampaignStatus(Long id, int year, int month) {
         return campaignService.getVoteCampaignStatus(id, year, month);
+    }
+
+    @GetMapping("/public/get-campaign")
+    public CampaignInfoDto getCampaign(Long id) {
+        return campaignService.getCampaign(id);
     }
 
 }
