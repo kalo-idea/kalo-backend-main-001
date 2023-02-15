@@ -3,7 +3,14 @@ server:
 
 spring:
   profiles:
-    active: main
+    active: dev
+    
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test
@@ -32,3 +39,29 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test
+    username: user
+    password: user1234U
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database:  mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    defer-datasource-initialization: true
+  data:
+    web:
+      pageable:
+        default-page-size: 5
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
