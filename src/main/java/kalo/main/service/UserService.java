@@ -58,16 +58,17 @@ public class UserService {
 
         List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
-            User writer = userRepository.findById(simplePetition.getWriterId()).get();
 
             String progress = simplePetition.getProgress();
-            if (progress.equals("recruit")) {
-                if (!simplePetition.getCreatedDate().isAfter( LocalDate.now().minusDays(29).atStartOfDay())) {
-                    if (simplePetition.getSupportCount() >= 100) {
+            if (progress.equals("unchecked")) {
+                if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
+                    if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
                         progress = "ongoing";
                     } else {
                         progress = "fail";
                     }
+                } else {
+                    progress = "recruit";
                 }
             }
             simplePetition.setProgress(progress);
@@ -84,12 +85,9 @@ public class UserService {
             for (Media medium : media) {
                 fileNames.add(medium.getFileName());
             }
-            if (writer.getDeleted()) {
-                result.add(new ReadPetitionsDto(simplePetition, null, steps, words, fileNames));
-            }
-            else {
-                result.add(new ReadPetitionsDto(simplePetition, new SimpleWriterDto(writer.getId(), writer.getNickname(), writer.getProfileSrc()), steps, words, fileNames));
-            }
+            User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
         }
 
         return result;
