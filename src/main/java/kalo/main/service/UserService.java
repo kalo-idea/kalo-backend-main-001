@@ -102,13 +102,15 @@ public class UserService {
         List<ReadPetitionsDto> result = new ArrayList<ReadPetitionsDto>();
         for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
             String progress = simplePetition.getProgress();
-            if (progress.equals("recruit")) {
-                if (!simplePetition.getCreatedDate().isAfter(LocalDate.now().minusDays(29).atStartOfDay())) {
-                    if (simplePetition.getSupportCount() >= 100) {
+            if (progress.equals("unchecked")) {
+                if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
+                    if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
                         progress = "ongoing";
                     } else {
                         progress = "fail";
                     }
+                } else {
+                    progress = "recruit";
                 }
             }
             simplePetition.setProgress(progress);
