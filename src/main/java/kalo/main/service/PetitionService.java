@@ -87,6 +87,7 @@ public class PetitionService {
         .goal(createPetitionDto.getGoal())
         .replyCount(0L)
         .likeCount(0L)
+        .step("")
         .dislikeCount(0L)
         .addressName(createPetitionDto.getAddressName())
         .region1depthName(createPetitionDto.getRegion1depthName())

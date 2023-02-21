@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import kalo.main.domain.dto.NotisResDto;
 import kalo.main.domain.dto.OnlyIdDto;
-import kalo.main.service.NotisService;
+import kalo.main.service.NotiService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class NotisController {
-    private final NotisService notisService;
+    private final NotiService notisService;
 
     @GetMapping("/get-my-notis")
     public List<NotisResDto> getMyNotis(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Long userId) {
@@ -36,7 +36,7 @@ public class NotisController {
     }
 
     @PostMapping("/undisplay-noti")
-    public Boolean notisUndisplay(@RequestBody OnlyIdDto req) {
+    public Boolean notiUndisplay(@RequestBody OnlyIdDto req) {
         return notisService.notiUndisplay(req.getId());
     }
 }

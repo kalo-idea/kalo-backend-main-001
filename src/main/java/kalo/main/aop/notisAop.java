@@ -12,7 +12,7 @@ import kalo.main.domain.LikePetition;
 import kalo.main.domain.LikePetitionReply;
 import kalo.main.domain.LikePost;
 import kalo.main.domain.LikePostReply;
-import kalo.main.domain.Notis;
+import kalo.main.domain.Noti;
 import kalo.main.domain.Petition;
 import kalo.main.domain.PetitionReply;
 import kalo.main.domain.Post;
@@ -28,7 +28,7 @@ import kalo.main.repository.LikePetitionReplyRepository;
 import kalo.main.repository.LikePetitionRepository;
 import kalo.main.repository.LikePostReplyRepository;
 import kalo.main.repository.LikePostRepository;
-import kalo.main.repository.NotisRepository;
+import kalo.main.repository.NotiRepository;
 import kalo.main.repository.PetitionReplyRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.PostReplyRepository;
@@ -43,7 +43,7 @@ public class notisAop {
 
     
     private final UserRepository userRepository;
-    private final NotisRepository notisRepository;
+    private final NotiRepository notisRepository;
     private final PetitionRepository petitionRepository;
     private final PostRepository postRepository;
     private final PetitionReplyRepository petitionReplyRepository;
@@ -62,7 +62,7 @@ public class notisAop {
         User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User kalo = userRepository.findById(kaloId).get();
 
-        Notis notis = Notis.builder()
+        Noti notis = Noti.builder()
         .image("kalo")
         .isCheck(false)
         .title(null)
@@ -93,7 +93,7 @@ public class notisAop {
             User petitionWriter = userRepository.findById(petitionWriterId).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
             User kalo = userRepository.findById(kaloId).get();
     
-            Notis notis = Notis.builder()
+            Noti notis = Noti.builder()
             .image(null)
             .isCheck(false)
             .title("누군가 내 청원에 참여했어요.")
@@ -129,7 +129,7 @@ public class notisAop {
 
             if (petition.getUser().getId() != null && req.getUserId() != petition.getUser().getId() && likePetition.getCreatedDate() == likePetition.getLastModifiedDate()) {
 
-                Notis notis = Notis.builder()
+                Noti notis = Noti.builder()
                 .image(null)
                 .isCheck(false)
                 .title(sender.getNickname() + "님이 내 청원을 좋아합니다.")
@@ -166,7 +166,7 @@ public class notisAop {
             LikePost likePost = likePostRepository.findByPostIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
             if (post.getUser().getId() != null && sender.getId() != post.getUser().getId() && likePost.getCreatedDate() == likePost.getLastModifiedDate()) {
-                Notis notis = Notis.builder()
+                Noti notis = Noti.builder()
                 .image(null)
                 .isCheck(false)
                 .title(sender.getNickname() + "님이 내 게시글을 좋아합니다.")
@@ -201,7 +201,7 @@ public class notisAop {
 
         if (receiver.getId() != null && receiver.getId() != sender.getId()) {
 
-            Notis notis = Notis.builder()
+            Noti notis = Noti.builder()
             .image(null)
             .isCheck(false)
             .title(sender.getNickname() + "님이 내 청원에 댓글을 작성했습니다.")
@@ -233,7 +233,7 @@ public class notisAop {
         User receiver = postRepository.findById(req.getPostId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다.")).getUser();
 
         if (receiver.getId() != null && sender.getId() != receiver.getId()) {
-            Notis notis = Notis.builder()
+            Noti notis = Noti.builder()
             .image(null)
             .isCheck(false)
             .title(sender.getNickname() + "님이 내 게시글에 댓글을 작성했습니다.")
@@ -267,7 +267,7 @@ public class notisAop {
             LikePetitionReply reply = likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
             if (result.getIsLike() && petitionReply.getUser().getId() != null && sender.getId() != petitionReply.getUser().getId() && reply.getCreatedDate() == reply.getLastModifiedDate()) {
-                Notis notis = Notis.builder()
+                Noti notis = Noti.builder()
                 .image(null)
                 .isCheck(false)
                 .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
@@ -302,7 +302,7 @@ public class notisAop {
             LikePostReply reply = likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
             if (postReply.getUser().getId() != null && sender.getId() != postReply.getUser().getId() && reply.getCreatedDate() == reply.getLastModifiedDate()) {
-                Notis notis = Notis.builder()
+                Noti notis = Noti.builder()
                 .image(null)
                 .isCheck(false)
                 .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")

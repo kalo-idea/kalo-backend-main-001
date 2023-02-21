@@ -2,7 +2,7 @@ package kalo.main.domain.dto;
 
 import java.time.LocalDateTime;
 
-import kalo.main.domain.Notis;
+import kalo.main.domain.Noti;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +22,7 @@ public class NotisResDto {
     String target;
     LocalDateTime createdDate;
 
-    public NotisResDto(Notis notis) {
+    public NotisResDto(Noti notis) {
         this.id = notis.getId();
         this.image = notis.getImage();
         this.title = notis.getTitle();

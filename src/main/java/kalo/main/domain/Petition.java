@@ -75,7 +75,7 @@ public class Petition extends BaseEntity {
     ImportantPetition importantPetition;
 
     @Builder
-    public Petition(Long id, String title, String content, Long supportCount, Long viewCount, User user, String progress, Long goal, Long replyCount, Long likeCount, Long dislikeCount, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, String category, LocalDateTime supportingDateEnd, ImportantPetition importantPetition) {
+    public Petition(Long id, String title, String content, Long supportCount, Long viewCount, User user, String progress, String step, Long goal, Long replyCount, Long likeCount, Long dislikeCount, String addressName, String region1depthName, String region2depthName, String region3depthName, Double latitude, Double longitude, String category, LocalDateTime supportingDateEnd, ImportantPetition importantPetition) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -83,6 +83,7 @@ public class Petition extends BaseEntity {
         this.viewCount = viewCount;
         this.user = user;
         this.progress = progress;
+        this.step = step;
         this.goal = goal;
         this.replyCount = replyCount;
         this.likeCount = likeCount;

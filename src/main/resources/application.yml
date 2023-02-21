@@ -36,9 +36,9 @@ spring:
       enabled: always
 
 logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type: TRACE
+  # level:
+  #   org.hibernate.SQL: DEBUG
+  #   org.hibernate.type: TRACE
 
 ---
 
@@ -63,5 +63,8 @@ spring:
         default-page-size: 5
 
 logging:
+  pattern:
+    console: "[%d{HH:mm:ss.SSS}][%-5level][%logger.%method:line%line] - %msg%n"
   level:
-    org.hibernate.SQL: DEBUG
+    org:
+      springframework.web.servlet.DispatcherServlet: DEBUG

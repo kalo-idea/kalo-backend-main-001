@@ -31,6 +31,7 @@ public class User extends BaseEntity {
     @Column(length = 32)
     String nickname;
 
+    @Column(columnDefinition = "TEXT")
     String intro;
     String profileSrc;
     String publicInfos;
