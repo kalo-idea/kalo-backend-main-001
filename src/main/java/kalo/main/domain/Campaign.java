@@ -23,7 +23,7 @@ public class Campaign extends BaseEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String title;
-    String subTitle;
+    String subtitle;
     String info;
     String thumbnail;
     String contentImage;

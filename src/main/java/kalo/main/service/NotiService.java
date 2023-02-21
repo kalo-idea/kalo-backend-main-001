@@ -8,43 +8,43 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kalo.main.controller.BasicException;
-import kalo.main.domain.Notis;
+import kalo.main.domain.Noti;
 import kalo.main.domain.dto.NotisResDto;
-import kalo.main.repository.NotisRepository;
+import kalo.main.repository.NotiRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class NotisService {
+public class NotiService {
     
-    private final NotisRepository notisRepository;
+    private final NotiRepository notiRepository;
     
     Long kaloId = 112L;
 
     public List<NotisResDto> getMyNotis(Pageable pageable, Long userId) {
-        List<Notis> notis = notisRepository.findNotisByReceiverIdAndDeletedAndIsDisplay(pageable, userId, false, true);
+        List<Noti> notis = notiRepository.findNotisByReceiverIdAndDeletedAndIsDisplay(pageable, userId, false, true);
         
         List<NotisResDto> res = new ArrayList<NotisResDto>();
-        for (Notis noti : notis) {
+        for (Noti noti : notis) {
             res.add(new NotisResDto(noti));
         }
         return res;
     }
 
     public Long countMyNotis(Long userId) {
-        return notisRepository.countNotisByReceiverIdAndDeletedAndIsDisplayAndIsCheck(userId, false, true, false);
+        return notiRepository.countNotisByReceiverIdAndDeletedAndIsDisplayAndIsCheck(userId, false, true, false);
     }
 
     public Boolean notiCheck(Long noticeId) {
-        Notis notis = notisRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
+        Noti notis = notiRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
         notis.setIsCheck(true);
         
         return true;
     }
 
     public Boolean notiUndisplay(Long noticeId) {
-        Notis notis = notisRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
+        Noti notis = notiRepository.findById(noticeId).orElseThrow(() -> new BasicException("알림을 찾을 수 없습니다."));
         notis.setIsDisplay(false);
         
         return true;

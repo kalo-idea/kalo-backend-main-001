@@ -21,7 +21,7 @@ public class CampaignInfoDto {
     public CampaignInfoDto(Campaign campaign, Double percent) {
         this.id = campaign.getId();
         this.title = campaign.getTitle();
-        this.subTitle = campaign.getSubTitle();
+        this.subTitle = campaign.getSubtitle();
         this.info = campaign.getInfo();
         this.thumbnail = campaign.getThumbnail();
         this.contentImage = campaign.getContentImage();
