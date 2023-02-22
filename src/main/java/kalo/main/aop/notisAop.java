@@ -273,10 +273,10 @@ public class notisAop {
                 .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
                 .content(petitionReply.getContent())
                 .isDisplay(true)
-                .targetId(req.getTargetId())
+                .targetId(petitionReply.getPetition().getId())
                 .sender(sender)
                 .receiver(petitionReply.getUser())
-                .targetUrl("/community/view/petition/" + req.getTargetId())
+                .targetUrl("/community/view/petition/" + petitionReply.getPetition().getId())
                 .target("petition")
                 .build();
         
@@ -308,10 +308,10 @@ public class notisAop {
                 .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
                 .content(postReply.getContent())
                 .isDisplay(true)
-                .targetId(req.getTargetId())
+                .targetId(postReply.getPost().getId())
                 .sender(sender)
                 .receiver(postReply.getUser())
-                .targetUrl("/community/view/post/" + req.getTargetId())
+                .targetUrl("/community/view/post/" + postReply.getPost().getId())
                 .target("post")
                 .build();
         
