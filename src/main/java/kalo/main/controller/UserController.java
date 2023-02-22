@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
+import kalo.main.domain.dto.user.ChangeNicknameDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.domain.dto.user.MyProfileHomeDto;
 import kalo.main.domain.dto.user.NicknameValidResDto;
@@ -106,5 +107,17 @@ public class UserController {
     @GetMapping("/get-my-profile-home")
     public MyProfileHomeDto getProfileHome(@RequestParam Long id) {
         return userService.getProfileHome(id);
+    }
+
+    // %익명% 유저 닉네임 변경
+    @PostMapping("/update-username")//userId, nickname
+    public NicknameValidResDto updateUserNickname(@RequestBody ChangeNicknameDto req) {
+
+        NicknameValidResDto result = userService.isValidNickname(req.getNickname());
+
+        if (result.getStatus().equals("success")) {
+            userService.updateNickname(req.getId(), req.getNickname());
+        }
+        return result;
     }
 }
