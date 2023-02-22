@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev
+    active: prod
     
 ---
 
@@ -30,15 +30,15 @@ spring:
   data:
     web:
       pageable:
-        default-page-size: 5
+        default-page-size: 10
   output:
     ansi:
       enabled: always
 
 logging:
-  # level:
-  #   org.hibernate.SQL: DEBUG
-  #   org.hibernate.type: TRACE
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
 
 ---
 
@@ -48,7 +48,7 @@ spring:
       on-profile: prod
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test
+    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_main
     username: user
     password: user1234U
   jpa:
@@ -60,7 +60,7 @@ spring:
   data:
     web:
       pageable:
-        default-page-size: 5
+        default-page-size: 10
 
 logging:
   pattern:

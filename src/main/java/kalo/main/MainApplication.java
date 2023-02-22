@@ -22,7 +22,7 @@ public class MainApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("http://localhost:3000", "https://kaloidea.com");
+				registry.addMapping("/**").allowedOrigins("https://kaloidea.com", "https://www.kaloidea.com");
 			}
 		};
 	}
