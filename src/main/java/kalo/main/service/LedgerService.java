@@ -34,7 +34,7 @@ public class LedgerService {
         if (!isAttend(userId)) {
             User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 회원입니다."));
 
-            Ledger ledger = Ledger.builder().user(user).type("attendence").amount(500L).build();
+            Ledger ledger = Ledger.builder().user(user).type("attendance").amount(500L).build();
 
             ledgerRepository.save(ledger);
             return ledger.getAmount();
