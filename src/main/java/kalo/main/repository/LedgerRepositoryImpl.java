@@ -31,7 +31,7 @@ public class LedgerRepositoryImpl implements LedgerRepositoryCustom {
         .from(ledger)
         .where(ledger.user.id.eq(userId)
             .and(ledger.createdDate.after(LocalDate.now().atStartOfDay()))
-            .and(ledger.type.eq("attendence"))
+            .and(ledger.type.eq("attendance"))
             .and(ledger.deleted.eq(false))
             )
         .fetch();
@@ -44,7 +44,7 @@ public class LedgerRepositoryImpl implements LedgerRepositoryCustom {
         .where(ledger.user.id.eq(userId)
             .and(ledger.createdDate.year().eq(year))
             .and(ledger.createdDate.month().eq(month))
-            .and(ledger.type.eq("attendence"))
+            .and(ledger.type.eq("attendance"))
             .and(ledger.deleted.eq(false))
         )
         .fetch();
