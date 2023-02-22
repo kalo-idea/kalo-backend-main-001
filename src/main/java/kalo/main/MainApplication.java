@@ -3,6 +3,7 @@ package kalo.main;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,7 +17,19 @@ public class MainApplication {
 	}
 
 	@Bean
-	public WebMvcConfigurer corsConfigurer() {
+	@Profile("prod")
+	public WebMvcConfigurer prodCorsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOrigins("http://localhost:3000", "https://kaloidea.com");
+			}
+		};
+	}
+	
+	@Bean
+	@Profile("dev")
+	public WebMvcConfigurer devCorsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {

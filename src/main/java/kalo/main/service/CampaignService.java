@@ -63,7 +63,7 @@ public class CampaignService {
             }
             else {
                 Double percent = 100 * campaign.getVote().doubleValue() / voteCount;
-                campaignInfos.add(new CampaignInfoDto(campaign, percent));
+                campaignInfos.add(new CampaignInfoDto(campaign, (Math.round(percent * 100)/100.0)));
             }
         }
         GroupCampaignInfoDto info = GroupCampaignInfoDto.builder()

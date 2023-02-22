@@ -101,7 +101,6 @@ public class AdminController {
     // 중요 청원 지정
     @PostMapping("/update-important-petition")
     public String updateImportantPetition(@RequestBody AdminImportantPetitionDto req) {
-        System.out.println("req@@@" + req);
         adminService.updateImportantPetition(req);
         return "성공";
     }
