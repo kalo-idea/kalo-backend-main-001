@@ -21,7 +21,7 @@ public class NotisController {
     private final NotiService notisService;
 
     @GetMapping("/get-my-notis")
-    public List<NotisResDto> getMyNotis(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Long userId) {
+    public List<NotisResDto> getMyNotis(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, Long userId) {
         return notisService.getMyNotis(pageable, userId);
     }
 
