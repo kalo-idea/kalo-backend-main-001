@@ -36,14 +36,14 @@ public class UserController {
     // 좋아요 한 청원 리스트
     @GetMapping("/get-like-petitions")
     public List<ReadPetitionsDto> readLikePetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto id) {
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, @Valid OnlyIdDto id) {
             return userService.getLikePetitions(pageable, id.getId());
     }
 
     // 참여한 청원 리스트
     @GetMapping("/get-support-petitions")
     public List<ReadPetitionsDto> readSupportPetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto id) {
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, @Valid OnlyIdDto id) {
             return userService.getSupportPetitions(pageable, id.getId());
     }
 

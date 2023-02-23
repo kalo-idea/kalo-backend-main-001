@@ -179,7 +179,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
     // 청원에 참여한 사람 리스트
     @Override
     public List<SupportPetitionUserListDto> findSupportPetitionUserList(Pageable pageable, Long petitionId) {
-        return queryFactory.select(new QSupportPetitionUserListDto(
+        JPAQuery<SupportPetitionUserListDto> query =  queryFactory.select(new QSupportPetitionUserListDto(
             user.nickname,
             user.deleted,
             supportPetition.createdDate))
@@ -188,9 +188,15 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .join(supportPetition.petition, petition)
         .where(petition.id.eq(petitionId))
         .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .orderBy(supportPetition.createdDate.desc())
-        .fetch();
+        .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(user.getType(), user.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+
+        return query.fetch();
     }
 
     // Important 청원

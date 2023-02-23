@@ -51,7 +51,7 @@ public class PostController {
     // 게시글 댓글 조회
     @GetMapping("/public/get-post-replys")
     public List<ReplyDto> readComments(
-        @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
         TargetIdUserIdDto req) {
         return postService.readPostReply(req.getTargetId(), req.getUserId(), pageable);
     }
@@ -59,7 +59,7 @@ public class PostController {
     // 게시글 리스트 조회
     @GetMapping("/public/get-posts")
     public List<ReadPostsDto> readPosts(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
          PostCondDto cond,
          @RequestParam(defaultValue = "false") Boolean recent
     ) {
@@ -93,7 +93,7 @@ public class PostController {
     // 해쉬태그 검색
     @GetMapping("/get-post-hashtag")
     public List<ReadPostsDto> getHashtags(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
         String hashtag
     ) {
         return postService.getPostsByHashtag(pageable, hashtag);

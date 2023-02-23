@@ -53,7 +53,7 @@ public class PetitionController {
     // 청원 댓글 조회
     @GetMapping("/public/get-petition-replys")
     public List<ReplyDto> readComments(
-        @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
         TargetIdUserIdDto req) {
         return petitionService.readPetitionsReply(req.getTargetId(), req.getUserId(), pageable);
     }
@@ -61,7 +61,7 @@ public class PetitionController {
     // 청원 리스트 조회
     @GetMapping ("/public/get-petitions")
     public List<ReadPetitionsDto> readPetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
          PetitionCondDto cond,
          @RequestParam(defaultValue = "false") Boolean recent
         ) {
@@ -101,7 +101,7 @@ public class PetitionController {
     // 청원 참여 리스트
     @GetMapping("/public/get-support-users")
     public List<SupportPetitionUserListDto> getSupportPetitionList(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
         Long id) {
         return petitionService.getSupportPetitionList(pageable, id);
     }
@@ -109,7 +109,7 @@ public class PetitionController {
     // 해쉬태그 검색
     @GetMapping("/get-petition-hashtag")
     public List<ReadPetitionsDto> getHashtags(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
         String hashtag
     ) {
         return petitionService.getPetitionsByHashtag(pageable, hashtag);
