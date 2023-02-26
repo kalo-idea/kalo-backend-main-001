@@ -47,6 +47,7 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
          .from(post)
          .where(
             post.deleted.eq(false),
+            searchFilter(cond.getSearch()),
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
             topicFilter(cond.getTopic()),
