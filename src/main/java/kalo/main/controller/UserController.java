@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.OnlyIdDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
+import kalo.main.domain.dto.user.ChangeNicknameDto;
 import kalo.main.domain.dto.user.JoinReqDto;
 import kalo.main.domain.dto.user.MyProfileHomeDto;
 import kalo.main.domain.dto.user.NicknameValidResDto;
@@ -35,14 +36,14 @@ public class UserController {
     // 좋아요 한 청원 리스트
     @GetMapping("/get-like-petitions")
     public List<ReadPetitionsDto> readLikePetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto id) {
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, @Valid OnlyIdDto id) {
             return userService.getLikePetitions(pageable, id.getId());
     }
 
     // 참여한 청원 리스트
     @GetMapping("/get-support-petitions")
     public List<ReadPetitionsDto> readSupportPetitions(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @Valid OnlyIdDto id) {
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, @Valid OnlyIdDto id) {
             return userService.getSupportPetitions(pageable, id.getId());
     }
 
@@ -106,5 +107,17 @@ public class UserController {
     @GetMapping("/get-my-profile-home")
     public MyProfileHomeDto getProfileHome(@RequestParam Long id) {
         return userService.getProfileHome(id);
+    }
+
+    // %익명% 유저 닉네임 변경
+    @PostMapping("/update-username")//userId, nickname
+    public NicknameValidResDto updateUserNickname(@RequestBody ChangeNicknameDto req) {
+
+        NicknameValidResDto result = userService.isValidNickname(req.getNickname());
+
+        if (result.getStatus().equals("success")) {
+            userService.updateNickname(req.getId(), req.getNickname());
+        }
+        return result;
     }
 }

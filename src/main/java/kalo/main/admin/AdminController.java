@@ -37,14 +37,14 @@ public class AdminController {
     // 포인트 내역
     @GetMapping("/get-ledger")
     public List<AdminLedgerHistoryDto> getLedger(
-        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
         Long userId) {
             return adminService.getLedgersHistory(pageable, userId);
     }
 
     // 계정 리스트 조회
     @GetMapping("/get-auths")
-    public List<AdminAuthResDto> getAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, AdminAuthsReqDto req) {
+    public List<AdminAuthResDto> getAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, AdminAuthsReqDto req) {
         return adminService.getAuths(pageable, req);
     }
 
@@ -93,7 +93,7 @@ public class AdminController {
 
     // 유저s 계정s 조회
     @GetMapping("/get-users-auths")
-    public List<AdminUserAuthResDto> getUsersAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, 
+    public List<AdminUserAuthResDto> getUsersAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, 
     AdminUsersAuthsReqDto req) {
         return adminService.getUsersAndAuths(pageable, req);
     }
@@ -101,7 +101,6 @@ public class AdminController {
     // 중요 청원 지정
     @PostMapping("/update-important-petition")
     public String updateImportantPetition(@RequestBody AdminImportantPetitionDto req) {
-        System.out.println("req@@@" + req);
         adminService.updateImportantPetition(req);
         return "성공";
     }

@@ -217,7 +217,7 @@ public class UserService {
 
         // 닉네임 불가능 문자
         Pattern pattern = Pattern.compile("^[a-zA-Z0-9ㄱ-ㅎ가-힣!?@#$%^&*]{2,10}$");
-        if (!pattern.matcher(nickname).find()) {
+        if (!pattern.matcher(nickname).find() || nickname.contains("익명")) {
             return new NicknameValidResDto("error", "허용되지 않은 문자가 있습니다.");
         }
 
@@ -387,5 +387,11 @@ public class UserService {
         }
 
         return new MyProfileHomeDto(ledgers, supportPetitionCount, likePetitionCount);
+    }
+
+    // 닉네임 변경
+    public void updateNickname(Long userId, String nickname) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 유저입니다."));
+        user.setNickname(nickname);
     }
 }
