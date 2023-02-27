@@ -31,7 +31,10 @@ import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
 import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RequiredArgsConstructor
+@Slf4j
 public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
@@ -191,7 +194,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .limit(pageable.getPageSize());
 
         for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(user.getType(), user.getMetadata());
+            PathBuilder pathBuilder = new PathBuilder(supportPetition.getType(), supportPetition.getMetadata());
             query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
                     pathBuilder.get(o.getProperty())));
         }
