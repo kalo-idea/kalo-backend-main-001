@@ -187,7 +187,6 @@ public class PostService {
         .build();
 
         PostReply result = postReplyRepository.save(postReply);
-        System.out.println();
 
         return result.getId();
     }
