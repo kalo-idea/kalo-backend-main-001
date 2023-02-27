@@ -267,6 +267,107 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         }
         return null;
     }
+    @Override
+    public List<ReadSimplePetitionsDto> findListBestPetitions(Pageable pageable, List<String> progress, List<Long> importantPetitionIds) {
+
+        JPAQuery<ReadSimplePetitionsDto> query = queryFactory.select(new QReadSimplePetitionsDto(
+            petition.id,
+            petition.user.id,
+            petition.title,
+            petition.createdDate,
+            petition.content.substring(0, 100),
+            petition.likeCount,
+            petition.dislikeCount,
+            petition.progress,
+            petition.step,
+            petition.goal,
+            petition.replyCount,
+            petition.category,
+            petition.region1depthName,
+            petition.region2depthName,
+            petition.latitude,
+            petition.longitude,
+            petition.supportCount,
+            petition.supportingDateEnd
+            ))
+        .from(petition)
+        .where(
+            petition.deleted.eq(false),
+            progressListFilter(progress),
+            excludeImportant(importantPetitionIds)
+            )
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(petition.getType(), petition.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+        
+        List<ReadSimplePetitionsDto> result = query.fetch();
+
+        return result;
+    }
+
+    private BooleanExpression excludeImportant(List<Long> excludePetitionIds) {
+        return petition.id.notIn(excludePetitionIds);
+    }
+
+    private BooleanExpression progressListFilter(List<String> progressList) {
+
+        BooleanExpression result = null;
+        if (progressList.contains("fail")) {
+            if (result == null) {
+                result = petition.progress.eq("unchecked")
+                .and(petition.supportingDateEnd.lt(LocalDateTime.now()))
+                .and(petition.supportCount.lt(petition.goal))
+                .or(petition.progress.eq("fail"));
+            }
+        }
+        if (progressList.contains("recruit")) {
+            if (result == null) {
+                result = petition.progress.eq("unchecked")
+                .and(petition.supportingDateEnd.gt(LocalDateTime.now()))
+                .or(petition.progress.eq("recruit"));
+            }
+            else {
+                result =  result.or(
+                    petition.progress.eq("unchecked")
+                    .and(petition.supportingDateEnd.gt(LocalDateTime.now()))
+                    .or(petition.progress.eq("recruit"))
+                );
+            }
+        }
+        if (progressList.contains("ongoing")) {
+            if (result == null) {
+                result = petition.progress.eq("unchecked")
+                .and(petition.supportingDateEnd.lt(LocalDateTime.now())
+                .and(petition.supportCount.goe(petition.goal)))
+                .or(petition.progress.eq("ongoing"));
+            }
+            else {
+                result = result.or(
+                    petition.progress.eq("unchecked")
+                    .and(petition.supportingDateEnd.lt(LocalDateTime.now())
+                    .and(petition.supportCount.goe(petition.goal)))
+                    .or(petition.progress.eq("ongoing"))
+                );
+            }
+        }
+        if (progressList.contains("complete")) {
+            if (result == null) {
+                petition.progress.eq("complete");
+            }
+            else {
+                result = result.or(
+                    petition.progress.eq("complete")
+                );
+            }
+        }
+
+        return result;
+    }
 
     private BooleanExpression stepFilter(String step) {
 
