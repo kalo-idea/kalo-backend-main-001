@@ -15,6 +15,7 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.DislikePetition;
 import kalo.main.domain.DislikePetitionReply;
 import kalo.main.domain.Hashtag;
+import kalo.main.domain.ImportantPetition;
 import kalo.main.domain.Ledger;
 import kalo.main.domain.LikePetition;
 import kalo.main.domain.LikePetitionReply;
@@ -42,6 +43,7 @@ import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
 import kalo.main.repository.DislikePetitionReplyRepository;
 import kalo.main.repository.DislikePetitionRepository;
 import kalo.main.repository.HashtagRepository;
+import kalo.main.repository.ImportantPetitionRepository;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.LikePetitionReplyRepository;
 import kalo.main.repository.LikePetitionRepository;
@@ -72,6 +74,7 @@ public class PetitionService {
     private final MediaRepository mediaRepository;
     private final MediaPetitionRepository mediaPetitionRepository;
     private final LedgerRepository ledgerRepository;
+    private final ImportantPetitionRepository importantPetitionRepository;
     private final LedgerService ledgerService;
 
     // 청원 생성
@@ -621,5 +624,63 @@ public class PetitionService {
     // 중요청원 출력
     public List<ImportantPetitionResDto> getImportantPetitons() {
         return petitionRepository.getImportantPetitions();
+    }
+    // 베스트 청원 조회
+    public List<ReadPetitionsDto> getBestPetitons(Pageable pageable, List<String> cond) {
+
+        List<ImportantPetitionResDto> importantPetitions = petitionRepository.getImportantPetitions();
+        List<Long> excludePetitionIds = new ArrayList();
+        for (ImportantPetitionResDto importantPetition : importantPetitions) {
+            if (importantPetition.getSupportingDateEnd().isAfter(LocalDateTime.now())) {
+                excludePetitionIds.add(importantPetition.getPetitionId());
+            }
+        }
+        
+        List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findListBestPetitions(pageable, cond, excludePetitionIds);
+        System.out.println("@@@ db result : " + simplePetitions);
+        List<ReadPetitionsDto> result = new ArrayList<>();
+        for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
+            
+            String progress = simplePetition.getProgress();
+            if (progress.equals("unchecked")) {
+                if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
+                    if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
+                        progress = "ongoing";
+                    } else {
+                        progress = "fail";
+                    }
+                } else {
+                    progress = "recruit";
+                }
+            }
+
+            simplePetition.setProgress(progress);
+
+            List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
+            
+            List<String> words = new ArrayList<String>();
+            List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
+            for (Hashtag hashtag : hashtags) {
+                words.add(hashtag.getWord());
+            }
+
+
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> medium = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
+            for (Media media : medium) {
+                fileNames.add(media.getFileName());
+            }
+            System.out.println("");
+
+            User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            
+            result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
+        }
+
+        
+        System.out.println("@@@ db1 result : " + excludePetitionIds);
+        System.out.println("@@@ db2 result : " + simplePetitions);
+        return result;
     }
 }

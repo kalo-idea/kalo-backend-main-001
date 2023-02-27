@@ -1,5 +1,6 @@
 package kalo.main.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -119,5 +120,15 @@ public class PetitionController {
     @GetMapping("/public/get-important-petitions")
     public List<ImportantPetitionResDto> getImportantPetiton() {
         return petitionService.getImportantPetitons();
+    }
+
+    // 베스트 청원 리스트
+    @GetMapping("/public/get-best-petitions")
+    public List<ReadPetitionsDto> getBestPetiton(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
+    String progress) {
+        System.out.println("@@@@ cond : " + progress + " !!!!" );
+        List<String> cond = Arrays.asList(progress.split(","));
+        System.out.println("@@@@ cond : " + cond + " !!!!" );
+        return petitionService.getBestPetitons(pageable, cond);
     }
 }
