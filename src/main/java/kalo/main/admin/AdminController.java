@@ -93,7 +93,7 @@ public class AdminController {
 
     // 유저s 계정s 조회
     @GetMapping("/get-users-auths")
-    public List<AdminUserAuthResDto> getUsersAuths(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable, 
+    public List<AdminUserAuthResDto> getUsersAuths(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, 
     AdminUsersAuthsReqDto req) {
         return adminService.getUsersAndAuths(pageable, req);
     }

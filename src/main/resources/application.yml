@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: prod
+    active: dev
     
 ---
 
@@ -13,7 +13,7 @@ spring:
       on-profile: dev
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test
+    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_test?serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false
     username: user
     password: user1234U
   jpa:
@@ -48,7 +48,7 @@ spring:
       on-profile: prod
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_main
+    url: jdbc:mysql://db-brlk9.pub-cdb.ntruss.com/kalo_main?serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false
     username: user
     password: user1234U
   jpa:

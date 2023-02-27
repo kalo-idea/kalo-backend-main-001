@@ -121,7 +121,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .limit(pageable.getPageSize());
 
         for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(petition.getType(), petition.getMetadata());
+            PathBuilder pathBuilder = new PathBuilder(likePetition.getType(), likePetition.getMetadata());
             query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
                     pathBuilder.get(o.getProperty())));
         }
@@ -166,7 +166,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .limit(pageable.getPageSize());
 
         for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(petition.getType(), petition.getMetadata());
+            PathBuilder pathBuilder = new PathBuilder(supportPetition.getType(), supportPetition.getMetadata());
             query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
                     pathBuilder.get(o.getProperty())));
         }
@@ -191,7 +191,7 @@ public class PetitionRepositoryImpl implements PetitionRepositoryCustom {
         .limit(pageable.getPageSize());
 
         for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(user.getType(), user.getMetadata());
+            PathBuilder pathBuilder = new PathBuilder(supportPetition.getType(), supportPetition.getMetadata());
             query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
                     pathBuilder.get(o.getProperty())));
         }
