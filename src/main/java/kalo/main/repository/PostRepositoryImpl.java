@@ -47,6 +47,7 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
          .from(post)
          .where(
             post.deleted.eq(false),
+            searchFilter(cond.getSearch()),
             region1Filter(cond.getRegion1depthName()),
             region2Filter(cond.getRegion2depthName()),
             topicFilter(cond.getTopic()),
@@ -65,6 +66,13 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
         List<ReadSimplePostDto> result = query.fetch();
 
         return result;    
+    }
+
+    private BooleanExpression searchFilter(String search) {
+        if (StringUtils.hasText(search)) {
+            return post.title.like("%" + search + "%").or(post.content.like("%" + search + "%"));
+        }
+        return null;
     }
 
     private BooleanExpression region1Filter(String region1Name) {
