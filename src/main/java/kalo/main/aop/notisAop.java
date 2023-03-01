@@ -199,13 +199,15 @@ public class notisAop {
         Petition petition = petitionRepository.findById(req.getPetitionId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
         User receiver = petition.getUser();
 
+        String content = req.getContent().length() < 100? req.getContent():req.getContent().substring(0, 100);
+
         if (receiver.getId() != null && receiver.getId() != sender.getId()) {
 
             Noti notis = Noti.builder()
             .image(null)
             .isCheck(false)
             .title(sender.getNickname() + "님이 내 청원에 댓글을 작성했습니다.")
-            .content(req.getContent())
+            .content(content)
             .isDisplay(true)
             .targetId(req.getPetitionId())
             .sender(sender)
@@ -232,12 +234,14 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         User receiver = postRepository.findById(req.getPostId()).orElseThrow(() -> new BasicException("게시글을 찾을 수 없습니다.")).getUser();
 
+        String content = req.getContent().length() < 100? req.getContent():req.getContent().substring(0, 100);
+
         if (receiver.getId() != null && sender.getId() != receiver.getId()) {
             Noti notis = Noti.builder()
             .image(null)
             .isCheck(false)
             .title(sender.getNickname() + "님이 내 게시글에 댓글을 작성했습니다.")
-            .content(req.getContent())
+            .content(content)
             .isDisplay(true)
             .targetId(req.getPostId())
             .sender(sender)
@@ -263,6 +267,8 @@ public class notisAop {
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         PetitionReply petitionReply = petitionReplyRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
 
+        String content = petitionReply.getContent().length() < 100? petitionReply.getContent():petitionReply.getContent().substring(0, 100);
+
         if (result.getIsLike()) {
             LikePetitionReply reply = likePetitionReplyRepository.findByPetitionReplyIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
 
@@ -271,7 +277,7 @@ public class notisAop {
                 .image(null)
                 .isCheck(false)
                 .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
-                .content(petitionReply.getContent())
+                .content(content)
                 .isDisplay(true)
                 .targetId(petitionReply.getPetition().getId())
                 .sender(sender)
@@ -297,6 +303,7 @@ public class notisAop {
         LikeDislikeResDto result = (LikeDislikeResDto) joinPoint.proceed();
         User sender = userRepository.findById(req.getUserId()).orElseThrow(() -> new BasicException("유저를 찾을 수 없습니다."));
         PostReply postReply = postReplyRepository.findById(req.getTargetId()).orElseThrow(() -> new BasicException("댓글을 찾을 수 없습니다."));
+        String content = postReply.getContent().length() < 100? postReply.getContent():postReply.getContent().substring(0, 100);
 
         if (result.getIsLike()) {
             LikePostReply reply = likePostReplyRepository.findByPostReplyIdAndUserIdAndDeleted(req.getTargetId(), req.getUserId(), false).get();
@@ -306,7 +313,7 @@ public class notisAop {
                 .image(null)
                 .isCheck(false)
                 .title(sender.getNickname() + "님이 내 댓글을 좋아합니다.")
-                .content(postReply.getContent())
+                .content(content)
                 .isDisplay(true)
                 .targetId(postReply.getPost().getId())
                 .sender(sender)
