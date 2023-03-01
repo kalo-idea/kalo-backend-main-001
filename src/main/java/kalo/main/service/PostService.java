@@ -178,6 +178,7 @@ public class PostService {
     public Long createPostReply(CreatePostReplyDto createPostReplyDto) {
         Post post = postRepository.findById(createPostReplyDto.getPostId()).orElseThrow(() -> new BasicException("없는 게시글입니다."));
         post.setReplyCount(post.getReplyCount() + 1);
+        
         PostReply postReply = PostReply.builder()
         .user(userRepository.findById(createPostReplyDto.getUserId()).orElseThrow(() -> new BasicException("없는 회원입니다.")))
         .content(createPostReplyDto.getContent())
@@ -187,7 +188,6 @@ public class PostService {
         .build();
 
         PostReply result = postReplyRepository.save(postReply);
-        System.out.println();
 
         return result.getId();
     }

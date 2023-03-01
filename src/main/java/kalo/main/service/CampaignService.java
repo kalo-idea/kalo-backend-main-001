@@ -134,6 +134,8 @@ public class CampaignService {
             } else {
                 User user = userRepository.findById(userId).orElseThrow(() -> new BasicException("없는 유저입니다."));
                 Campaign campaign = campaignRepository.findById(targetId).orElseThrow(() -> new BasicException("없는 캠페인입니다."));
+                campaign.setVote(campaign.getVote() + 1);
+                
     
                 CampaignUser campaignUser = CampaignUser.builder()
                 .campaign(campaign)

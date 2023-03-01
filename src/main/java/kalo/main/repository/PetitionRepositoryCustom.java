@@ -15,4 +15,5 @@ public interface PetitionRepositoryCustom {
     List<ReadSimplePetitionsDto> findSupportPetitions(Pageable pageable, Long viewerId);
     List<SupportPetitionUserListDto> findSupportPetitionUserList(Pageable pageable, Long petitionId);
     List<ImportantPetitionResDto> getImportantPetitions();
+    List<ReadSimplePetitionsDto> findListBestPetitions(Pageable pageable, List<String> progress, List<Long> importantPetitionIds);
 }

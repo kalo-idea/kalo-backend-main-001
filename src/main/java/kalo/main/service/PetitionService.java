@@ -15,15 +15,19 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.DislikePetition;
 import kalo.main.domain.DislikePetitionReply;
 import kalo.main.domain.Hashtag;
+import kalo.main.domain.ImportantPetition;
 import kalo.main.domain.Ledger;
 import kalo.main.domain.LikePetition;
 import kalo.main.domain.LikePetitionReply;
 import kalo.main.domain.Media;
 import kalo.main.domain.MediaPetition;
+import kalo.main.domain.MediaTimeLine;
 import kalo.main.domain.Petition;
 import kalo.main.domain.PetitionHashtag;
 import kalo.main.domain.PetitionReply;
 import kalo.main.domain.SupportPetition;
+import kalo.main.domain.Timeline;
+import kalo.main.domain.TimelinePetition;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.LikeDislikeResDto;
 import kalo.main.domain.dto.ReplyDto;
@@ -39,18 +43,23 @@ import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.ReadSimplePetitionsDto;
 import kalo.main.domain.dto.petition.SimpleImportantPetitionDto;
 import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
+import kalo.main.domain.dto.petition.TimelineDto;
 import kalo.main.repository.DislikePetitionReplyRepository;
 import kalo.main.repository.DislikePetitionRepository;
 import kalo.main.repository.HashtagRepository;
+import kalo.main.repository.ImportantPetitionRepository;
 import kalo.main.repository.LedgerRepository;
 import kalo.main.repository.LikePetitionReplyRepository;
 import kalo.main.repository.LikePetitionRepository;
 import kalo.main.repository.MediaPetitionRepository;
 import kalo.main.repository.MediaRepository;
+import kalo.main.repository.MediaTimelineRepository;
 import kalo.main.repository.PetitionHashtagRepository;
 import kalo.main.repository.PetitionReplyRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.SupportPetitionRepository;
+import kalo.main.repository.TimelinePetitionRepository;
+import kalo.main.repository.TimelineRepository;
 import kalo.main.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -72,7 +81,11 @@ public class PetitionService {
     private final MediaRepository mediaRepository;
     private final MediaPetitionRepository mediaPetitionRepository;
     private final LedgerRepository ledgerRepository;
+    private final ImportantPetitionRepository importantPetitionRepository;
     private final LedgerService ledgerService;
+    private final TimelinePetitionRepository timelinePetitionRepository;
+    private final TimelineRepository timelineRepository;
+    private final MediaTimelineRepository mediaTimelineRepository;
 
     // 청원 생성
     public Long createPetition(CreatePetitionDto createPetitionDto) {
@@ -313,7 +326,6 @@ public class PetitionService {
             for (Media media : medium) {
                 fileNames.add(media.getFileName());
             }
-            System.out.println("");
 
             User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
             SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
@@ -466,7 +478,6 @@ public class PetitionService {
             .dislikeCount(reply.getDislikeCount())
             .build();
         
-        System.out.println("aaaa");
 
         return result;
     }
@@ -607,7 +618,6 @@ public class PetitionService {
             for (Media media : medium) {
                 fileNames.add(media.getFileName());
             }
-            System.out.println("");
 
             User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
             SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
@@ -621,5 +631,88 @@ public class PetitionService {
     // 중요청원 출력
     public List<ImportantPetitionResDto> getImportantPetitons() {
         return petitionRepository.getImportantPetitions();
+    }
+    // 베스트 청원 조회
+    public List<ReadPetitionsDto> getBestPetitons(Pageable pageable, List<String> cond) {
+
+        List<ImportantPetitionResDto> importantPetitions = petitionRepository.getImportantPetitions();
+        List<Long> excludePetitionIds = new ArrayList();
+        for (ImportantPetitionResDto importantPetition : importantPetitions) {
+            if (importantPetition.getSupportingDateEnd().isAfter(LocalDateTime.now())) {
+                excludePetitionIds.add(importantPetition.getPetitionId());
+            }
+        }
+        
+        List<ReadSimplePetitionsDto> simplePetitions = petitionRepository.findListBestPetitions(pageable, cond, excludePetitionIds);
+        List<ReadPetitionsDto> result = new ArrayList<>();
+        for (ReadSimplePetitionsDto simplePetition : simplePetitions) {
+            
+            String progress = simplePetition.getProgress();
+            if (progress.equals("unchecked")) {
+                if (LocalDateTime.now().isAfter(simplePetition.getSupportingDateEnd())) {
+                    if (simplePetition.getSupportCount() >= simplePetition.getGoal()) {
+                        progress = "ongoing";
+                    } else {
+                        progress = "fail";
+                    }
+                } else {
+                    progress = "recruit";
+                }
+            }
+
+            simplePetition.setProgress(progress);
+
+            List<String> steps = Arrays.asList(simplePetition.getStep().split(","));
+            
+            List<String> words = new ArrayList<String>();
+            List<Hashtag> hashtags = hashtagRepository.findPetitionHashtags(simplePetition.getPetitionId());
+            for (Hashtag hashtag : hashtags) {
+                words.add(hashtag.getWord());
+            }
+
+
+            List<String> fileNames = new ArrayList<String>();
+            List<Media> medium = mediaRepository.findPetitionMedia(simplePetition.getPetitionId());
+            for (Media media : medium) {
+                fileNames.add(media.getFileName());
+            }
+
+            User user = userRepository.findById(simplePetition.getWriterId()).orElseThrow(() -> new BasicException("작성자를 찾을 수 없습니다."));
+            SimpleWriterDto writer = !user.getDeleted() ? new SimpleWriterDto(user) : new SimpleDeletedWriterDto();
+            
+            result.add(new ReadPetitionsDto(simplePetition, writer, steps, words, fileNames));
+        }
+
+        return result;
+    }
+
+    public List<TimelineDto> getTimeline(Long id) {
+        Petition findPetition = petitionRepository.findById(id).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+
+        List<TimelinePetition> timelinePetitions = timelinePetitionRepository.findByPetition(findPetition);
+        List<Long> timelinePetitionIds = new ArrayList();
+
+        for (TimelinePetition timelinePetition : timelinePetitions) {
+            timelinePetitionIds.add(timelinePetition.getTimeline().getId());
+        }
+        List<Timeline> timelines = timelineRepository.findByIdInAndDeletedOrderByAtTime(timelinePetitionIds, false);
+
+        List<TimelineDto> result = new ArrayList();
+        for (Timeline timeline : timelines) {
+            List<MediaTimeLine> mediaTimelines = mediaTimelineRepository.findByTimeline(timeline);
+            List<Long> mediumIds = new ArrayList();
+            for (MediaTimeLine mediaTimeline : mediaTimelines) {
+                mediumIds.add(mediaTimeline.getMedia().getId());
+            }
+            List<Media> medium = mediaRepository.findByIdIn(mediumIds);
+            List<String> fileNames = new ArrayList();
+            for (Media media : medium) {
+                fileNames.add(media.getFileName());
+            }
+
+            result.add(new TimelineDto(timeline, fileNames));
+        }
+
+        return result;
     }
 }

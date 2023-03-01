@@ -1,5 +1,6 @@
 package kalo.main.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ import kalo.main.domain.dto.petition.PetitionCondDto;
 import kalo.main.domain.dto.petition.ReadPetitionDto;
 import kalo.main.domain.dto.petition.ReadPetitionsDto;
 import kalo.main.domain.dto.petition.SupportPetitionUserListDto;
+import kalo.main.domain.dto.petition.TimelineDto;
 import kalo.main.service.PetitionService;
 import lombok.RequiredArgsConstructor;
 
@@ -119,5 +121,19 @@ public class PetitionController {
     @GetMapping("/public/get-important-petitions")
     public List<ImportantPetitionResDto> getImportantPetiton() {
         return petitionService.getImportantPetitons();
+    }
+
+    // 베스트 청원 리스트
+    @GetMapping("/public/get-best-petitions")
+    public List<ReadPetitionsDto> getBestPetiton(@PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.ASC) Pageable pageable,
+    String progress) {
+        List<String> cond = Arrays.asList(progress.split(","));
+        return petitionService.getBestPetitons(pageable, cond);
+    }
+
+    // 타임라인 호출
+    @GetMapping("/public/get-timeline")
+    public List<TimelineDto> getTimeline(Long id) {
+        return petitionService.getTimeline(id);
     }
 }

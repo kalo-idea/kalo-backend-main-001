@@ -68,6 +68,13 @@ public class PostRepositoryImpl implements PostRespositoryCustom {
         return result;    
     }
 
+    private BooleanExpression searchFilter(String search) {
+        if (StringUtils.hasText(search)) {
+            return post.title.like("%" + search + "%").or(post.content.like("%" + search + "%"));
+        }
+        return null;
+    }
+
     private BooleanExpression region1Filter(String region1Name) {
         if (StringUtils.hasText(region1Name)) {
             return post.region1depthName.eq(region1Name) ;
