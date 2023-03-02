@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kalo.main.admin.dto.AddTimelineDto;
 import kalo.main.admin.dto.AdminAuthDataDto;
 import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
@@ -102,6 +103,13 @@ public class AdminController {
     @PostMapping("/update-important-petition")
     public String updateImportantPetition(@RequestBody AdminImportantPetitionDto req) {
         adminService.updateImportantPetition(req);
+        return "성공";
+    }
+
+    // 타임라인 추가
+    @PostMapping("/update-timeline")
+    public String updateTimeline(@RequestBody AddTimelineDto req) {
+        adminService.updateTimeline(req);
         return "성공";
     }
 
