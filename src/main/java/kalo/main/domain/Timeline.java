@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,12 @@ public class Timeline extends BaseEntity {
     String title;
     String content;
     LocalDateTime atTime;
+
+    @Builder
+    public Timeline(String title, String content, LocalDateTime atTime) {
+        this.title = title;
+        this.content = content;
+        this.atTime = atTime;
+    }
+
 }

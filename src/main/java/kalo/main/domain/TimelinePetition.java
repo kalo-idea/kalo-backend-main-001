@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +27,11 @@ public class TimelinePetition extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "petition_id")
     Petition petition;
+
+    @Builder
+    public TimelinePetition(Timeline timeline, Petition petition) {
+        this.timeline = timeline;
+        this.petition = petition;
+    }
+
 }

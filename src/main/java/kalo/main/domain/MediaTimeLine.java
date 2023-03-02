@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +27,12 @@ public class MediaTimeLine extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "timeline_id")
     Timeline timeline;
+
+    @Builder
+    public MediaTimeLine(Long id, Media media, Timeline timeline) {
+        this.id = id;
+        this.media = media;
+        this.timeline = timeline;
+    }
+
 }
