@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kalo.main.admin.dto.AddTimelineDto;
 import kalo.main.admin.dto.AdminAuthDataDto;
 import kalo.main.admin.dto.AdminAuthReqDto;
 import kalo.main.admin.dto.AdminAuthResDto;
@@ -23,14 +24,22 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.Auth;
 import kalo.main.domain.ImportantPetition;
 import kalo.main.domain.Ledger;
+import kalo.main.domain.Media;
+import kalo.main.domain.MediaTimeLine;
 import kalo.main.domain.Petition;
+import kalo.main.domain.Timeline;
+import kalo.main.domain.TimelinePetition;
 import kalo.main.domain.User;
 import kalo.main.domain.dto.SimpleWriterDto;
 import kalo.main.repository.AuthRepository;
 import kalo.main.repository.ImportantPetitionRepository;
 import kalo.main.repository.LedgerRepository;
+import kalo.main.repository.MediaRepository;
+import kalo.main.repository.MediaTimelineRepository;
 import kalo.main.repository.PetitionRepository;
 import kalo.main.repository.PostRepository;
+import kalo.main.repository.TimelinePetitionRepository;
+import kalo.main.repository.TimelineRepository;
 import kalo.main.repository.UserRepository;
 import kalo.main.service.LedgerService;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +56,10 @@ public class AdminService {
     private final LedgerRepository ledgerRepository;
     private final LedgerService ledgerService;
     private final ImportantPetitionRepository importantPetitionRepository;
+    private final TimelineRepository timelineRepository;
+    private final MediaRepository mediaRepository;
+    private final MediaTimelineRepository mediaTimelineRepository;
+    private final TimelinePetitionRepository timelinePetitionRepository;
     
     // 관리자용 거래내역 조회
     public List<AdminLedgerHistoryDto> getLedgersHistory(Pageable pageable, Long userId) {        
@@ -426,5 +439,33 @@ public class AdminService {
         importantPetitionRepository.save(importantPetition);
 
         petition.setImportantPetition(importantPetition);
+    }
+
+    public void updateTimeline(AddTimelineDto req) {
+        Petition petition = petitionRepository.findById(req.getId()).orElseThrow(() -> new BasicException("청원을 찾을 수 없습니다."));
+        Timeline timeline = Timeline.builder()
+        .title(req.getTitle())
+        .content(req.getContent())
+        .atTime(req.getAtTime())
+        .build();
+        TimelinePetition timelinePetition = TimelinePetition.builder()
+        .timeline(timeline)
+        .petition(petition)
+        .build();
+        timelinePetitionRepository.save(timelinePetition);
+
+        List<String> medium = req.getMedium();
+        for (String filename : medium) {
+            Media media = new Media(filename);
+            mediaRepository.save(media);
+
+            MediaTimeLine mediaTimeLine = MediaTimeLine.builder()
+            .media(media)
+            .timeline(timeline)
+            .build();
+            mediaTimelineRepository.save(mediaTimeLine);
+        }
+
+        timelineRepository.save(timeline);
     }
 }
