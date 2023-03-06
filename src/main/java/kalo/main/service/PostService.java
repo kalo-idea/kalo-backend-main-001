@@ -3,6 +3,7 @@ package kalo.main.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -87,27 +88,21 @@ public class PostService {
 
         List<String> hashtags = createPostsDto.getHashtags();
         for (String hashtag : hashtags) {
-            try {
-                System.out.println("hashtag:: " + hashtag);
-                // hashtag find
-                PostHashtag postsHashtags = PostHashtag.builder()
-                    .post(resultPost)
-                    .hashtag(hashtagRepository.findByWordAndDeleted(hashtag, false).orElseThrow())
-                    .build();
-                System.out.println("ok:: hashtagRepository.findByWordAndDeleted" + hashtag);
-                postHashtagRepository.save(postsHashtags);
-                System.out.println("ok:: postHashtagRepository.save(postsHashtags);" + hashtag);
-            } catch(NoSuchElementException | IncorrectResultSizeDataAccessException e) {
-                System.out.println("IncorrectResultSizeDataAccessException:: ");
-                // hashtag make
-                Hashtag makeHashtag = new Hashtag(hashtag);
+            Optional<Hashtag> existHashtag = hashtagRepository.findByWordAndDeleted(hashtag, false);
+            Hashtag makeHashtag = null;
+            
+            if (existHashtag.isPresent()) { 
+                makeHashtag = existHashtag.get();
+            } else {
+                makeHashtag = new Hashtag(hashtag);
                 hashtagRepository.save(makeHashtag);
-                PostHashtag postsHashtags = PostHashtag.builder()
-                    .post(resultPost)
-                    .hashtag(makeHashtag)
-                    .build();
-                postHashtagRepository.save(postsHashtags);
             }
+
+            PostHashtag petitionHashtag = PostHashtag.builder()
+                .post(resultPost)
+                .hashtag(makeHashtag)
+                .build();
+                postHashtagRepository.save(petitionHashtag);
         }
 
         List<String> media = createPostsDto.getMedium();

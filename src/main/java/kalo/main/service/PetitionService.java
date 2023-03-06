@@ -5,9 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import kalo.main.controller.BasicException;
 import kalo.main.domain.DislikePetition;
 import kalo.main.domain.DislikePetitionReply;
 import kalo.main.domain.Hashtag;
-import kalo.main.domain.ImportantPetition;
 import kalo.main.domain.Ledger;
 import kalo.main.domain.LikePetition;
 import kalo.main.domain.LikePetitionReply;
@@ -116,24 +114,23 @@ public class PetitionService {
         Petition resultPetition = petitionRepository.save(petition);
         
         List<String> hashtags = createPetitionDto.getHashtags();
+
         for (String hashtag : hashtags) {
-            try {
-                // hashtag find
-                PetitionHashtag postsHashtag = PetitionHashtag.builder()
-                    .petition(resultPetition)
-                    .hashtag(hashtagRepository.findByWordAndDeleted(hashtag, false).orElseThrow())
-                    .build();
-                petitionHashtagRepository.save(postsHashtag);
-            } catch(NoSuchElementException | IncorrectResultSizeDataAccessException e) {
-                // hashtag make
-                Hashtag makeHashtag = new Hashtag(hashtag);
+            Optional<Hashtag> existHashtag = hashtagRepository.findByWordAndDeleted(hashtag, false);
+            Hashtag makeHashtag = null;
+            
+            if (existHashtag.isPresent()) { 
+                makeHashtag = existHashtag.get();
+            } else {
+                makeHashtag = new Hashtag(hashtag);
                 hashtagRepository.save(makeHashtag);
-                PetitionHashtag postsHashtag = PetitionHashtag.builder()
-                    .petition(resultPetition)
-                    .hashtag(makeHashtag)
-                    .build();
-                petitionHashtagRepository.save(postsHashtag);
             }
+
+            PetitionHashtag petitionHashtag = PetitionHashtag.builder()
+                .petition(resultPetition)
+                .hashtag(makeHashtag)
+                .build();
+                petitionHashtagRepository.save(petitionHashtag);
         }
 
         List<String> medium = createPetitionDto.getMedium();
