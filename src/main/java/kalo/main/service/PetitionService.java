@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,7 +124,7 @@ public class PetitionService {
                     .hashtag(hashtagRepository.findByWordAndDeleted(hashtag, false).orElseThrow())
                     .build();
                 petitionHashtagRepository.save(postsHashtag);
-            } catch(NoSuchElementException e) {
+            } catch(NoSuchElementException | IncorrectResultSizeDataAccessException e) {
                 // hashtag make
                 Hashtag makeHashtag = new Hashtag(hashtag);
                 hashtagRepository.save(makeHashtag);

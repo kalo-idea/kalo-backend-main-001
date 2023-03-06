@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,13 +88,17 @@ public class PostService {
         List<String> hashtags = createPostsDto.getHashtags();
         for (String hashtag : hashtags) {
             try {
+                System.out.println("hashtag:: " + hashtag);
                 // hashtag find
                 PostHashtag postsHashtags = PostHashtag.builder()
                     .post(resultPost)
                     .hashtag(hashtagRepository.findByWordAndDeleted(hashtag, false).orElseThrow())
                     .build();
+                System.out.println("ok:: hashtagRepository.findByWordAndDeleted" + hashtag);
                 postHashtagRepository.save(postsHashtags);
-            } catch(NoSuchElementException e) {
+                System.out.println("ok:: postHashtagRepository.save(postsHashtags);" + hashtag);
+            } catch(NoSuchElementException | IncorrectResultSizeDataAccessException e) {
+                System.out.println("IncorrectResultSizeDataAccessException:: ");
                 // hashtag make
                 Hashtag makeHashtag = new Hashtag(hashtag);
                 hashtagRepository.save(makeHashtag);
