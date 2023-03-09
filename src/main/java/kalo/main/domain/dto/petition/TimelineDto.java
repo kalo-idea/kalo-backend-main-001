@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class TimelineDto {
     String title;
     String content;
+    String type;
     List<String> medium;
     LocalDateTime atTime;
 
@@ -19,6 +20,7 @@ public class TimelineDto {
         this.title = timeline.getTitle();
         this.content = timeline.getContent();
         this.medium = medium;
+        this.type = timeline.getType();
         this.atTime = timeline.getAtTime();
     }
 
