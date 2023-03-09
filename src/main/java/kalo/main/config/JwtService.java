@@ -70,6 +70,12 @@ public class JwtService {
     //     }
     // }
 
+    /**
+     * access token 만료 40011
+        access token 변조 40012
+        refresh token 만료 40013
+        refresh token 변조 40014
+     */
     public LoginInfoDto getInfo() {
         String accessToken = getJwt();
         if(accessToken == null || accessToken.length() == 0){

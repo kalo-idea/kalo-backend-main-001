@@ -21,13 +21,16 @@ public class Timeline extends BaseEntity {
     
     String title;
     String content;
+    String type;
     LocalDateTime atTime;
 
     @Builder
-    public Timeline(String title, String content, LocalDateTime atTime) {
+
+    public Timeline(Long id, String title, String content, String type, LocalDateTime atTime) {
+        this.id = id;
         this.title = title;
         this.content = content;
+        this.type = type;
         this.atTime = atTime;
     }
-
 }
